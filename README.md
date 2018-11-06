@@ -8,6 +8,8 @@ ROLIST는 방사선 종양학과에서 근무하면서 스케쥴링의 자동화
 
 버그 리포팅이나 문의는 아래 카카오톡 오픈챗을 이용해 주세요 :)
 
+HTML, MariaDB, PHP, Javascript등등을 구글링 하여 만들었습니다ㅋㅋ
+
 
  - sample site: http://ec2-54-88-165-135.compute-1.amazonaws.com
  - id/pass: guest/guest
