@@ -14,6 +14,7 @@ HTML, MariaDB, PHP, Javascript등등을 구글링 하여 만들었습니다ㅋ�
  - sample site: http://ec2-54-88-165-135.compute-1.amazonaws.com
  - id/pass: guest/guest
  - 카카오톡 오픈챗: https://open.kakao.com/o/gkyrLG3
+ - Mail: hanbean.youn@gmail.com
  
 ## 사용법
  - 신환등록: 우상단 New-Patient 버튼 또는 왼쪽 연필 아이콘 클릭후 원하느 환자 아이디를 입력한다. 환자 아이디는 숫자 형태만 지원
