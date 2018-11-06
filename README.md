@@ -12,6 +12,7 @@ HTML, MariaDB, PHP, Javascript등등을 구글링 하여 만들었습니다ㅋ�
 
 혼자 만들다보니 여기저기 지저분한곳들이 있습니다.
 
+가장 저렴한 AWS 서버를 쓰다보니 속도가 느려요. 좋은 서버 쓰면 빨라집니다 :(
 
  - sample site: http://ec2-54-88-165-135.compute-1.amazonaws.com
  - id/pass: guest/guest
