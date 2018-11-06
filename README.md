@@ -5,7 +5,7 @@ ROLIST는 방사선 종양학과에서 근무하면서 스케쥴링의 자동화
 
 취미삼아 만들었기 때문에 보안에 취약할 수 있습니다. 반드시 인트라넷 웹서버를 구축한 후 사용할 수 있습니다. 샘플 사이트에 실제 환자 정보를 입력할 수 없습니다.
 
-sample site: http://ec2-54-88-165-135.compute-1.amazonaws.com
-id/pass: guest/guest
+ - sample site: http://ec2-54-88-165-135.compute-1.amazonaws.com
+ - id/pass: guest/guest
 
 
