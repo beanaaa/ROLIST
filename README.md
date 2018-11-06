@@ -1,7 +1,7 @@
 # ROLIST
 Radiation Oncology List. An open source EMR system dedicated to the small sized radiation oncology department
 
-![스크린샷](https://github.com/beanaaa/ROLIST/blob/master/SC_%202018-11-06%2018.43.08.png)
+![스크린샷](https://github.com/beanaaa/ROLIST/blob/master/SC_%202018-11-06%2018.59.07.png)
 
 ## 소개
 ROLIST는 방사선 종양학과에서 근무하면서 스케쥴링의 자동화, 치료기록의 저장등을 목적으로 자체 제작한 미니 EMR 시스템 입니다. 아래 페이지로 로그인 하여 새로운 가상의 환자를 등록해 테스트 해 보세요 :)
