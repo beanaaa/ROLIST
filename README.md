@@ -7,5 +7,8 @@ ROLIST는 방사선 종양학과에서 근무하면서 스케쥴링의 자동화
 
  - sample site: http://ec2-54-88-165-135.compute-1.amazonaws.com
  - id/pass: guest/guest
-
+ - 카카오톡 오픈챗: https://open.kakao.com/o/gkyrLG3
+ 
+## 사용법
+ 
 
