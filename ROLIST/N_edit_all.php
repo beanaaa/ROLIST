@@ -2220,26 +2220,7 @@ $total_Orderinfo = mysql_num_rows($OrderInfo);
 
 	$cropN = 100;
 	
-/*
-	for($planIdx=1;$planIdx<$row_treatmentinfo[idx]+1;$planIdx++){
-	    
-		$SiteX       = "Site" . "$planIdx";
-		$SiteX=(substr($row_treatmentinfo[$SiteX],0,$cropN));
-		if(strlen($SiteX)==0){
-		  $SiteX = "N/A";
-		}
-		
-		$doseX     = "dose" . "$planIdx";
-		$fxX       = "Fx" . "$planIdx";
-		if(strcmp($row_treatmentinfo[$fxX],"0")!=0){
-		
-		  $CourseRemarker2 = $CourseRemarker." ".$planIdx.". ".$SiteX.":".$row_treatmentinfo[$doseX]."(".$row_treatmentinfo[$fxX].")&nbsp;";
-		}  
-	
-	}
-*/
 
-// 	echo($CourseRemarker);
           ?>
 
 
@@ -2276,14 +2257,6 @@ for ($statId=0;$statId<$row_RecordsetTelegram[idx];$statId++){
 ?>
 
 
-
-<!--
-<font color="red">
-&nbsp;<strong>(2018-10-16) Physician이 "JJ", Pathology가 비어있을때 HB 선택하면 자동으로 특정 문구가 입력됩니다..</strong><br></font>
-<font color=#9fa7a7>
-&nbsp;<strong>(2018-10-11) 이전에 입력한적이 있는 Ref. physician의 경우 Clinic을 빈칸으로 두시면 자동으로 입력 됩니다. 수동으로 입력하셔도 상관없습니다.</strong><br>
-</font>
--->
 <a onclick="this.nextSibling.style.display=(this.nextSibling.style.display=='none')?'block':'none';" href="javascript:void(0)"> 
 &nbsp;<strong>COURSE EDITOR (Click to open/close) <?php if($olders>0){echo("<font color=red>".$olders2. " previous courses</font>");} ?></strong>
 </a><div style="DISPLAY: none">
@@ -2377,29 +2350,12 @@ for($idcourse = 0; $idcourse<$curcourse;$idcourse++){
 		
 		<form></form>
 		<td width="50px" scope="row">
-<!--
-			<form id=form11 name=form11 method=post target=_blank action="N_register_all.php">
-				<td align=right >
-					<input class = "btn btn-default" type=submit name=btn_home id=btn_home value=NEW-PATIENT />
-					<input class = "btn btn-default" name=permit type=hidden id=permit  value= <?php echo $permitUser ?>/>
-				</td>
-			</form>
--->
-			
+	
 		</td>
   
   	</table>
   	
-  	
-<!--
-<div class="float-button-close">
-<input class="btn button-close" type='BUTTON' value="X" onClick='self.close()'>
-</div>
--->
-
-
-
-  	
+  	  	
   	<br>
 
 	    <?php
@@ -2447,7 +2403,6 @@ for($idcourse = 0; $idcourse<$curcourse;$idcourse++){
   			  
   			<td bgcolor="#153d73" ><font color="white">Physician</font></td>
   			<td bgcolor="#153d73" colspan="2"><font color="white" >Clinic (hospital)</font></td>
-<!--   			<td width="120px" bgcolor="#153d73"><font color="white"><br></font></td> -->
   			<td bgcolor="#153d73"><font color="white">Refer. physician</font></td>
 		</tr>
 
@@ -2830,48 +2785,6 @@ if (is_dir($dir)){
   	</table>
 
 
-<!--
-  	<table class = "type1" width="960px" border="1" cellspacing="1" cellpadding="5" align="center">
-  		<tr>
-  			<td width="240px">Primary site/site: &nbsp;
-	  			<select name="primary_menu" id="primary_menu" class="required" onchange="fnCngList(this.value);" >
-	  				<option value="<?php echo $row_treatmentinfo['primarysite']; ?>" selected="selected"><?php echo $row_treatmentinfo['primarysite']; ?></option>
-	  				<option value="CNS">CNS</option> 
-	  				<option value="HN">HN</option>
-	  				<option value="THX">THX</option>
-	  				<option value="BRST">BRST</option>
-	  				<option value="GI">GI</option>
-	  				<option value="GU">GU</option>
-	  				<option value="GY">GY</option>
-	  				<option value="MS">MS</option>
-	  				<option value="SKIN">SKIN</option>
-	  				<option value="HMT">HMT</option>
-	  				<option value="PD">PD</option>
-	  				<option value="BENIGN">BENIGN</option>
-	  				<option value="CUPS">CUPS</option>
-	  				<option value="OTHER">OTHER</option>
-	  			</select>
-  			</td>
-  			<td width="240px">
-	  			<input class="form-control" style="height:25px; width:150px" name="sub_site" type="text" id="sub_site" value="<?php echo $row_treatmentinfo['subsite']; ?>" />	  			
-  			</td>
-  			<td width="480px">
-	  			
-  			</td>      
-		</tr>
-		
-  	</table>  	
--->
-
-
-<!--
-  	<table class = "type03" width="960px" border="1" cellspacing="1" cellpadding="5" align="center">
-		
-		
-
-	</table>  	
--->
-  	
 
   	
   	<table class = "type03" width="960px" border="1" cellspacing="1" cellpadding="5" align="center">
@@ -2885,17 +2798,15 @@ if (is_dir($dir)){
 		</tr>
   		<tr>
 	  	  	<td width="480px" colspan="1" rowspan="1">
-            <?php 
-            if(strlen($row_clinicalinfo['RadioHistory'])>1){
-              $rthist = trim($row_clinicalinfo['RadioHistory'])."&nbsp;\r".$prev;
-            }
-            else{
-              $rthist = $prev;
-
-            }
-
-            ?>
-		  	  			  	  	<textarea style="width:100%; resize:none;"   class="noresize" width="480px" rows="3" cols = "65" name="txt_ClinicalHistoryRadioHistory" type="text" id="txt_ClinicalHistoryRadioHistory"><?php echo $rthist; ?></textarea>
+				<?php 
+				if(strlen($row_clinicalinfo['RadioHistory'])>1){
+					$rthist = trim($row_clinicalinfo['RadioHistory'])."&nbsp;\r".$prev;
+				}
+				else{
+					$rthist = $prev;
+				}
+				?>
+				<textarea style="width:100%; resize:none;"   class="noresize" width="480px" rows="3" cols = "65" name="txt_ClinicalHistoryRadioHistory" type="text" id="txt_ClinicalHistoryRadioHistory"><?php echo $rthist; ?></textarea>
 
 	  	  	</td>
 	  		
@@ -2915,7 +2826,6 @@ if (is_dir($dir)){
 		</tr>
   		<tr>
   			<td><textarea style="width:100%; resize:none;"   class="noresize"  width="480px" rows="3" cols = "65" name="txt_ClinicalHistoryOp" type="text" id="txt_ClinicalHistoryOp"><?php echo $row_clinicalinfo['Op']; ?></textarea></td>      
-	  		
   			<td><textarea style="width:100%; resize:none;"   class="noresize"  width="480px" rows="3" cols = "65" name="txt_ClinicalHistoryChemo" type="text" id="txt_ClinicalHistoryChemo"><?php echo $row_clinicalinfo['chemo']; ?></textarea></td>
 		</tr>
   	</table>  	
