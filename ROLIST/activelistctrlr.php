@@ -538,14 +538,6 @@ if(strcmp($linacname,"ix")==0){
 	</th>
 </form>
 
-<!--
-<form id=form11 name=form11 method=post target=_blank  action="activelistctrlr_physician.php">
-	<th align=right ><input type=submit name=btn_home id=btn_home value=Todo-Physician />
-		<input name=permit type=hidden id=permit value= <?php echo $permitUser ?>/>
-	</th>
-</form>
--->
-
 
 <form id=form11 name=form11 method=post target=_blank  action="live.php">
 	<th align=right ><input type=submit name=btn_home id=btn_home value=Active />
@@ -704,13 +696,11 @@ for($idDays = 0;$idDays<1;$idDays++){
 $seven          = $idDays + $week_post;
 $a_week_ago_todo     = date('Y-m-d', strtotime($date . "+" . $seven . 'days'));
 $a_week_after_todo     = date('Y-m-d', strtotime($date . "+" . $seven . 'days'));
-// echo($a_week_ago_todo);
 $weekDays= strftime("%w", strtotime($a_week_ago_todo));
 if($weekDays!=6 and $weekDays!=0){
 	$workDay = $workDay+1;
 	
 }
-// echo($weekDays);
 $catchar  = 'Start';
 $sortCat1 = 'RT_start1';
 $sortCat2 = 'RT_start2';
@@ -724,15 +714,9 @@ $sortCat7 = 'RT_start7';
 
 $query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo join Timer on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID and PatientInfo.Hospital_ID = Timer.Hospital_ID where  $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$a_week_ago_todo' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$a_week_ago_todo' AND (PatientInfo.CurrentStatus like 1  OR PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL) AND (STR_TO_DATE(Timer.date1, '%m/%d/%Y') = '$a_week_ago_todo')" ;	
 
-
-
-
-
 if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'asc';
 }
-
-
 $query_Recordset1 .= " ORDER BY Timer.time1 ASC, binary(PatientInfo.KorName) ASC";
 
 $Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());

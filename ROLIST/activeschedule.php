@@ -542,68 +542,6 @@ for($Idtx = 0; $Idtx<count($datesID); $Idtx++){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <?php
 if(strcmp($linacname,"versa")==0){
 	$lin = "VERSA";
@@ -752,14 +690,6 @@ if(strcmp($linacname,"ix")==0){
 	</th>
 </form>
 
-<!--
-<form id=form11 name=form11 method=post target=_blank  action="activeschedule_physician.php">
-	<th align=right ><input type=submit name=btn_home id=btn_home value=Todo-Physician />
-		<input name=permit type=hidden id=permit value= <?php echo $permitUser ?>/>
-	</th>
-</form>
--->
-
 
 <form id=form11 name=form11 method=post target=_blank  action="live.php">
 	<th align=right ><input type=submit name=btn_home id=btn_home value=Active />
@@ -836,32 +766,6 @@ if(strcmp($linacname,"ix")==0){
 
     <table cellpadding = "1px" width="960px" border="0" align="center" cellspacing="0">
 	    
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 <tr>
@@ -1236,12 +1140,6 @@ if (strcasecmp(trim($row_Recordset1[$Linac_curr]),$linacname)==0){
 		$photoPath = "/PatientPhoto/icon.png";
 
 	}
-	
-
-	// $sqlQ = "insert into Timer (Hospital_ID, date1) values ('$row_Recordset1[Hospital_ID]', 'xxxxxx')";
-	// echo($sqlQ);
-	// echo("<br>");
-	// mysql_query("insert into Timer (Hospital_ID, date1) values ('$row_Recordset1[Hospital_ID]', 'xxxxxx')");
 	
 	$treatTimeF = (int)(substr($row_Recordset1[time1],0,2));
 
