@@ -318,13 +318,6 @@ mysql_query("set session character_set_connection=latin1;");
 mysql_query("set session character_set_results=latin1;");
 mysql_query("set session character_set_client=latin1;");
 
-
-// 
-// 
-// 
-// 
-
-
 // 시간 스케쥴러 계산을 위한 변수 불러오기(input 박스에서 불러오는 변수)
 $datetime = $_POST['datetime'];
 $datetimeend = $_POST['hf_fin'];
@@ -797,77 +790,6 @@ echo($UPDATESQL);
 		$Dates = Date("n/j/y");    
 
 
-
-		if(strlen($statChange)>0){
-			$post_title = "$row_RecordsetTelegram[Hospital_ID]($row_RecordsetTelegram[FirstName] $row_RecordsetTelegram[SecondName] $row_RecordsetTelegram[KorName])의 상태변경 ".$statChange."($uid)";
-			$api_code = '460837379:AAEMQO7cETGDbz7sF9ACdDwWjJMhgAyEwpk';
-			if(strcmp($row_RecordsetTelegram[physician],'myki')==0){$curlPhy ="KI"; $chatId = "@rodbki";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhro";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjlee')==0){$curlPhy ="JaL";$chatId = "@rodbjal";}
-			if(strcmp($row_RecordsetTelegram[physician],'mhlee')==0){$curlPhy ="JuL";$chatId = "@pnuyhrojul";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhrojul";}
-			$telegram_text = "{$post_title}";
-			$query_array = array(
-			    'chat_id' => $chatId,
-			    'text' => $telegram_text,
-			);
-			$request_url = "https://api.telegram.org/bot{$api_code}/sendMessage?" . http_build_query($query_array);
-			$curl_opt = array(
-			    CURLOPT_RETURNTRANSFER => 1,
-			    CURLOPT_URL => $request_url,
-			);
-/*
-			$curl = curl_init($request_url);
-			echo("<font color=#FFFFFF size='1px'> ");	
-			$resCurl = curl_exec($curl);
-			echo("</font>");	
-*/
-/*
-			$logquery = "insert into Log (date1, content, author, Hospital_ID) values('$Dates', '$post_title', '$uid', '$row_RecordsetTelegram[Hospital_ID]')";
-			mysql_query($logquery);
-*/
-			
-		}
-
-
-
-		if(strlen($titleSum)>0){
-			$post_title = "$row_RecordsetTelegram[Hospital_ID]($row_RecordsetTelegram[FirstName] $row_RecordsetTelegram[SecondName] $row_RecordsetTelegram[KorName])의 ". $titleSum. "일정 추가/변경($uid)";
-
-			$api_code = '460837379:AAEMQO7cETGDbz7sF9ACdDwWjJMhgAyEwpk';
-			if(strcmp($row_RecordsetTelegram[physician],'myki')==0){$curlPhy ="KI"; $chatId = "@rodbki";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhro";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjlee')==0){$curlPhy ="JaL";$chatId = "@rodbjal";}
-			if(strcmp($row_RecordsetTelegram[physician],'mhlee')==0){$curlPhy ="JuL";$chatId = "@pnuyhrojul";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhrojul";}
-			$telegram_text = "{$post_title}";
-			$query_array = array(
-			    'chat_id' => $chatId,
-			    'text' => $telegram_text,
-			);
-			$request_url = "https://api.telegram.org/bot{$api_code}/sendMessage?" . http_build_query($query_array);
-			$curl_opt = array(
-			    CURLOPT_RETURNTRANSFER => 1,
-			    CURLOPT_URL => $request_url,
-			);
-/*
-			$curl = curl_init($request_url);
-			echo("<font color=#FFFFFF size='1px'> ");	
-			$resCurl = curl_exec($curl);
-			echo("</font>");	
-*/
-
-/*
-			$logquery = "insert into Log (date1, content, author, Hospital_ID) values('$Dates', '$post_title', '$uid', '$row_RecordsetTelegram[Hospital_ID]')";
-			
-			mysql_query($logquery);
-*/
-			
-// 		echo($logquery);
-					
-			
-		}
-		
 	
 	
 	$tVals = $idx_;
