@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+
+<style>
+	body {
+font-family: Century Gothic, sans-serif;	  font-size:10pt;
+	}
+	
+	table {
+font-family: Century Gothic, sans-serif;		
+		border-collapse: collapse;
+	}	
+	td {
+		padding: 5px 10px;
+		text-align: center;
+	}
+	input{
+font-family: Century Gothic, sans-serif;
+		
+		border: none;
+	}
+	input{
+		padding: 0px 0px;
+		text-align: right;
+		border: none;
+	}
+	input:focus{
+		outline: none;
+	}
+	
+</style>
+
+</head>
+
+<?php
+
+?>
+
+
+<body>
+	<table border = "1" width="220px">
+		<tr>
+			<td height="50px" colspan="4" bgcolor="#373737"> 
+				<input style="color: white; background-color: #373737; font-size:35px; width: 100%"  type="text" id="display">
+			</td>
+		</tr>
+		<tr>
+			<td width="55px"  bgcolor="#999999" style="color: white"> 107%</td> 
+			<td width="55px"  bgcolor="#fe8500"> 
+				<div id="107" style="color: white">
+				100
+				</div>
+			</td>
+			<td width="55px"  bgcolor="#999999" style="color: white" > 90%</td>
+			<td width="55px"  bgcolor="#00aa5e"> 
+				<div id="90" style="color: white">
+				100
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td  bgcolor="#999999" style="color: white" > 105%</td>
+			<td  bgcolor="#fe8500">
+				<div id="105" style="color: white">
+				100
+				</div>
+			</td>
+			<td  bgcolor="#999999" style="color: white" > 80%</td>
+			<td  bgcolor="#00aa5e">
+				<div id="80" style="color: white">
+				100
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td   bgcolor="#999999" style="color: white"> 103%</td>
+			<td  bgcolor="#fe8500">
+				<div id="103" style="color: white">
+				100
+				</div>
+			<//td>
+			<td  bgcolor="#999999" style="color: white" > 70%</td>
+			<td  bgcolor="#00aa5e">
+				<div id="70" style="color: white">
+				100
+				</div>
+			<//td>
+		</tr>
+		<tr>
+			<td   bgcolor="#999999" style="color: white"> 100%</td>
+			<td  bgcolor="#fe8500">
+				<div id="100" style="color: white">
+				100
+				</div>
+			<//td>
+			<td   bgcolor="#999999" style="color: white"> 60%</td>
+			<td  bgcolor="#00aa5e">
+				<div id="60" style="color: white">
+				100
+				</div>
+			<//td>
+		</tr>
+		<tr>
+			<td  bgcolor="#999999" style="color: white" > 98%</td>
+			<td  bgcolor="#fe8500">
+				<div id="98" style="color: white">
+				100
+				</div>
+			<//td>
+			<td   bgcolor="#999999" style="color: white"> 50%</td>
+			<td  bgcolor="#00aa5e">
+				<div id="50" style="color: white">
+				100
+				</div>
+			<//td>
+		</tr>
+		<tr>
+			<td  bgcolor="#999999" style="color: white" > 95%</td>
+			<td  bgcolor="#fe8500">
+				<div id="95" style="color: white">
+				100
+				</div>
+			<//td>
+			<td  bgcolor="#999999" style="color: white" > 40%</td>
+			<td  bgcolor="#00aa5e">
+				<div id="40" style="color: white">
+				100
+				</div>
+			<//td>
+		</tr>
+		<tr>
+			<td   bgcolor="#999999" style="color: white"> 92%</td>
+			<td  bgcolor="#fe8500">
+				<div id="92" style="color: white">
+				100
+				</div>
+			<//td>
+			<td   bgcolor="#999999" style="color: white"> 30%</td>
+			<td  bgcolor="#00aa5e">
+				<div id="30" style="color: white">
+				100
+				</div>
+			<//td>
+		</tr>
+		
+		<tr>
+			<td bgcolor="#373737" colspan=2>
+				<input style="color: white; background-color: #373737; font-size:20px; width: 100%"  type="text" id="percent">
+				
+			</td>
+			<td colspan=2>
+				<div id="percentin" style="color: black">
+				100
+				</div>
+				
+			</td>
+		</tr>
+		
+		<tr>
+			<td bgcolor="#373737" colspan=2>
+				<input style="color: white; background-color: #373737; font-size:20px; width: 100%"  type="text" id="gy">
+				
+			</td>
+			<td colspan=2>
+				<div id="dosein" style="color: black">
+				100
+				</div>
+				
+			</td>
+		
+		</tr>
+	
+	
+	
+	</table>
+
+<br>
+
+
+
+
+
+
+
+<script src="js/jquery.min.js"></script>
+
+<script>
+$( "#display").change(function() {
+	var dose = $('#display').val();
+	var caldose = dose*1.07;
+	$('#107').text(caldose.toFixed(2));
+	var caldose = dose*1.05;
+	$('#105').text(caldose.toFixed(2));
+	var caldose = dose*1.03;
+	$('#103').text(caldose.toFixed(2));
+	var caldose = dose*1.00;
+	$('#100').text(caldose.toFixed(2));
+	var caldose = dose*0.98;
+	$('#98').text(caldose.toFixed(2));
+	var caldose = dose*0.95;
+	$('#95').text(caldose.toFixed(2));
+	var caldose = dose*0.92;
+	$('#92').text(caldose.toFixed(2));
+	var caldose = dose*0.90;
+	$('#90').text(caldose.toFixed(2));
+	var caldose = dose*0.80;
+	$('#80').text(caldose.toFixed(2));
+	var caldose = dose*0.70;
+	$('#70').text(caldose.toFixed(2));
+	var caldose = dose*0.60;
+	$('#60').text(caldose.toFixed(2));
+	var caldose = dose*0.50;
+	$('#50').text(caldose.toFixed(2));
+	var caldose = dose*0.40;
+	$('#40').text(caldose.toFixed(2));
+	var caldose = dose*0.30;
+	$('#30').text(caldose.toFixed(2));
+	
+	var dosei = $('#percent').val();
+	var caldose = dose*dosei/100;
+	$('#percentin').text(caldose.toFixed(2)+" Gy");
+	var dosei = $('#gy').val();
+	var caldose = dosei/dose*100;
+	$('#dosein').text(caldose.toFixed(2)+"%");
+	
+	
+});
+</script>
+<script>
+	$( "#percent").change(function() {
+	var dose = $('#display').val();
+	var dosei = $('#percent').val();
+	var caldose = dose*dosei/100;
+	$('#percentin').text(caldose.toFixed(2)+" Gy");
+
+});
+
+</script>
+<script>
+	$( "#gy").change(function() {
+	var dose = $('#display').val();
+	var dosei = $('#gy').val();
+	var caldose = dosei/dose*100;
+	$('#dosein').text(caldose.toFixed(2)+"%");
+
+});
+
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

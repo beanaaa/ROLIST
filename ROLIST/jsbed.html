@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+
+<style>
+	body {
+font-family: Century Gothic, sans-serif;	  font-size:10pt;
+	}
+	
+	table {
+font-family: Century Gothic, sans-serif;		
+		border-collapse: collapse;
+	}	
+	td {
+		padding: 5px 10px;
+		text-align: center;
+	}
+	th {		
+		padding: 5px 10px;
+	}
+	input{
+font-family: Century Gothic, sans-serif;
+		
+		border: none;
+	}
+	input{
+		padding: 0px 0px;
+		text-align: right;
+		border: none;
+	}
+	input:focus{
+		outline: none;
+	}
+	div{
+font-family: Century Gothic, sans-serif;
+		
+		border: none;
+	}
+	div{
+		padding: 0px 0px;
+		text-align: right;
+		border: none;
+	}
+	
+</style>
+
+</head>
+
+<?php
+
+?>
+
+
+<body>
+	<table border = "1" width="220px">
+		<tr>
+			<td bgcolor="#373737" colspan=4 height="50px">
+
+				<div  style="color: white; background-color: #373737; font-size:30px; width: 100%" id="display">
+					0
+				</div>
+				
+			</td>
+		
+		</tr>
+		<tr>
+			<td bgcolor="#373737" colspan=4 height="50px">
+
+				<div  style="color: white; background-color: #373737; font-size:30px; width: 100%" id="display2">
+					0
+				</div>
+				
+			</td>
+		
+		</tr>
+
+		<tr>
+			<td bgcolor="#999999" style="color: white"  colspan=3 width="220px">
+				<div id="dosein" style="color: white">
+				Number of Fractions, n
+				</div>
+				
+			</td>
+			
+			<td bgcolor="#fe8500" colspan=1>
+				<input style="color: white; background-color: #fe8500; font-size:20px; width: 30px"  type="text" id="nBED">
+				
+			</td>
+		
+		</tr>
+		<tr>
+			<td  bgcolor="#999999" style="color: white" colspan=3>
+				<div id="dosein" style="color: white">
+				Dose per Fraction, d
+				</div>
+				
+			</td>
+			
+			<td bgcolor="#00aa5e" colspan=1>
+				<input style="color: white; background-color: #00aa5e; font-size:20px; width: 30px"  type="text" id="dBED">
+				
+			</td>
+		
+		</tr>
+		<tr>
+			<td  bgcolor="#999999" style="color: white" colspan=3>
+				<div id="dosein" style="color: white">
+					α/β Ratio
+				</div>
+				
+			</td>
+			
+			<td bgcolor="#785ef0" colspan=1>
+				<input style="color: white; background-color: #785ef0; font-size:20px; width: 30px"  type="text" id="abeBED">
+				
+			</td>
+		
+		</tr>
+		<tr>
+			<td align="left" colspan="4"><font color="#00884b" size="1">
+				<div align="left"> 
+<!-- 				<p align="left"> -->
+				BED = nxd(1+d/α/β)<br>
+				EQD<sub>2</sub> = Dx{d+(α/β)}/{2+(α/β)}<br>
+				Fowler, J. F. 1989.<br>
+				Khan, F. M, 2012.</font>
+<!-- 				</p> -->
+</div>
+			</td>
+		</tr>
+	
+	
+	</table>
+
+<br>
+
+
+
+
+
+
+
+<script src="js/jquery.min.js"></script>
+
+<script>
+$( "#nBED").keyup(function() {
+	var n = parseFloat($('#nBED').val());
+	var d = parseFloat($('#dBED').val());
+	var abe = parseFloat($('#abeBED').val();
+	var abr = $('#abrBED').val());
+	var caldose = n*d*(1+d/(abe));
+	$('#display').text(" BED: "+caldose.toFixed(2));	
+	caldose = n*d*(d+abe)/(2.0+abe);
+	$('#display2').text("EQD2: "+caldose.toFixed(2));	
+});
+</script>
+<script>
+$( "#dBED").keyup(function() {
+	var n = parseFloat($('#nBED').val());
+	var d = parseFloat($('#dBED').val());
+	var abe = parseFloat($('#abeBED').val());
+	var abr = $('#abrBED').val();
+	var caldose = n*d*(1+d/(abe));
+	$('#display').text(" BED: "+caldose.toFixed(2));	
+	caldose = n*d*(d+abe)/(2.0+abe);
+	$('#display2').text("EQD2: "+caldose.toFixed(2));	
+	
+});
+</script>
+<script>
+$( "#abeBED").keyup(function() {
+	var n = parseFloat($('#nBED').val());
+	var d = parseFloat($('#dBED').val());
+	var abe = parseFloat($('#abeBED').val());
+	var abr = $('#abrBED').val();
+	var caldose = n*d*(1+d/(abe));
+	$('#display').text(" BED: "+caldose.toFixed(2));	
+	caldose = n*d*(d+abe)/(2.0+abe);
+	$('#display2').text("EQD2: "+caldose.toFixed(2));	
+	
+});
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

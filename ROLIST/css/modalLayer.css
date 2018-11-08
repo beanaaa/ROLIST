@@ -1,0 +1,24 @@
+/*리셋*/
+*{font-family: arial,'dotum', '돋움', Sans-serif;}
+body{ font-size:11px; color:#555}
+a{text-decoration:none; color:#666; font-weight:bold}
+button, input[type="submit"], input[type="button"]{cursor:pointer}
+button[type="submit"]{display:block; width:100px; margin:15px 0 15px 120px}
+/*리셋*/
+div.modal{position:absolute; z-index:100; padding:10px; display:none}
+div.modal div.modal-inside{position:relative;}
+div.modal h1{height:50px; overflow:hidden; display:block; font-size:16px}
+div.modal button.closeModalLayer{overflow:hidden; *overflow:visible; padding:0; margin:0; line-height:0; width:40px; height:34px; position:absolute; top:15px; right:16px;}
+div.modal fieldset legend, span.hide, p.hide {display:block;position:absolute;left:-9999px;width:1px;height:1px;line-height:0;overflow:hidden;font-size:0;text-indent:-9999px}
+div.m-regist{ width:596px; background:#eee;}
+div.m-regist fieldset{padding:37px 0 0 116px;}
+div.m-regist div{padding:3px 0}
+div.m-regist div label{width:110px; overflow:hidden; display:inline-block; *display:inline; }
+div.m-regist div label,
+div.m-regist div input{line-height:14px; vertical-align:middle;}
+div.m-regist div.m-input04 input,
+div.m-regist div.m-input04 label{width:auto; display:inline;}
+div.m-regist div.footer_txt{padding:5px 0 0 30px}
+div.m-regist div.footer_txt img{vertical-align:top;}
+/* 백보드 div */
+div.overlay {width:100%;height:100%;z-index:2;background-color:#000; opacity:0.8; filter: alpha(opacity=40); -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)"; position:fixed; top:0; left:0;	margin:0;	padding:0; display:none}
