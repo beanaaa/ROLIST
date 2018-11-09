@@ -1,4 +1,24 @@
 <!doctype html>
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
+
 <meta charset="utf-8">
 
 <script language='javascript'>
