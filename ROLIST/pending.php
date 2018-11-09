@@ -166,46 +166,46 @@ if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
 
 <?php
 		require_once('Connections/login.php'); 
-		$result = mysql_select_db($database_login, $login);
+		$result = mysqli_select_db($database_login, $login);
 		$uid = $_POST['btn_comment'];
 		$pass = $_POST['ids'];
 		$cat = $_POST['cat'];
 		$access = $_POST['access'];
-		mysql_query("set session character_set_connection=latin1;");
-		mysql_query("set session character_set_results=latin1;");
-		mysql_query("set session character_set_client=latin1;");
+		mysqli_query($login, "set session character_set_connection=latin1;");
+		mysqli_query($login, "set session character_set_results=latin1;");
+		mysqli_query($login, "set session character_set_client=latin1;");
 		
 		if($cat==1 and strcmp($uid,"Accept")==0){
 			$openquery = "select * from loginpend where h_id like '$pass'";
-			$insertFetch = mysql_fetch_assoc(mysql_query($openquery));
+			$insertFetch = mysqli_fetch_assoc(mysqli_query($login, $openquery));
  			$updateQuery = "Insert Into login (h_id,h_password,access) values ('$insertFetch[h_id]','$insertFetch[h_password]',$access)";
  			$deleteQuery = "Delete from loginpend where h_id like '$insertFetch[h_id]'";
- 			mysql_query($updateQuery);
+ 			mysqli_query($login, $updateQuery);
  			echo("<br>");
- 			mysql_query($deleteQuery); 			
+ 			mysqli_query($login, $deleteQuery); 			
 			
 		}
 		if($cat==1 and strcmp($uid,"Reject")==0){
 			$openquery = "select * from loginpend where h_id like '$pass'";
-			$insertFetch = mysql_fetch_assoc(mysql_query($openquery));
+			$insertFetch = mysqli_fetch_assoc(mysqli_query($login, $openquery));
  			$updateQuery = "Insert Into login (h_id,h_password,'access') values ($insertFetch[h_id],$insertFetch[h_password],$access)";
  			$deleteQuery = "Delete from loginpend where h_id like '$insertFetch[h_id]'";
- 			mysql_query($deleteQuery); 			
+ 			mysqli_query($login, $deleteQuery); 			
 			
 		}
 		
 		if($cat==2 and strcmp($uid,"Change")==0){
 			$openquery = "select * from login where h_id like '$pass'";
-			$insertFetch = mysql_fetch_assoc(mysql_query($openquery));
+			$insertFetch = mysqli_fetch_assoc(mysqli_query($login, $openquery));
  			$updateQuery = "Update login Set access= $access where h_id like '$insertFetch[h_id]'";
- 			mysql_query($updateQuery);
+ 			mysqli_query($login, $updateQuery);
 			
 		}
 		if($cat==2 and strcmp($uid,"Delete")==0){
 			$openquery = "select * from login where h_id like '$pass'";
-			$insertFetch = mysql_fetch_assoc(mysql_query($openquery));
+			$insertFetch = mysqli_fetch_assoc(mysqli_query($login, $openquery));
  			$deleteQuery = "Delete from login where h_id like '$insertFetch[h_id]'";
- 			mysql_query($deleteQuery); 			
+ 			mysqli_query($login, $deleteQuery); 			
 			
 		}
 		
@@ -254,8 +254,8 @@ if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
 
 
         <?php
-$queries = mysql_query("select * from loginpend");
-$numPends = mysql_num_rows($queries);
+$queries = mysqli_query($login, "select * from loginpend");
+$numPends = mysqli_num_rows($queries);
 
 
 
@@ -283,11 +283,11 @@ $numPends = mysql_num_rows($queries);
   </thead>
 	
 <?php
-$queries = mysql_query("select * from loginpend");
-$abss = mysql_num_rows($queries);
+$queries = mysqli_query($login, "select * from loginpend");
+$abss = mysqli_num_rows($queries);
 
 for($idx = 0;$idx<$numPends;$idx++){
-	$data = mysql_fetch_assoc($queries);
+	$data = mysqli_fetch_assoc($queries);
 	
 	
 	echo("<tr>");
@@ -353,12 +353,12 @@ for($idx = 0;$idx<$numPends;$idx++){
 	</tr>
   </thead>
 <?php
-$queries = mysql_query("select * from login");
-$abss = mysql_num_rows($queries);
-$numPends = mysql_num_rows($queries);
+$queries = mysqli_query($login, "select * from login");
+$abss = mysqli_num_rows($queries);
+$numPends = mysqli_num_rows($queries);
 
 for($idx = 0;$idx<$numPends;$idx++){
-	$data = mysql_fetch_assoc($queries);
+	$data = mysqli_fetch_assoc($queries);
 	
 	
 	echo("<tr>");

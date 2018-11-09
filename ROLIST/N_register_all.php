@@ -1,4 +1,22 @@
 <!doctype html>
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
 <?php 
 $permitUser = 0;
 if (!isset($_SESSION)) {
@@ -45,7 +63,7 @@ if ($_GET['permit'] != NULL) {
     
 	if ($permitUser ==1 | $permitUser ==2 | $permitUser ==3){
 	require_once('Connections/test.php');
-	mysql_select_db($database_test, $test);
+	mysqli_select_db($database_test );
        
 	//session_destroy();
 	//echo $permitUser;
@@ -54,7 +72,7 @@ if ($_GET['permit'] != NULL) {
  		$MM_restrictGoTo = "testphpr2.php";
  		header("Location: ". $MM_restrictGoTo); 
  		require_once('Connections/test.php'); 
- 		mysql_select_db($database_test, $test);
+ 		mysqli_select_db($database_test );
        
 	}
 	//session_start();
@@ -160,7 +178,7 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
     $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
   }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+  $theValue = function_exists("mysqli_real_escape_string") ? mysqli_real_escape_string($theValue) : mysqli_escape_string($theValue);
 
   switch ($theType) {
     case "text":
@@ -206,21 +224,21 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
   	$h_id = trim($h_id);
   	$hid = trim($_POST['txt_hospital_id']);
   	$sql_test = sprintf("select * from PatientInfo where Hospital_ID = '$h_id'");
-  	$sql_test = mysql_query($sql_test);
-  	$sql_test_rows = mysql_num_rows($sql_test); // mysql row 수를 판단하여 중복 유/무 판별
+  	$sql_test = mysqli_query($test, $sql_test);
+  	$sql_test_rows = mysqli_num_rows($sql_test); // mysql row 수를 판단하여 중복 유/무 판별
   	
   	// 입력할 때 hospital id 가 원래 있는 것인지 아닌 것인지 판별
   	if($sql_test_rows!='0') // 원래 있을 경우 --> Update가 필요합니다. 곧 업데이트 하겠습니다.
   	{
   	echo($sql_test_rows);
 
-      $UpdateIDX = mysql_query("select idx from TreatmentInfo where Hospital_ID = '$h_id'");
-  		$Total_Dose= mysql_query("select dose_sum from TreatmentInfo where Hospital_ID = '$h_id'");
-  		$Total_Fx = mysql_query("select Fx_sum from TreatmentInfo where Hospital_ID = '$h_id'");       
+      $UpdateIDX = mysqli_query($test, "select idx from TreatmentInfo where Hospital_ID = '$h_id'");
+  		$Total_Dose= mysqli_query($test, "select dose_sum from TreatmentInfo where Hospital_ID = '$h_id'");
+  		$Total_Fx = mysqli_query($test, "select Fx_sum from TreatmentInfo where Hospital_ID = '$h_id'");       
        
-  		$UpdateIDX = mysql_result($UpdateIDX,0,"idx");
-  		$Total_Dose = mysql_result($Total_Dose,0,"dose_sum");
-  		$Total_Fx = mysql_result($Total_Fx,0,"Fx_sum");
+  		$UpdateIDX = mysqli_result($UpdateIDX,0,"idx");
+  		$Total_Dose = mysqli_result($Total_Dose,0,"dose_sum");
+  		$Total_Fx = mysqli_result($Total_Fx,0,"Fx_sum");
        
   		if($UpdateIDX=='' || $UpdateIDX==0){
   			$UpdateIDX=0;
@@ -272,7 +290,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")) {
 			
 			$insertSQL3 = sprintf("UPDATE TreatmentInfo SET $Q_RT_start = '$Start_[$i]', RT_start_f = '$Start_[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]', dose_sum = '$Dose_sum', Fx_sum = '$Fx_sum', $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', $Q_Site = '$Site_[$i]', site_f = '$Site_[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]', idx = '$idx', $Q_CT = '$CT_[$i]', CT_Sim_f = '$CT_[$i]', $Q_Finish = '$Finish_[$i]', RT_fin_f = '$Finish_[$i]' WHERE Hospital_ID = '$h_id' ");
 			
-			$Insert_Result3 = mysql_query($insertSQL3);
+			$Insert_Result3 = mysqli_query($test, $insertSQL3);
 			if($Insert_Result3 == TRUE){
 				$Q_idx = $Q_idx + 1;
 			}
@@ -295,48 +313,21 @@ $hid = trim($hidNew1);
 	   echo "<script>window.alert('Not a numeric character. Please check the primary chart number'); window.location.replace('N_register_all.php?permit=$permitUser');</script>";
 }
 	
-  	$insertSQL = sprintf("INSERT INTO PatientInfo (Hospital_ID, RO_ID, Sex, Age, FirstName, SecondName, dateOfBirth) VALUES ('%s', %s, %s, %s, %s, %s, %s)",
-                       $hid,
-                       GetSQLValueString($_POST['txt_ro_id'], "text"),
-                       GetSQLValueString($_POST['sex_menu'], "text"),
-                       GetSQLValueString($_POST['txt_age'], "int"),
-                       GetSQLValueString($_POST['txt_name'], "text"),
-                       GetSQLValueString($_POST['txt_lastname'], "text"),
-                       GetSQLValueString($_POST['txt_birth'], "text"));
+  	$insertSQL = sprintf("INSERT INTO PatientInfo (Hospital_ID) VALUES ('%s')",$hid);
   
-	$insertSQL1 = sprintf("INSERT INTO ClinicalInfo (Hospital_ID, Ill, Clinic, RefPhys, RefCl, RefHos, Mtd, Detail, Dat, Modality_var1) VALUES ('%s', %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                       $hid,
-                       GetSQLValueString($_POST['txt_illness'], "text"),
-                       GetSQLValueString($_POST['txt_clinic'], "text"),
-                       GetSQLValueString($_POST['txt_refphys'], "text"),
-                       GetSQLValueString($_POST['txt_refci'], "text"),
-                       GetSQLValueString($_POST['txt_refhos'], "text"),
-                       GetSQLValueString($_POST['treatment_menu'], "text"),
-                       GetSQLValueString($_POST['txt_detail'], "text"),
-                       GetSQLValueString($_POST['txt_date'], "date"),
-                       GetSQLValueString($_POST['txt_modality'], "text"));
+	$insertSQL1 = sprintf("INSERT INTO ClinicalInfo (Hospital_ID) VALUES ('%s')",$hid);
                        
 
-  	$insertSQL2 = sprintf("INSERT INTO TreatmentInfo (Hospital_ID, purpose, physician, primarysite, subsite, Site1, site_f, pathol) VALUES ('%s', %s, %s, %s, %s, %s, %s, %s)",
-  				$hid,
-                GetSQLValueString($_POST['purpose_menu'], "text"),
-                GetSQLValueString($_POST['txt_physician'], "text"),
-                GetSQLValueString($_POST['primary_menu'], "text"),
-                GetSQLValueString($_POST['sub_site'],"text"),
-                GetSQLValueString($_POST['primary_menu'], "text"),
-                GetSQLValueString($_POST['primary_menu'], "text"),
-                GetSQLValueString($_POST['pathology_menu'], "text")
-                
-	);
+  	$insertSQL2 = sprintf("INSERT INTO TreatmentInfo (Hospital_ID) VALUES ('%s')",$hid);
 	
 	$ii = 0;
 	echo($insertSQL."<br>".$insertSQL1."<br>".$insertSQL2."<br>");
 	// 혹시 쿼리가 안들어 갈 경우를 대비하여 100번 반복을 하였
-	mysql_select_db($database_test, $test);
+	mysqli_select_db($database_test );
     while($ii<100){
-		$Result1 = mysql_query($insertSQL, $test); 
-		$Result2 = mysql_query($insertSQL1, $test);
-		$Result3 = mysql_query($insertSQL2, $test);
+		$Result1 = mysqli_query($test, $insertSQL ); 
+		$Result2 = mysqli_query($test, $insertSQL1 );
+		$Result3 = mysqli_query($test, $insertSQL2 );
 		
 		if($Result1 == True && $Result2 == True && $Result3 == True){
 			break;
@@ -379,12 +370,12 @@ $hid = trim($hidNew1);
 				$Fx_sum = $Fx_[$i];
 			}else{
 				
-				$sql_dose = mysql_query("select dose_sum from TreatmentInfo where Hospital_ID = $h_id");
-				$sql_dose_result = mysql_result($sql_dose,0,"dose_sum");
+				$sql_dose = mysqli_query($test, "select dose_sum from TreatmentInfo where Hospital_ID = $h_id");
+				$sql_dose_result = mysqli_result($sql_dose,0,"dose_sum");
 					
 				
-				$sql_fx = mysql_query("select Fx_sum from TreatmentInfo where Hospital_ID = $h_id"); 
-				$sql_fx_result = mysql_result($sql_fx,0,"Fx_sum");
+				$sql_fx = mysqli_query($test, "select Fx_sum from TreatmentInfo where Hospital_ID = $h_id"); 
+				$sql_fx_result = mysqli_result($sql_fx,0,"Fx_sum");
 				
 				$Dose_sum = $sql_dose_result + $Dose_[$i];
 
@@ -403,7 +394,7 @@ $hid = trim($hidNew1);
 			
 			$insertSQL3 = sprintf("UPDATE TreatmentInfo SET $Q_RT_start = '$Start_[$i]', RT_start_f = '$Start_[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]', dose_sum = '$Dose_sum', Fx_sum = '$Fx_sum', $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', $Q_Site = '$Site_[$i]', site_f = '$Site_[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]', idx = '$idx', $Q_CT = '$CT_[$i]', CT_Sim_f = '$CT_[$i]', $Q_Finish = '$Finish_[$i]', RT_fin_f = '$Finish_[$i]' WHERE Hospital_ID = '$h_id' ");
 			
-			$Insert_Result3 = mysql_query($insertSQL3);
+			$Insert_Result3 = mysqli_query($test, $insertSQL3);
 			if($Insert_Result3 == TRUE){
 				$Q_idx = $Q_idx + 1;
 			}
@@ -767,8 +758,8 @@ $hid = trim($hidNew1);
         
 
 <?php
-mysql_free_result($Recordset1);
-mysql_free_result($Recordset2);
+mysqli_free_result($Recordset1);
+mysqli_free_result($Recordset2);
 ?>
 
 <script type="text/javascript">

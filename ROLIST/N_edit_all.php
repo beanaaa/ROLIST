@@ -1014,10 +1014,13 @@ mysqli_query($test, "set session character_set_client=latin1;");
 	                       $curstats = "0";
                        }
 
-
-	$UPDATESQL1 = sprintf("UPDATE PatientInfo SET   Sex='%s', Age='%s', KorName='%s', dateOfBirth='%s', CurrentStatus=%s, ManualEdit=$Manuals WHERE Hospital_ID like '$ID_'",
+	$pAge = $_POST['txt_age'];
+	if(strlen($_POST['txt_age'])==0){
+		$pAge = 0;
+	}
+	$UPDATESQL1 = sprintf("UPDATE PatientInfo SET   Sex='%s', Age=%s, KorName='%s', dateOfBirth='%s', CurrentStatus=%s, ManualEdit=$Manuals WHERE Hospital_ID like '$ID_'",
                        ($_POST['txt_search_sex']),
-                       ($_POST['txt_age']),
+                       ($pAge),
                        ($_POST['txt_name']),
                        ($_POST['txt_birth']),
                        ($curstats),
@@ -1025,7 +1028,7 @@ mysqli_query($test, "set session character_set_client=latin1;");
                        ($_POST['txt_pStatus'])
                                         	     
                        );                      
-                       
+               echo($UPDATESQL1);        
                        $curstats = $_POST['CurrentStatus_menu'];
                        if(strlen($curstats)==0){
 	                       $curstats = "0";

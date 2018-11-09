@@ -1,5 +1,24 @@
 <!doctype html>
 <meta charset="utf-8">
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
 
 <?php 
 $permitUser = 0;
@@ -56,19 +75,19 @@ if($_POST['insert_rev']==1){
 //echo $menu;// MUST BE DELETED!!!!
 //echo $insert_menu;
 } ?>
-
+,
 
 <?php 
     
 	if ($permitUser ==1 | $permitUser ==2 | $permitUser ==3){
 	require_once('Connections/test.php'); 
-	mysql_select_db($database_test, $test);
+	mysqli_select_db($database_test );
 	}
 	else{
  		$MM_restrictGoTo = "testphpr2.php";
  		header("Location: ". $MM_restrictGoTo); 
 	require_once('Connections/test.php'); 
-	mysql_select_db($database_test, $test);
+	mysqli_select_db($database_test );
 
 	}
 	 ?>
@@ -258,13 +277,6 @@ select {
 <p style="font-size: 8px; font-weight: bold; color: #999999;" valign = "top" align = "right"> 
 	<a href="index.php" style=color: #999999>LOGOUT </a> 
 		| SITEMAP &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-<!--
-<div class="header" style="padding:30px;">
-  <p style="font-size: 20px; font-weight: bold; color: #999999;" valign = "center"> <a href="testphpr2.php">     
-    <img src="logo.gif" alt="" width="1" height="1" /></a>  </p>
-  </h1></th>
-</div>
--->
 
 
 </head>
@@ -276,36 +288,7 @@ select {
 
 <?php require_once('Connections/test.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
@@ -315,10 +298,10 @@ if (isset($_SERVER['QUERY_STRING'])) {
 if ((isset($_POST['hd_del'])) && ($_POST['hd_del'] != "")) {
   
   $deleteSQL = sprintf("delete from OrderTemp where idx = %s and Hospital_ID = %s",
-  GetSQLValueString($_POST['hd_del'],"int"),
-  GetSQLValueString($_POST['ho_id'],"int"));
-  mysql_select_db($database_test, $test);
-  $Result1 = mysql_query($deleteSQL, $test) or die(mysql_error());
+  $_POST['hd_del'],
+  $_POST['ho_id']);
+  echo($deleteSQL);
+  $Result1 = mysqli_query($test, $deleteSQL );
 
   $deleteGoTo = "testphpr2.php";
   if (isset($_SERVER['QUERY_STRING'])) {
@@ -328,89 +311,79 @@ if ((isset($_POST['hd_del'])) && ($_POST['hd_del'] != "")) {
   //header(sprintf("Location: %s", $deleteGoTo));
 }
 
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+mysqli_query($test, "set session character_set_connection=latin1;");
+mysqli_query($test, "set session character_set_results=latin1;");
+mysqli_query($test, "set session character_set_client=latin1;");
 
 
 //echo GetSQLValueString($h_id, "int");
 if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "form1")) {
- 	$h_id = GetSQLValueString($_POST['txt_hospital_id'],"text");
- 	$sql_test = mysql_query("select * from OrderTemp where Hospital_ID = $h_id");
- 	$sql_test_rows = mysql_num_rows($sql_test); // mysql row 수를 판단하여 중복 유/무 판별
+ 	$h_id = $_POST['txt_hospital_id'];
+ 	$sql_test = mysqli_query($test, "select * from OrderTemp where Hospital_ID = '$h_id'");
+ 	$sql_test_rows = mysqli_num_rows($sql_test); // mysql row 수를 판단하여 중복 유/무 판별
   
  	if($sql_test_rows>'0'){
- 	$sql_idx = mysql_query("select idx from OrderTemp where Hospital_ID = $h_id");   
- 	$n = mysql_num_rows($sql_idx);
- 	$idxx = mysql_result($sql_idx,$n-1,'idx');
+ 	$sql_idx = mysqli_query($test, "select idx from OrderTemp where Hospital_ID = '$h_id'");   
+ 	$n = mysqli_num_rows($sql_idx);
+ 	$idxx = mysqli_result($sql_idx,$n-1,'idx');
  	$j = $idxx + 1;
  
  	$txt_comment = "txt_comment"."$n";
  	$txt_comment_date = "txt_comment_date"."$n";
      
- 	if(GetSQLValueString($_POST['txt_Memo'],"text") !="NULL"){
- 	$updateSQL = sprintf("insert into OrderTemp(Hospital_ID, Memo1, Date1, idx) values (%s, %s, %s, $j)" ,
-                       GetSQLValueString($_POST['txt_hospital_id'] ,"text"),
-                       GetSQLValueString($_POST['txt_Memo'], "text"),
-                       GetSQLValueString($_POST['txt_Date'], "text")
+ 	if(strlen($_POST['txt_Memo']) !=0){
+ 	  $updateSQL = sprintf("insert into OrderTemp(Hospital_ID, Memo1, Date1, idx) values ('%s', '%s', '%s', $j)" ,
+                       $_POST['txt_hospital_id'],
+                       $_POST['txt_Memo'],
+                       $_POST['txt_Date']
                        //GetSQLValueString($colname_patientinfo, "int"),
                        );
- 	$updateSQL = mysql_query(sprintf("Update TreatmentInfo Set NumOrder='$j' where Hospital_ID like '%s'", GetSQLValueString($_POST['txt_hospital_id'] ,"text")));
-         
-		 mysql_select_db($database_test, $test);
-		 while(1){
-		 	$Result1 = mysql_query($updateSQL, $test);
-		 	mysql_query("Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $h_id");
+
+ 	  // $updateSQL = mysqli_query($test, sprintf("Update TreatmentInfo Set NumOrder='$j' where Hospital_ID like '%s'", $colname_patientinfo));
+
+     echo $updateSQL;
+
+		 	$Result1 = mysqli_query($test, $updateSQL );
+		 	mysqli_query($test, "Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $h_id");
 		 	
-		 	if($Result1 == True){
-			 	break;
-		 	}
-		 }	
  
   		}
-  	if(GetSQLValueString($_POST['txt_Memo'],"text") =="NULL" && $insert_menu==1){
+  	if(strlen($_POST['txt_Memo']) ==0 && $insert_menu==1){
  		         
     for($i=0; $i<$sql_test_rows; $i++){
 	    
-	$idx_i = mysql_result($sql_idx,$i,"idx");
+	$idx_i = mysqli_result($sql_idx,$i,"idx");
     $txt_comment = "txt_comment"."$idx_i";
 	$txt_comment_date = "txt_comment_date"."$idx_i";
     	
     $updateSQL = sprintf("update OrderTemp SET Memo1 = %s, Date1=%s where Hospital_ID = $h_id and idx = '$idx_i'",
-    				GetSQLValueString($_POST[$txt_comment],"text"),
-    				GetSQLValueString($_POST[$txt_comment_date],"text"));
-    while(1){
-		$C_result = mysql_query($updateSQL, $test);
-    mysql_query("Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $h_id");
+    				$_POST[$txt_comment],
+    				$_POST[$txt_comment_date]);
+            echo $updateSQL;
+
+		$C_result = mysqli_query($test, $updateSQL );
+    mysqli_query($test, "Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $h_id");
 		
-		if($C_result == True){
-			break;
-		}
-	}
 		    //echo $updateSQL1;
     	}
     }
   }
   if($sql_test_rows=='0'){
-	if(GetSQLValueString($_POST['txt_Memo'],"text") !="NULL"){
- 	  
-	$updateSQL = sprintf("insert into OrderTemp(Hospital_ID, Memo1, Date1, idx) values (%s, %s, %s, 1)" ,
-                       GetSQLValueString($_POST['txt_hospital_id'] ,"text"),
-                       GetSQLValueString($_POST['txt_Memo'], "text"),
-                       GetSQLValueString($_POST['txt_Date'], "text")
+    echo($_POST['txt_Memo']);
+	if(strlen($_POST['txt_Memo']) !=0){
+ 	  $colname_patientinfo = $_POST['ho_id'];
+	$updateSQL = sprintf("insert into OrderTemp(Hospital_ID, Memo1, Date1, idx) values ('%s', '%s', '%s', 1)" ,
+                       $colname_patientinfo,
+                       $_POST['txt_Memo'],
+                       $_POST['txt_Date']
                        //GetSQLValueString($colname_patientinfo, "int"),
                        );
     echo $updateSQL;
-    mysql_select_db($database_test, $test);
-    while(1){
-    	$Result1 = mysql_query($updateSQL, $test);
-    mysql_query("Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $h_id");
-    	
-		if($Result1 == True){
-			break;
-		}
-    }
     
+    	$Result1 = mysqli_query($test, $updateSQL );
+      mysqli_query($test, "Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $h_id");
+    	
+		
     } 
 	  
   }
@@ -421,7 +394,7 @@ if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "form1")) {
     $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
     $updateGoTo .= $_SERVER['QUERY_STRING'];
   }
-  header(sprintf("Location: %s", $updateGoTo));
+  // header(sprintf("Location: %s", $updateGoTo));
 }
 
 
@@ -434,44 +407,17 @@ if (isset($_POST['ho_id'])){
 }
 
 //echo $colname_patientinfo;
-mysql_select_db($database_test, $test);
+mysqli_select_db($database_test );
 
-$query_TempMemo = sprintf("SELECT * FROM OrderTemp WHERE Hospital_ID = %s", GetSQLValueString($colname_patientinfo, "text"));
-$MemoInfo = mysql_query($query_TempMemo, $test) or die(mysql_error());
-//$a_MemoInfo = mysql_data_seek($MemoInfo, 8);
-$row_Memoinfo = mysql_fetch_assoc($MemoInfo);
-$total_Memoinfo = mysql_num_rows($MemoInfo);
+$query_TempMemo = sprintf("SELECT * FROM OrderTemp WHERE Hospital_ID = %s", $colname_patientinfo);
+$MemoInfo = mysqli_query($test, $query_TempMemo ) or die(mysqli_error());
+//$a_MemoInfo = mysqli_data_seek($MemoInfo, 8);
+$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
+$total_Memoinfo = mysqli_num_rows($MemoInfo);
 
 //echo $total_Memoinfo;
-$h_id = GetSQLValueString($colname_patientinfo, "string");
-
-/*
-if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "form1")) {
-  $updateSQL = sprintf("INSERT INTO OrderTemp (Hospital_ID, Date, Memo) VALUES(%s, %s, %s)",
-                       GetSQLValueString($_POST['txt_name'], "text"),
-                       GetSQLValueString($_POST['txt_lastname'], "text"),
-                       GetSQLValueString($_POST['txt_hospital_id'], "int"));
-
-  mysql_select_db($database_test, $test);
-  $Result1 = mysql_query($updateSQL, $test) or die(mysql_error());
-
-  $updateGoTo = "testphpr2.php";
-  if (isset($_SERVER['QUERY_STRING'])) {
-    $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
-    $updateGoTo .= $_SERVER['QUERY_STRING'];
-  }
-  header(sprintf("Location: %s", $updateGoTo));
-}
-
-
-
-$colname_Recordset1 = "-1";
-if (isset($_POST['hf_edit'])) {
-  $colname_Recordset1 = $_POST['hf_edit'];
-}
-*/
-
-
+// $h_id = GetSQLValueString($colname_patientinfo, "string");
+$h_id = $colname_patientinfo;
 
 
 ?>
@@ -486,7 +432,7 @@ if (isset($_POST['hf_edit'])) {
 <table width="70%" border="0" cellspacing="1" cellpadding="1" align ="center">
 
 <tr>
- <td valign="middle" width="40%" scope="row" colspan="2" height="60" valign="middle"> <img src="/Resources/IconSet/CommentInfo.png" height="30"></td>
+ <td valign="middle" width="40%" scope="row" colspan="2" height="60" valign="middle"> </td>
  <td width="40%">
 <form id = "form11" name = "form11" method="POST" action = "shortorder.php">
 	<input type = "hidden" name = "permit" id = "permit" value = <?php echo $permitUser?> />
@@ -501,15 +447,6 @@ if (isset($_POST['hf_edit'])) {
 <form id="form1" name="form1" method="POST" action="<?php echo $editFormAction; ?>">
 
 
-<?php /* $updateSQL = sprintf("INSERT INTO OrderTemp (Hospital_ID,Memo1, Date1) VALUES(%s, %s, '2015-12-08')",                                             
-                       GetSQLValueString($colname_patientinfo, "int"), GetSQLValueString($_POST['txt_Memo'], "text"));
-                       echo $updateSQL; ?>*/
-
-/*
-<?php $temp = sprintf("INSERT INTO OrderTemp (Hospital_ID,Memo1, Date1) VALUES(%s, %s, '2015-12-08')",                                             
-                       GetSQLValueString($colname_patientinfo, "text"), GetSQLValueString($_POST['txt_Memo'], "text"));        
-                       echo $temp;*/
-                       ?>
 
   <table width="70%" border="0" cellspacing="1" cellpadding="1" align ="center">
     
@@ -517,9 +454,9 @@ if (isset($_POST['hf_edit'])) {
 	    
 	$Today_Date = Date("n/j/y");
 	//echo $Today_Date;    
-	$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = '$h_id'");
-	$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = '$h_id'"); 
-	$sql_idx = mysql_query("select idx from OrderTemp where Hospital_ID = '$h_id'");  
+	$sql_Memo = mysqli_query($test, "select Memo1 from OrderTemp where Hospital_ID = '$h_id'");
+	$sql_Date = mysqli_query($test, "select Date1 from OrderTemp where Hospital_ID = '$h_id'"); 
+	$sql_idx = mysqli_query($test, "select idx from OrderTemp where Hospital_ID = '$h_id'");  
 	
 	     ?>
     <tr>
@@ -530,9 +467,9 @@ if (isset($_POST['hf_edit'])) {
     
     <?php if($menu==1){ ?>
     <?php for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
-	    $Memo = mysql_result($sql_Memo, $i,"Memo1");
-	    $Date = mysql_result($sql_Date, $i,"Date1");
-	    $idx = mysql_result($sql_idx, $i, "idx");
+	    $Memo = mysqli_result($sql_Memo, $i,"Memo1");
+	    $Date = mysqli_result($sql_Date, $i,"Date1");
+	    $idx = mysqli_result($sql_idx, $i, "idx");
 	    
 	    $txt_comment = "txt_comment"."$idx";
 	    $txt_comment_date = "txt_comment_date"."$idx";
@@ -560,9 +497,9 @@ if (isset($_POST['hf_edit'])) {
     <?php }}?>
     <?php if($menu==0){ ?>
     <?php for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
-	    $Memo = mysql_result($sql_Memo, $i,"Memo1");
-	    $Date = mysql_result($sql_Date, $i,"Date1");
-	    $idx = mysql_result($sql_idx, $i, "idx");
+	    $Memo = mysqli_result($sql_Memo, $i,"Memo1");
+	    $Date = mysqli_result($sql_Date, $i,"Date1");
+	    $idx = mysqli_result($sql_idx, $i, "idx");
 	    
 	    $txt_comment = "txt_comment"."$idx";
 	    $txt_comment_date = "txt_comment_date"."$idx";
@@ -613,5 +550,5 @@ if (isset($_POST['hf_edit'])) {
 </form>
 
 <?php
-mysql_free_result($Memoinfo);
+mysqli_free_result($Memoinfo);
 ?>
