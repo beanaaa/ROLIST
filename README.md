@@ -16,6 +16,8 @@ ROLIST는 방사선 종양학과에서 근무하면서 스케쥴링의 자동화
  - id/pass: guest/guest
  - 카카오톡 오픈챗: https://open.kakao.com/o/gkyrLG3
  - Mail: hanbean.youn@gmail.com
+ 
+업로드된 파일은 php7으로 마이그레이션 하고 있지만 샘플 사이트는 php5.6 기준입니다. 
 
 ## 사용법
  - 신환등록: 우상단 New-Patient 버튼 또는 왼쪽 연필 아이콘 클릭후 원하느 환자 아이디를 입력한다. 환자 아이디는 숫자 형태만 지원
