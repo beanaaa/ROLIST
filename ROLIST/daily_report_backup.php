@@ -1,25 +1,4 @@
 <!doctype html>
-
-<?php
-function mysqli_result($res,$row=0,$col=0)
-{ 
-	$nums=mysqli_num_rows($res);
-	if($nums && $row<=($nums-1) && $row>=0)
-	{
-		mysqli_data_seek($res,$row);
-		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
-		if(isset($resrow[$col]))
-		{
-			return $resrow[$col];
-		}
-	}
-	return false;
-}
-	
-	error_reporting(0);	
-?>
-
-
 <?php 
 	include("configuration.php");
 ?>
@@ -226,6 +205,7 @@ function get_time() {
     return ((float)$usec + (float)$sec);
 }
 
+    echo("test");
 
 // mysql_select_db($database_test, $test);
 mysqli_query($test,"set session character_set_connection=latin1;");
@@ -599,10 +579,11 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.Hospital_ID " . $order;
+echo($query_Recordset1);
 $Recordset1 = mysqli_query($test,$query_Recordset1);
 $row_Recordset1       = mysqli_fetch_assoc($Recordset1);
 $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
-
+echo($totalRows_Recordset1);
 
 
 $rsetTemp = mysqli_query($test,$query_Recordset1);

@@ -80,10 +80,10 @@ if (isset($_POST['ID_txt'])) {
   // GetSQLValueString($loginUsername, "text"), GetSQLValueString($password, "text")); 
    
   $LoginRS = mysqli_query($login,$LoginRS__query);
-   echo($LoginRS__query);
+  // echo($LoginRS__query);
   $loginFoundUser = mysqli_num_rows($LoginRS);
   echo($loginFoundUser);
-
+echo("redirected?");
   if ($loginFoundUser !=0) {
     echo("redirected?");
  
@@ -105,8 +105,10 @@ if (isset($_POST['ID_txt'])) {
   }
   else {
     echo($loginFoundUser);
-     echo "<script>window.alert('Login Fail');
-		    window.location.href='index.php';</script>";
+    echo( $LoginRS__query);
+    echo($loginFoundUser);    
+    //  echo "<script>window.alert('Login Fail');
+		//     window.location.href='index.php';</script>";
   }
 }
 ?>
