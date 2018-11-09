@@ -1,38 +1,24 @@
-/* body all */
-body {margin:0; color:#6E6E7F; background:#e9eaed;}
-a:link,
-a:visited {color:#9090FF; text-decoration:none; font-weight:bolder; }
-a:hover {color:#B1B1CC;}
+/*
 
-/* container start */
-div#container {margin:0 auto;}
+bootstrap template - login-form Template
+Version: 1.0
+By: dave-cheon
 
-/* header start */
-header {width:94%; background:#fff; margin:1% 2% 0 2%; padding:1%; border-radius:10px;}
-header h1 {margin:0; padding:5px;}
-header h1 > a:link,
-header h1 > a:visited {color:#8E8E9F; text-decoration:none;}
-header h1 > a:hover {color:#000;}
-div#logo {float:left; width:255px;}
-div#navset {float:right;}
-nav#menu {text-align:right; width:300px;}
-nav#menu > li {float:right; list-style:none; margin-left:10px}
+*/
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+* { font-family: 'Nanum Gothic', sans-serif; }
 
-nav#login {clear:both; padding-top:5px; text-align:right; width:300px;}
+.spaceLeft {
+  margin-left: 10px;
+}
+.spaceRight {
+  margin-right: 10px;
+}
 
-div.ad_1 {clear:both; background:#fff; text-align:center; padding:10px 0 5px 0; background:#e9eaed; border-radius:10px;}
-/* header end */
-
-/* section start */
-/* article start */
-article {float:left; width:68%; height:300px; background:#fff; margin:10px 0px 10px 2%; padding:1%; border-radius:10px;}
-/* article end */
-/* aside start */
-aside {float:right; width:23%; height:300px; background:#fff; margin:10px 2% 10px 1%; padding:1%; border-radius:10px;}
-/* aside end */
-/* section end */
-
-/* footer start */
-footer {clear:both; width:94%; background:#fff; margin:0 2% 10px 2%; padding:1%; border-radius:10px;}
-/* footer end */
-/* container end */
+/* custom checkbox */
+.btn span.fa {
+	opacity: 0;
+}
+.btn.active span.fa {
+	opacity: 1;
+}
