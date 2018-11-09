@@ -1,6 +1,6 @@
 <?php
 
-	include("mysql_compact.php")
+
 
 
    $filename = "param.cfg";

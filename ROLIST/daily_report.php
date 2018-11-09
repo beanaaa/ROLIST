@@ -1,7 +1,24 @@
 <!doctype html>
 <link rel="stylesheet" href="normalize.css">
 <meta charset="utf-8">
+
 <?php 	
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+
+	error_reporting(0);
 if (!isset($_SESSION)) {
 session_cache_expire(10000000);  
 
@@ -300,12 +317,12 @@ if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
     header("Location: " . $MM_restrictGoTo);
 }
 
-$conn = mysql_connect("localhost", "root", "dbsgksqls") or die(mysql_error());
-mysql_select_db("test", $conn);
-// mysql_select_db($database_test, $test);
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+$conn = mysqli_connect("localhost", "root", "dbsgksqls")  ;
+mysqli_select_db("test", $conn);
+// mysqli_select_db($database_test );
+mysqli_query($test,"set session character_set_connection=latin1;");
+mysqli_query($test,"set session character_set_results=latin1;");
+mysqli_query($test,"set session character_set_client=latin1;");
 
 //오늘 날짜 출력 ex) 2013-04-10
 $today_date      = date('Y-m-d');
@@ -322,7 +339,7 @@ for ($dayCount=-1; $dayCount>-20; $dayCount--){
 	$beforeDay = date("m/d/y", strtotime($today. $dcs));
 // 		echo($beforeDay);
 	$daySql = "Select * from Holiday where solar_date like STR_TO_DATE('$beforeDay','%m/%d/%Y')";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,$daySql));	
 	$yoils = date('w', strtotime($beforeDay));
 // 	echo($sqlQuery[solar_date]); echo("&nbsp");echo($yoils); echo("&nbsp");echo($today_date);
 	$workingyest = $sqlQuery[solar_date];
@@ -337,7 +354,7 @@ for ($dayCount=1; $dayCount<20; $dayCount++){
 	$beforeDay = date("m/d/y", strtotime($today. $dcs));
 // 		echo($beforeDay);
 	$daySql = "Select * from Holiday where solar_date like STR_TO_DATE('$beforeDay','%m/%d/%Y')";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,$daySql));	
 	$yoils = date('w', strtotime($beforeDay));
 // 	echo($sqlQuery[solar_date]); echo("&nbsp");echo($yoils); echo("&nbsp");echo($today_date);
 	$workingtom = $sqlQuery[solar_date];
@@ -400,19 +417,19 @@ else{
 
 	for($idphyss=0;$idphyss<$numphyss;$idphyss++){ 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.physician LIKE '%$phyIdd[$idphyss]%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveMD[$idphyss] = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$liveMD[$idphyss] = mysqli_num_rows($Recordset1);
 	}
 	for($idphyss=0;$idphyss<$numtech;$idphyss++){ 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where  $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.RT_method_f LIKE '%$techIdd[$idphyss]%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveTech[$idphyss] = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$liveTech[$idphyss] = mysqli_num_rows($Recordset1);
 	}
 	
 	for($idphyss=0;$idphyss<$numrooms;$idphyss++){ 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.Linac1 LIKE '%$rmsInt[$idphyss]%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveRoom[$idphyss] = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$liveRoom[$idphyss] = mysqli_num_rows($Recordset1);
 	}
 
 
@@ -422,24 +439,24 @@ else{
 
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.Linac1 LIKE '%Ver%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveVersa = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$liveVersa = mysqli_num_rows($Recordset1);
 	
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.Linac1 LIKE '%IX%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveIx = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$liveIx = mysqli_num_rows($Recordset1);
 	
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.Linac1 LIKE '%In%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveInfinity = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$liveInfinity = mysqli_num_rows($Recordset1);
 	
 	$query_Recordset1 = "SELECT * FROM PatientInfo join ClinicalInfo join TreatmentInfo on PatientInfo.Hospital_ID = ClinicalInfo.Hospital_ID AND PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND CHAR_LENGTH(TreatmentInfo.Modality_var1)>1" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$numCCRT = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$numCCRT = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$numTotal = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$numTotal = mysqli_num_rows($Recordset1);
 
 
 
@@ -453,91 +470,21 @@ else{
 
 	for($idphyss=0;$idphyss<$numcatg;$idphyss++){ 
 		$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $querySite $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%$catgInt[$idphyss]%'" ;	
-		$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-		$liveCatg[$idphyss] = mysql_num_rows($Recordset1);
+		$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+		$liveCatg[$idphyss] = mysqli_num_rows($Recordset1);
 	}
 
 
 
 
-/*
-
-
-
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%CNS%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	
-	$liveCNS = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%HN%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveHN = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%THX%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveTHX = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%BRST%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveBRST = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%GI%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveGI = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%GU%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveGU = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%GY%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveGY = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%MS%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveMS = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%SKIN%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveSKIN = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%HMT%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveHMT = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%PD%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$livePD = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%BENIGN%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveBENIGN = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%CUPS%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveCUPS = mysql_num_rows($Recordset1);
-
-	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%OTHER%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveOTHER = mysql_num_rows($Recordset1);
-*/
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') < '$Today_date_nextweek' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveFin = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$liveFin = mysqli_num_rows($Recordset1);
 	
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD $querySite  STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') < '$Today_date_nextweek' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)" ;	
-// 	echo($query_Recordset1);
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveStart = mysql_num_rows($Recordset1);
-// echo($query_Recordset1);
-/*
-
-echo($today_date);
-echo($Today_date_nextweek);
-echo($liveFin);
-*/
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$liveStart = mysqli_num_rows($Recordset1);
 ?>
 
 <?php
@@ -930,14 +877,14 @@ for($idstat = 0; $idstat<count($StatT); $idstat++){
 	$sId = substr($StatT[$idstat],9,2);
 	
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $sId from TreatmentInfo where Hospital_ID = '$hId'"));	
-	$sqlQueryPhys = mysql_fetch_assoc(mysql_query("select physician from TreatmentInfo where Hospital_ID = '$hId'"));	
-	$sqlQueryName = mysql_fetch_assoc(mysql_query("select Firstname, Secondname from PatientInfo where Hospital_ID = '$hId'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $sId from TreatmentInfo where Hospital_ID = '$hId'"));	
+	$sqlQueryPhys = mysqli_fetch_assoc(mysqli_query($test,"select physician from TreatmentInfo where Hospital_ID = '$hId'"));	
+	$sqlQueryName = mysqli_fetch_assoc(mysqli_query($test,"select Firstname, Secondname from PatientInfo where Hospital_ID = '$hId'"));	
 	if($sqlQuery[$sId]==0){ 
 
 	}
 	echo("");
- 	$sqlQuery = mysql_query("update TreatmentInfo set $sId = 1 where Hospital_ID = '$hId'");		
+ 	$sqlQuery = mysqli_query($test,"update TreatmentInfo set $sId = 1 where Hospital_ID = '$hId'");		
 }
 
 	
@@ -958,10 +905,10 @@ for($idstat = 0; $idstat<count($StatT); $idstat++){
 <form name = "Plan" method = "POST" action ="" >       
     <table cellpadding = "1px" width="960px" border="0" align="center" cellspacing="0">	    
 		<?php	
-		$Recordset1 = mysql_query($searchQuery, $test) or die(mysql_error());
+		$Recordset1 = mysqli_query($test,$searchQuery )  ;
 		
-		$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-		$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+		$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+		$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 		if($totalRows_Recordset1>0){ 
 		?>	    
         <tr class="border_bottom">
@@ -1028,16 +975,16 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 )  ;
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -1112,10 +1059,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -1326,15 +1273,15 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	$StatTarget = $sqlQuery[$tChecked];
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
 	$StatPlan = $sqlQuery[$pChecked];	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	$StatApprove = $sqlQuery[$aChecked];	
@@ -1538,16 +1485,16 @@ do {
 	}
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
 	if($row_Memoinfo>0){ 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 ?>
 
     <div class="memo"><?php echo $Memo ?></div>
@@ -1586,7 +1533,7 @@ do {
 }
 
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -1639,9 +1586,9 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
 }
 
 $query_Recordset1 .= " ORDER BY TreatmentInfo.Linac_f " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 // print_r($row_Recordset1);
@@ -1702,10 +1649,10 @@ if($totalRows_Recordset1 !=0){
 	}
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 )  ;
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["CT_Sim1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["CT_Sim2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["CT_Sim3"]));
@@ -1941,15 +1888,15 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	$StatTarget = $sqlQuery[$tChecked];
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
 	$StatPlan = $sqlQuery[$pChecked];	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	$StatApprove = $sqlQuery[$aChecked];	
@@ -2167,16 +2114,16 @@ do {
 	}
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
 	if($row_Memoinfo>0){ 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 	
 ?>
 
@@ -2230,7 +2177,7 @@ do {
 
 <?php
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -2392,16 +2339,16 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 )  ;
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -2476,10 +2423,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -2698,15 +2645,15 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	$StatTarget = $sqlQuery[$tChecked];
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
 	$StatPlan = $sqlQuery[$pChecked];	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	$StatApprove = $sqlQuery[$aChecked];	
@@ -2932,17 +2879,17 @@ $sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo w
 	}
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
 
 	if($row_Memoinfo>0){ 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 
 ?>
 
@@ -2981,7 +2928,7 @@ $sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo w
 <?php
 }
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -3051,16 +2998,16 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 )  ;
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -3135,10 +3082,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -3356,14 +3303,14 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	?>
@@ -3567,17 +3514,17 @@ do {
 	}
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
 
 	if($row_Memoinfo>0){ 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 
 ?>
 
@@ -3616,7 +3563,7 @@ do {
 <?php
 }
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -3703,16 +3650,16 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 )  ;
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -3787,10 +3734,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -4007,15 +3954,15 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	$StatTarget = $sqlQuery[$tChecked];
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
 	$StatPlan = $sqlQuery[$pChecked];	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	$StatApprove = $sqlQuery[$aChecked];		
@@ -4253,17 +4200,17 @@ do {
 	}
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
 
 	if($row_Memoinfo>0){ 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 
 ?>
 
@@ -4302,7 +4249,7 @@ do {
 <?php
 }
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -4351,9 +4298,9 @@ for($idDays = 1;$idDays<15;$idDays++){
 	    $order = 'DESC';
 	}
 	$query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-	$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+	$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+	$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 	if($totalRows_Recordset1 !=0){ 
 		$fTnum = $fTnum+1;
 	}
@@ -4495,9 +4442,9 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 if($totalRows_Recordset1 !=0){ 
 
 ?>
@@ -4506,10 +4453,10 @@ if($totalRows_Recordset1 !=0){
 
 <?php
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 )  ;
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -4585,10 +4532,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -4792,14 +4739,14 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	?>
@@ -5001,16 +4948,16 @@ do {
 		echo($phyMark) ;
 	}
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
 	if($row_Memoinfo>0){ 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 ?>
 
     <div class="memo"><?php echo $Memo ?></div>
@@ -5049,7 +4996,7 @@ do {
 <?php
 
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -5185,7 +5132,7 @@ for($idffd=0;$idffd<20;$idffd++){
 	$workingDaychecker     = date('Y-m-d', strtotime(date("n/j/y") . '+' . $idffd . ' days'));
 	
 	$daySql = "Select * from Holiday where solar_date like '$workingDaychecker'";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,$daySql));	
 	$yoils = date('w', strtotime($workingDaychecker));
 
 	$workingyest = $sqlQuery[solar_date];
@@ -5240,13 +5187,13 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
 
 $query_Recordset1 .= " ORDER BY binary(PatientInfo.KorName) ASC";
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
 
 // echo($query_Recordset1);
 
 
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 // print_r($row_Recordset1);
 /*
@@ -5254,10 +5201,10 @@ print_r($query_Recordset1);
 echo("<br>");
 */
 // print_r(($totalRows_Recordset1));
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 )  ;
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
 //     $idss = 
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
@@ -5299,7 +5246,7 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
         $dateSorter[$iddd] = $s7;
     }
 //     echo($pid[$iddd]);
-//  	$sqlQuery = mysql_query("update TreatmentInfo set RT_start_cur = $dateSorter[$iddd] where Hospital_ID = $rowOrders[Hospital_ID]");		
+//  	$sqlQuery = mysqli_query($test,"update TreatmentInfo set RT_start_cur = $dateSorter[$iddd] where Hospital_ID = $rowOrders[Hospital_ID]");		
 
     
 }
@@ -5489,14 +5436,14 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	?>
@@ -5705,16 +5652,16 @@ do {
 
 	}
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
 	if($row_Memoinfo>0){ 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 ?>
 
     <div class="memo"><?php echo $Memo ?></div>
@@ -5753,7 +5700,7 @@ do {
 
 <?php
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
 
 
   unset($row_Recordset1);
@@ -5846,12 +5793,12 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
 
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test,$query_Recordset1 )  ;
 
 
 
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 // print_r($row_Recordset1);
 /*
@@ -5859,10 +5806,10 @@ print_r($query_Recordset1);
 echo("<br>");
 */
 // print_r(($totalRows_Recordset1));
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 )  ;
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -5901,7 +5848,7 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
         $pid[$iddd]        = "7";
         $dateSorter[$iddd] = $s7;
     }
-//  	$sqlQuery = mysql_query("update TreatmentInfo set RT_start_cur = $dateSorter[$iddd] where Hospital_ID = $rowOrders[Hospital_ID]");		
+//  	$sqlQuery = mysqli_query($test,"update TreatmentInfo set RT_start_cur = $dateSorter[$iddd] where Hospital_ID = $rowOrders[Hospital_ID]");		
 
     
 }
@@ -6073,14 +6020,14 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $aChecked from TreatmentInfo where Hospital_ID = '$statVal'"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	?>
@@ -6290,16 +6237,16 @@ do {
 	}
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
 	if($row_Memoinfo>0){ 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 ?>
 
     <div class="memo"><?php echo $Memo ?></div>
@@ -6337,7 +6284,7 @@ do {
 
 <?php
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
 
 
   unset($row_Recordset1);
@@ -6375,8 +6322,8 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($Recordset1);
-mysql_free_result($Recordset2);
+mysqli_free_result($Recordset1);
+mysqli_free_result($Recordset2);
 
 ?>
 

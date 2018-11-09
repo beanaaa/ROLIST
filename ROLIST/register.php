@@ -2,11 +2,11 @@
 
 <?php
 		require_once('Connections/login.php'); 
-		$result = mysql_select_db($database_login, $login);
-		@mysql_query("set names utf8", $connect_db);
-          mysql_query("set session character_set_connection=latin1;");
-          mysql_query("set session character_set_results=latin1;");
-          mysql_query("set session character_set_client=latin1;");
+		$result = mysqli_select_db($database_login, $login);
+		@mysqli_query("set names utf8", $connect_db);
+          mysqli_query("set session character_set_connection=latin1;");
+          mysqli_query("set session character_set_results=latin1;");
+          mysqli_query("set session character_set_client=latin1;");
 
 		$uid = $_POST['Id'];
 		$pass = $_POST['Password'];
@@ -14,8 +14,10 @@
 		$msg = $_POST['msg'];
 
 		if(strcmp($pass,$pass2)==0 and strlen($pass2)>0){
- 			$query = "Insert Into loginpend(h_id, h_password, msg) values ('$uid','$pass','$msg')";
-			$res = mysql_query($query,$login);
+      $con=mysqli_connect("localhost","root","dbsgksqls","login");
+       $query = "Insert Into loginpend(h_id, h_password, msg) values ('$uid','$pass','$msg')";
+       echo($query);
+			$res = mysqli_query($login,$query);
 		}
 ?>
 <!DOCTYPE html>

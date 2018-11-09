@@ -6,5 +6,5 @@ $hostname_login = "localhost";
 $database_login = "login";
 $username_login = "root";
 $password_login = "dbsgksqls";
-$login = mysql_connect("localhost","root","dbsgksqls") or die(mysql_error()); 
+$login = mysqli_connect("localhost","root","dbsgksqls","login"); 
 ?>

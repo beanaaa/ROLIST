@@ -1,5 +1,28 @@
 <!doctype html>
 <link rel="stylesheet" href="normalize.css">
+
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
+
+
+
 <?php 	
 if (!isset($_SESSION)) {
 session_cache_expire(10000000);  
@@ -250,12 +273,12 @@ if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
     header("Location: " . $MM_restrictGoTo);
 }
 
-$conn = mysql_connect("localhost", "root", "dbsgksqls") or die(mysql_error());
-mysql_select_db("test", $conn);
-// mysql_select_db($database_test, $test);
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+
+mysqli_select_db("test", $conn);
+// mysqli_select_db($database_test );
+mysqli_query($test,"set session character_set_connection=latin1;");
+mysqli_query($test,"set session character_set_results=latin1;");
+mysqli_query($test,"set session character_set_client=latin1;");
 //오늘 날짜 출력 ex) 2013-04-10
 $today_date      = date('Y-m-d');
 //오늘의 요일 출력 ex) 수요일 = 3
@@ -269,7 +292,7 @@ for ($dayCount=-1; $dayCount>-20; $dayCount--){
 	$beforeDay = date("m/d/y", strtotime($today. $dcs));
 // 		echo($beforeDay);
 	$daySql = "Select * from Holiday where solar_date like STR_TO_DATE('$beforeDay','%m/%d/%Y')";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,$daySql));	
 	$yoils = date('w', strtotime($beforeDay));
 // 	echo($sqlQuery[solar_date]); echo("&nbsp");echo($yoils); echo("&nbsp");echo($today_date);
 	$workingyest = $sqlQuery[solar_date];
@@ -284,7 +307,7 @@ for ($dayCount=1; $dayCount<20; $dayCount++){
 	$beforeDay = date("m/d/y", strtotime($today. $dcs));
 // 		echo($beforeDay);
 	$daySql = "Select * from Holiday where solar_date like STR_TO_DATE('$beforeDay','%m/%d/%Y')";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,$daySql));	
 	$yoils = date('w', strtotime($beforeDay));
 // 	echo($sqlQuery[solar_date]); echo("&nbsp");echo($yoils); echo("&nbsp");echo($today_date);
 	$workingtom = $sqlQuery[solar_date];
@@ -300,7 +323,7 @@ for($idstat = 0; $idstat<count($StatF); $idstat++){
 	$sId = substr($StatF[$idstat],9,2);
 	
 	
- 	$sqlQuery = mysql_query("update TreatmentInfo set $sId = '1' where Hospital_ID like '$hId'");		
+ 	$sqlQuery = mysqli_query($test,"update TreatmentInfo set $sId = '1' where Hospital_ID like '$hId'");		
 }
 $StatF2 = $_POST['StatF2'];
 print_r($StatF2);
@@ -309,7 +332,7 @@ for($idstat = 0; $idstat<count($StatF2); $idstat++){
 	$hId = substr($StatF2[$idstat],0,9);
 	$sId = substr($StatF2[$idstat],9,2);
 	$fmQuery = "update TreatmentInfo set $sId = '1' where Hospital_ID like '$hId'";
- 	$sqlQuery = mysql_query($fmQuery);		
+ 	$sqlQuery = mysqli_query($test,$fmQuery);		
  	
 }
 
@@ -546,9 +569,9 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
 // echo($query_Recordset1);
 
 $query_Recordset1 .= " ORDER BY STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') DESC";
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test,$query_Recordset1 ) or die(mysqli_error());
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 $workDay = 0;
@@ -575,10 +598,10 @@ $sortCat7 = 'RT_start7';
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 ) or die(mysqli_error());
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -652,10 +675,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test,$query_Recordset1 ) or die(mysqli_error());
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -831,11 +854,11 @@ do {
 	$pChecked = "FM";
 
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID like '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $tChecked from TreatmentInfo where Hospital_ID like '$statVal'"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurFP = "	checked='checked'";}
 	else{ $chkCurFP = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID like '$statVal'"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,"select $pChecked from TreatmentInfo where Hospital_ID like '$statVal'"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurFM = "	checked='checked'";}
 	else{ $chkCurFM = "";}
 	?>
@@ -966,9 +989,9 @@ do {
 	echo($phyMark) ;
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID like '$row_Recordset1[Hospital_ID]'");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID like '$row_Recordset1[Hospital_ID]'");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID like '$row_Recordset1[Hospital_ID]'");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID like '$row_Recordset1[Hospital_ID]'");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
 </tr>
@@ -977,7 +1000,7 @@ do {
 <?php
 
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -1027,8 +1050,8 @@ $curl_opt = array(
 </html>
 <?php
 /*
-mysql_free_result($Recordset1);
-mysql_free_result($Recordset2);
+mysqli_free_result($Recordset1);
+mysqli_free_result($Recordset2);
 */
 
 ?>

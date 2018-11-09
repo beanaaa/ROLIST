@@ -3,10 +3,10 @@
 	
 	session_start();
 	session_unset();
-    require_once('Connections/login.php'); ?>
+  require_once('Connections/login.php'); ?>
 <?php
 	
-	//var_dump($_SESSION);
+	// var_dump($_SESSION);
 	
 if (!function_exists("GetSQLValueString")) {
 function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
@@ -15,7 +15,7 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
     $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
   }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysqli_escape_string($theValue);
 
   switch ($theType) {
     case "text":
@@ -68,36 +68,45 @@ if (isset($_POST['ID_txt'])) {
   $MM_redirectLoginSuccess = "activelistctrlr.php";
   }
   else{
-  $MM_redirectLoginSuccess = "daily_report.php";
+  $MM_redirectLoginSuccess = "daily_report_backup.php";
 	  
   }
   
   $MM_redirectLoginFailed = "index.php";
   $MM_redirecttoReferrer = false;
-  mysql_select_db($database_login, $login);
-  	
-  $LoginRS__query=sprintf("SELECT h_id, h_password, access FROM login WHERE h_id=%s AND h_password=%s",
-  GetSQLValueString($loginUsername, "text"), GetSQLValueString($password, "text")); 
+
+  $LoginRS__query=	"Select h_id, h_password, access From login where h_id = '$loginUsername' and h_password='$password'";
+  // $LoginRS__query=sprintf("SELECT h_id, h_password, access FROM login WHERE h_id=%s AND h_password=%s",
+  // GetSQLValueString($loginUsername, "text"), GetSQLValueString($password, "text")); 
    
-  $LoginRS = mysql_query($LoginRS__query, $login) or die(mysql_error());
-  $loginFoundUser = mysql_num_rows($LoginRS);
-  if ($loginFoundUser) {
-    
-    $loginStrGroup  = mysql_result($LoginRS,0,'access');
-    
-	if (PHP_VERSION >= 5.1) {session_regenerate_id(true);} else {session_regenerate_id();}
+  $LoginRS = mysqli_query($login,$LoginRS__query);
+   echo($LoginRS__query);
+  $loginFoundUser = mysqli_num_rows($LoginRS);
+  echo($loginFoundUser);
+
+  if ($loginFoundUser !=0) {
+    echo("redirected?");
+ 
+    // $loginStrGroup  = mysqli_result($LoginRS,0,'access');
+    $temp = mysqli_fetch_assoc($LoginRS);
+    $loginStrGroup= $temp[access];
+    echo($MM_redirectLoginSuccess);
+    session_regenerate_id(true);
     //declare two session variables and assign them
     $_SESSION['MM_Username'] = $loginUsername;
     $_SESSION['MM_UserGroup'] = $loginStrGroup;	      
-
+    $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
+    echo($MM_redirectLoginSuccess);
     if (isset($_SESSION['PrevUrl']) && false) {
       $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
     }
-    header("Location: " . $MM_redirectLoginSuccess );
+
+    header("Location: " . "daily_report_backup.php" );
   }
   else {
-    echo "<script>window.alert('Login Fail');
-		   window.location.href='index.php';</script>";
+    echo($loginFoundUser);
+     echo "<script>window.alert('Login Fail');
+		    window.location.href='index.php';</script>";
   }
 }
 ?>

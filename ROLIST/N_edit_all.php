@@ -3,6 +3,27 @@
 
 <!-- READ PHYSICIANS FROM CFG FILE -->
 <?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
+
+
+<?php
 include("configuration.php");
 
 ?>
@@ -157,14 +178,12 @@ include("idc.php");
     
 	if ($permitUser ==1 | $permitUser ==2 | $permitUser ==3){
 		require_once('Connections/test.php'); 
-		mysql_select_db($database_test, $test);
      
 	}
 	else{
  		$MM_restrictGoTo = "testphpr2.php";
  		header("Location: ". $MM_restrictGoTo); 
  		require_once('Connections/test.php'); 
- 		mysql_select_db($database_test, $test);
      
 
 	}
@@ -686,33 +705,32 @@ table.out { box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0.0), 0 6px 20px 0 rgba(0, 0, 
 <?php require_once('Connections/test.php'); ?>
 <?php
 if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "")
 {
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
+    $conn = new mysqli('localhost', 'username', 'password', 'dbname');
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+    $theValue = (!get_magic_quotes_gpc()) ? addslashes($theValue) : $theValue;
 
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
+    $theValue = $conn->real_escape_string($theValue); 
+    switch ($theType) {
+        case "text":
+          $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+          break;
+        case "long":
+        case "int":
+          $theValue = ($theValue != "") ? intval($theValue) : "NULL";
+          break;
+        case "double":
+          $theValue = ($theValue != "") ? "'" . doubleval($theValue) . "'" : "NULL";
+          break;
+        case "date":
+          $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+          break;
+        case "defined":
+          $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
+          break;
+    }
+    return $theValue;
 }
 }
 
@@ -720,9 +738,9 @@ $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
   $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+mysqli_query($test, "set session character_set_connection=latin1;");
+mysqli_query($test, "set session character_set_results=latin1;");
+mysqli_query($test, "set session character_set_client=latin1;");
 
 
 
@@ -758,7 +776,7 @@ for($idssn = 0; $idssn<count($ctNow); $idssn++){
 	$curs = "CT_Sim".$isCT;
 	$corders = "CT_Time".$isCT;
 	$ctupQuery ="Select * from TreatmentInfo where Hospital_ID like '$his'";
-	$ctPrev = mysql_fetch_assoc(mysql_query($ctupQuery));
+	$ctPrev = mysqli_fetch_assoc(mysqli_query($test, $ctupQuery));
 
 // 	echo(strlen($ctNow[$idssn]));
 	if(strlen($ctNow[$idssn])>4){
@@ -771,7 +789,7 @@ for($idssn = 0; $idssn<count($ctNow); $idssn++){
 		if(strcmp($ctPrev[$curs],$CTNow)!=0){
 			echo("<strong><font color=red>".$ctNow[$idssn]."의 CT 촬영 날짜가 변경되어 CT 시간 테이블이 초기화 되었습니다.</font></strong><br>");		
 			$deleter = "Update TreatmentInfo set $corders='0' where Hospital_ID like '$his'";
-			mysql_query($deleter);		
+			mysqli_query($test, $deleter);		
 		}
 
 
@@ -779,31 +797,27 @@ for($idssn = 0; $idssn<count($ctNow); $idssn++){
 }
 
 
-
-
-
-
 // Delay 구현 하는 부붙....
 if ((isset($_POST["MM_update"])) && (($_POST["MM_update"] == "form1") or ($_POST["MM_update"] == "form3"))) {
 	
-  	$h_result = sprintf("select idx from TreatmentInfo where Hospital_ID = %s", GetSQLValueString($_POST['H_ID'],"text"));
-  	$h_result = mysql_query($h_result);
-  	$h_idx = mysql_result($h_result,0,"idx");
+  	$h_result = sprintf("select idx from TreatmentInfo where Hospital_ID = '%s'", $colname_Hospital_ID);
+  	$h_result = mysqli_query($test, $h_result);
+  	$h_idx = mysqli_result($h_result,0,"idx");
   	$ID_ = $_POST['H_ID'];
 
+  	
 
-	$UPDATESQLManual = sprintf("UPDATE PatientInfo SET ManualEdit=%s WHERE Hospital_ID='$ID_'",GetSQLValueString($_POST['Manual'],"text"));
+	$UPDATESQLManual = sprintf("UPDATE PatientInfo SET ManualEdit='%s' WHERE Hospital_ID='$ID_'",$_POST['Manual']);
 	
- 	mysql_query($UPDATESQLManual);
+ 	mysqli_query($test, $UPDATESQLManual);
 // 	echo($UPDATESQLManual);	
 // 	echo($_POST['Manual']);
 	
 	
 	
-	mysql_select_db($database_test, $test);
-	$query_manualEdit = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = %s", GetSQLValueString($_POST['H_ID'],"text"));
-	$editinfo = mysql_query($query_manualEdit, $test) or die(mysql_error());
-	$row_editinfo = mysql_fetch_assoc($editinfo);
+	$query_manualEdit = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+	$editinfo = mysqli_query($test, $query_manualEdit )  ;
+	$row_editinfo = mysqli_fetch_assoc($editinfo);
 
 
 
@@ -894,8 +908,8 @@ if ((isset($_POST["MM_update"])) && (($_POST["MM_update"] == "form1") or ($_POST
 // 	이전과 달라진 부분을 체크하기 위해 해당 entry를 모두 가져온다.
 	$query_Telegram = sprintf("SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where TreatmentInfo.Hospital_ID like '%s'", $_POST['H_ID']);
 // 	echo($query_Telegram);
-	$RecordsetTelegram = mysql_query($query_Telegram, $test) or die(mysql_error());
-	$row_RecordsetTelegram       = mysql_fetch_assoc($RecordsetTelegram);
+	$RecordsetTelegram = mysqli_query($test, $query_Telegram )  ;
+	$row_RecordsetTelegram       = mysqli_fetch_assoc($RecordsetTelegram);
 
 	
 
@@ -907,20 +921,20 @@ if ((isset($_POST["MM_update"])) && (($_POST["MM_update"] == "form1") or ($_POST
 
 
 
-	if($row_RecordsetTelegram[CurrentStatus]!=GetSQLValueString($_POST['CurrentStatus_menu'],"int")){
-		if(GetSQLValueString($_POST['CurrentStatus_menu'],"int")==0){
+	if($row_RecordsetTelegram[CurrentStatus]!=($_POST['CurrentStatus_menu'] )){
+		if(($_POST['CurrentStatus_menu'] )==0){
 			$curStat = "Active";			
 		}
-		elseif(GetSQLValueString($_POST['CurrentStatus_menu'],"int")==1){
+		elseif(($_POST['CurrentStatus_menu'] )==1){
 			$curStat = "Finish";					
 		}
-		elseif(GetSQLValueString($_POST['CurrentStatus_menu'],"int")==2){
+		elseif(($_POST['CurrentStatus_menu'] )==2){
 			$curStat = "Stop";			
 		}
-		elseif(GetSQLValueString($_POST['CurrentStatus_menu'],"int")==3){
+		elseif(($_POST['CurrentStatus_menu'] )==3){
 			$curStat = "Drop";			
 		}
-		elseif(GetSQLValueString($_POST['CurrentStatus_menu'],"int")==4){
+		elseif(($_POST['CurrentStatus_menu'] )==4){
 			$curStat = "Hold";			
 		}
 		else{			$curStat = "";			
@@ -954,79 +968,91 @@ if ((isset($_POST["MM_update"])) && (($_POST["MM_update"] == "form1") or ($_POST
 
 
 
-	$query_numOrder = mysql_query(sprintf("Update TreatmentInfo Set NumOrder = '0' where Hospital_ID like '%s'", $_POST['H_ID']));
+	$query_numOrder = mysqli_query($test, sprintf("Update TreatmentInfo Set NumOrder = '0' where Hospital_ID like '%s'", $_POST['H_ID']));
 
-	$UPDATESQL = sprintf("UPDATE TreatmentInfo SET  Modality_var1=%s, Modality_var2=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_modality'], "text"),GetSQLValueString($_POST['txt_chemo'], "text"));
-	$UPDATESQL21 = sprintf("UPDATE ClinicalInfo SET  TumorMarker=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_ClinicalHistoryTumor'], "text"));
-    $Result41 = mysql_query($UPDATESQL21);    
-	$UPDATESQL22 = sprintf("UPDATE ClinicalInfo SET  chemo=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_ClinicalHistoryChemo'], "text"));
-    $Result42 = mysql_query($UPDATESQL22);    
-	$UPDATESQL23 = sprintf("UPDATE ClinicalInfo SET   Radio=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_ClinicalHistoryRadio'], "text"));
-    $Result43 = mysql_query($UPDATESQL23);    
-	$UPDATESQL24 = sprintf("UPDATE ClinicalInfo SET   Pathol=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_ClinicalHistoryPathol'], "text"));
-    $Result44 = mysql_query($UPDATESQL24);
-	$UPDATESQL25 = sprintf("UPDATE ClinicalInfo SET   Op=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_ClinicalHistoryOp'], "text"));
-    $Result45 = mysql_query($UPDATESQL25);    
-	$UPDATESQL26 = sprintf("UPDATE ClinicalInfo SET   RadioHistory=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_ClinicalHistoryRadioHistory'], "text"));
-    $Result46 = mysql_query($UPDATESQL26);
-	$UPDATESQL26 = sprintf("UPDATE ClinicalInfo SET   ConsultTemplate=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_ClinicalHistoryConsult'], "text"));
-    $Result46 = mysql_query($UPDATESQL26);
-	$UPDATESQL27 = sprintf("UPDATE ClinicalInfo SET   ConsultReply=%s WHERE Hospital_ID='$ID_'", GetSQLValueString($_POST['txt_ClinicalHistoryReply'], "text"));
-    $Result46 = mysql_query($UPDATESQL27);
+	$UPDATESQL = sprintf("UPDATE TreatmentInfo SET  Modality_var1='%s', Modality_var2='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_modality'] ),($_POST['txt_chemo'] ));
+	$UPDATESQL21 = sprintf("UPDATE ClinicalInfo SET  TumorMarker='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryTumor'] ));
+    $Result41 = mysqli_query($test, $UPDATESQL21);   
+    
+	$UPDATESQL22 = sprintf("UPDATE ClinicalInfo SET  chemo='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryChemo'] ));
+
+	
+    $Result42 = mysqli_query($test, $UPDATESQL22);    
+	$UPDATESQL23 = sprintf("UPDATE ClinicalInfo SET   Radio='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryRadio'] ));
+    $Result43 = mysqli_query($test, $UPDATESQL23);    
+    
+	$UPDATESQL24 = sprintf("UPDATE ClinicalInfo SET   Pathol='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryPathol']));
+	
+    $Result44 = mysqli_query($test, $UPDATESQL24);
+	$UPDATESQL25 = sprintf("UPDATE ClinicalInfo SET   Op='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryOp'] ));
+    $Result45 = mysqli_query($test, $UPDATESQL25);    
+	$UPDATESQL26 = sprintf("UPDATE ClinicalInfo SET   RadioHistory='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryRadioHistory'] ));
+    $Result46 = mysqli_query($test, $UPDATESQL26);
+	$UPDATESQL26 = sprintf("UPDATE ClinicalInfo SET   ConsultTemplate='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryConsult'] ));
+    $Result46 = mysqli_query($test, $UPDATESQL26);
+	$UPDATESQL27 = sprintf("UPDATE ClinicalInfo SET   ConsultReply='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryReply'] ));
+    $Result46 = mysqli_query($test, $UPDATESQL27);
 				  
 /*
-            mysql_query("set session character_set_client=utf8");
-          mysql_query("set session character_set_connection=utf8");  
-          mysql_query("set session character_set_results=utf8"); 
+            mysqli_query($test, "set session character_set_client=utf8");
+          mysqli_query($test, "set session character_set_connection=utf8");  
+          mysqli_query($test, "set session character_set_results=utf8"); 
 */
 
 
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+mysqli_query($test, "set session character_set_connection=latin1;");
+mysqli_query($test, "set session character_set_results=latin1;");
+mysqli_query($test, "set session character_set_client=latin1;");
 
-// 	echo(GetSQLValueString($_POST['txt_name'], "text"));
+// 	echo(GetSQLValueString($_POST['txt_name'] ));
 	$Manuals = $_POST['Manual'];
 	if(strlen($Manuals)==0){
 		$Manuals = 0;
 	}
+                       $curstats = $_POST['CurrentStatus_menu'];
+                       if(strlen($curstats)==0){
+	                       $curstats = "0";
+                       }
 
 
-	$UPDATESQL1 = sprintf("UPDATE PatientInfo SET   Sex=%s, Age=%s, KorName=%s, dateOfBirth=%s, CurrentStatus=%s, ManualEdit=$Manuals WHERE Hospital_ID='$ID_'",
-                       GetSQLValueString($_POST['txt_search_sex'], "text"),
-                       GetSQLValueString($_POST['txt_age'], "int"),
-                       GetSQLValueString($_POST['txt_name'], "text"),
-                       GetSQLValueString($_POST['txt_birth'],"text"),
-                       GetSQLValueString($_POST['CurrentStatus_menu'],"int"),
-                       GetSQLValueString($_POST['NextStatus_menu'],"int"),
-                       GetSQLValueString($_POST['txt_pStatus'],"text")
+	$UPDATESQL1 = sprintf("UPDATE PatientInfo SET   Sex='%s', Age='%s', KorName='%s', dateOfBirth='%s', CurrentStatus=%s, ManualEdit=$Manuals WHERE Hospital_ID like '$ID_'",
+                       ($_POST['txt_search_sex']),
+                       ($_POST['txt_age']),
+                       ($_POST['txt_name']),
+                       ($_POST['txt_birth']),
+                       ($curstats),
+                       ($_POST['NextStatus_menu']),
+                       ($_POST['txt_pStatus'])
                                         	     
-                       );
+                       );                      
                        
-//                        echo($UPDATESQL1);
-    $UPDATESQL2 = sprintf("UPDATE TreatmentInfo SET   Clinic=%s, diagnosis=%s, purpose=%s, CurrentStatus=%s, px=%s, wbc=%s, ast=%s, primarysite=%s, subsite = %s, subsiteDet = %s, pathol=%s, grade=%s, stage=%s, tnm=%s, physician =%s,planner =%s, dose_sum='$All_Dose', Fx_sum = '$All_Fx' WHERE Hospital_ID='$ID_'",
-                       GetSQLValueString($_POST['txt_clinic'], "text"),
-                       GetSQLValueString($_POST['txt_doctor'], "text"),
-                       GetSQLValueString($_POST['purpose_menu'], "text"),
-                       GetSQLValueString($_POST['CurrentStatus_menu'],"int"),
+                       $curstats = $_POST['CurrentStatus_menu'];
+                       if(strlen($curstats)==0){
+	                       $curstats = "0";
+                       }
+    $UPDATESQL2 = sprintf("UPDATE TreatmentInfo SET   Clinic='%s', diagnosis='%s', purpose='%s', CurrentStatus='%s', px='%s', wbc='%s', ast='%s', primarysite='%s', subsite = '%s', subsiteDet = '%s', pathol='%s', grade='%s', stage='%s', tnm='%s', physician ='%s',planner ='%s', dose_sum='$All_Dose', Fx_sum = '$All_Fx' WHERE Hospital_ID like '$ID_'",
+                       ($_POST['txt_clinic'] ),
+                       ($_POST['txt_doctor'] ),
+                       ($_POST['purpose_menu'] ),
+                       ($curstats ),
                        
-                       GetSQLValueString($_POST['txt_px'], "text"),
-                       GetSQLValueString($_POST['txt_wbc'], "text"),
-                       GetSQLValueString($_POST['txt_ast'], "text"),
-                       GetSQLValueString($_POST['primary_menu'], "text"),
-                       GetSQLValueString($_POST['sub_site'], "text"),
-                       GetSQLValueString($_POST['sub_siteDet'], "text"),
-                       GetSQLValueString($_POST['pathology_menu'], "text"),
-                       GetSQLValueString($_POST['grade_menu'], "text"),
-                       GetSQLValueString($_POST['stage_menu'], "text"),
-                       GetSQLValueString($_POST['txt_tnmstage'], "text"),
-					   GetSQLValueString($_POST['txt_physician'],"text"),
-					   GetSQLValueString($_POST['txt_planner'],"text"));
+                       ($_POST['txt_px'] ),
+                       ($_POST['txt_wbc'] ),
+                       ($_POST['txt_ast'] ),
+                       ($_POST['primary_menu'] ),
+                       ($_POST['sub_site'] ),
+                       ($_POST['sub_siteDet'] ),
+                       ($_POST['pathology_menu'] ),
+                       ($_POST['grade_menu'] ),
+                       ($_POST['stage_menu'] ),
+                       ($_POST['txt_tnmstage'] ),
+					   ($_POST['txt_physician'] ),
+					   ($_POST['txt_planner'] ));
 					   					   
-//     echo($UPDATESQL2."<br>");
-    $Result1 = mysql_query($UPDATESQL);
-    $Result2 = mysql_query($UPDATESQL1);
-    $Result3 = mysql_query($UPDATESQL2);
+
+    $Result1 = mysqli_query($test, $UPDATESQL);
+    $Result2 = mysqli_query($test, $UPDATESQL1);
+    $Result3 = mysqli_query($test, $UPDATESQL2);
 
     
 	$planStat = $_POST['StatusCheck'];
@@ -1064,7 +1090,7 @@ mysql_query("set session character_set_client=latin1;");
 		$aName = "A".$tCounter;				
 		$UPDATESQL = "UPDATE TreatmentInfo SET  $tName='$TsI', $pName='$PsI', $aName='$AsI' WHERE Hospital_ID like '$ID_'";
 // 		echo($UPDATESQL."<br>");
-		$Result1 = mysql_query($UPDATESQL);
+		$Result1 = mysqli_query($test, $UPDATESQL);
 
 
     }
@@ -1160,9 +1186,9 @@ mysql_query("set session character_set_client=latin1;");
 		
 		$CTCurs = "CT_Sim".($i+1);
 
-		$CTChecker = sprintf("Select %s from TreatmentInfo where Hospital_ID like  %s", $CTCurs, GetSQLValueString($_POST['H_ID'],"text"));
-		$PrevCT = mysql_query($CTChecker, $test) or die(mysql_error());
-		$row_PrevCT = mysql_fetch_assoc($PrevCT);
+		$CTChecker = sprintf("Select %s from TreatmentInfo where Hospital_ID like  %s", $CTCurs, $colname_Hospital_ID);
+		$PrevCT = mysqli_query($test, $CTChecker )  ;
+		$row_PrevCT = mysqli_fetch_assoc($PrevCT);
 
 
 		
@@ -1271,7 +1297,7 @@ mysql_query("set session character_set_client=latin1;");
 	
 
 		//echo $UPDATESQL3;
-		$UPDATE_Result3 = mysql_query($UPDATESQL3);
+		$UPDATE_Result3 = mysqli_query($test, $UPDATESQL3);
 		if($UPDATE_Result3 == TRUE){
 				$Q_idx = $Q_idx + 1;
 		}
@@ -1390,7 +1416,7 @@ mysql_query("set session character_set_client=latin1;");
 		}
 		
  		$UPDATESQL3 = sprintf("UPDATE TreatmentInfo SET $Q_RT_start = '', $Q_dose = '', $Q_Fx = '', $Q_method = '', $Q_CT = '', $Q_Finish = '', $Q_Linac = '', $Q_Delay='', $Q_Site='', $Q_CT=''  WHERE Hospital_ID = '$ID_'");
-		$UPDATE_Result3 = mysql_query($UPDATESQL3);			
+		$UPDATE_Result3 = mysqli_query($test, $UPDATESQL3);			
 	}
 
 
@@ -1408,12 +1434,12 @@ mysql_query("set session character_set_client=latin1;");
 	if (strcmp($uid, "Nurse")==0 or strcmp($uid, "nurse")==0 or strcmp($uid, "NURSE")==0){
 	$M_idx = 0;
 	$deleteMeetingDate = sprintf("DELETE FROM MeetingList WHERE Hospital_ID = '$ID_'");
-	mysql_query($deleteMeetingDate);
+	mysqli_query($test, $deleteMeetingDate);
 	for($j = 1; $j<=$M_Plan; $j++){
 		$jj = $j-1;
-		$insertMeeting = sprintf("INSERT INTO MeetingList (Hospital_ID, Memo, Date, idx) VALUES ('$ID_', '$Meet[$jj]', %s, $j)", GetSQLValueString($MeetDate[$jj] ,"text"));
+		$insertMeeting = sprintf("INSERT INTO MeetingList (Hospital_ID, Memo, Date, idx) VALUES ('$ID_', '$Meet[$jj]', %s, $j)", ($MeetDate[$jj]  ));
 		//echo $insertComment;
-		$insertQuery = mysql_query($insertMeeting, $test);
+		$insertQuery = mysqli_query($test, $insertMeeting );
 		if($insertQuery == TRUE){
 			$M_idx = $M_idx + 1;
 		}
@@ -1422,7 +1448,7 @@ mysql_query("set session character_set_client=latin1;");
 
 
                       
-  $Comment = $_POST['Comment'];
+	$Comment = $_POST['Comment'];
 	$CommentDate = $_POST['CommentDate'];
 
   // 저장하기 위해 comment의 날짜를 불러와서 포맷을 변경한다.
@@ -1432,7 +1458,6 @@ mysql_query("set session character_set_client=latin1;");
     if(strlen($CommentDate[$idss])>1){ 
         $myDateTime = DateTime::createFromFormat('y/n/j', $CommentDate[$idss]);
         $newDateString = $myDateTime->format('n/j/y');
-
         $CommentDate[$idss] =  $newDateString;
 //         echo "$CommentDate[$idss]";
     }
@@ -1521,7 +1546,7 @@ mysql_query("set session character_set_client=latin1;");
 		}
 		
  		$UPDATESQL3 = sprintf("UPDATE TreatmentInfo SET $Q_RT_start = '', $Q_dose = '0', $Q_Fx = '0', $Q_method = '', $Q_CT = '', $Q_Finish = '', $Q_Linac = '', $Q_Delay='0', $Q_Site='', $Q_CT=''  WHERE Hospital_ID like '$ID_'");
-		$UPDATE_Result3 = mysql_query($UPDATESQL3);			
+		$UPDATE_Result3 = mysqli_query($test, $UPDATESQL3);			
 	}
 
 
@@ -1537,7 +1562,7 @@ mysql_query("set session character_set_client=latin1;");
 
 
 
-//   echo(GetSQLValueString($CommentDate[0] ,"text"));
+//   echo(GetSQLValueString($CommentDate[0]  ));
 
 
 
@@ -1550,8 +1575,8 @@ mysql_query("set session character_set_client=latin1;");
 	$C_idx = 0;
 	$deleteComment = sprintf("DELETE FROM MemoTemp WHERE Hospital_ID = '$ID_'");
 	$prevNumComment = sprintf("Select * FROM MemoTemp WHERE Hospital_ID = '$ID_'");
-	$nRows = mysql_num_rows(mysql_query($prevNumComment)); 
-	mysql_query($deleteComment);
+	$nRows = mysqli_num_rows(mysqli_query($test, $prevNumComment)); 
+	mysqli_query($test, $deleteComment);
 	for($j = 1; $j<=$C_Plan; $j++){
 		$jj = $j-1;
 		$percentrecap = $Comment[$jj];
@@ -1564,10 +1589,9 @@ mysql_query("set session character_set_client=latin1;");
 		
 		
 		
-		$insertComment = sprintf("INSERT INTO MemoTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$percentrecap', %s, $j)", GetSQLValueString($CommentDate[$jj] ,"text"));
+		$insertComment = sprintf("INSERT INTO MemoTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$percentrecap', '%s', $j)", ($CommentDate[$jj]  ));
 
-
-		$insertQuery = mysql_query($insertComment, $test);
+		$insertQuery = mysqli_query($test, $insertComment );
 
 
 
@@ -1577,7 +1601,7 @@ mysql_query("set session character_set_client=latin1;");
 			$insertComment2 = str_replace("'", "", $insertComment);
 			$LogQuery = "INSERT INTO Log (date1, content, author, Hospital_ID) VALUES ('$Today_Date','$insertComment2','$uid','$ID_')";
 // 			echo($LogQuery);
-			mysql_query($LogQuery);
+			mysqli_query($test, $LogQuery);
 			
 		}
 
@@ -1609,17 +1633,17 @@ mysql_query("set session character_set_client=latin1;");
 	$C_Order = count($Order);
 	$C_idxOrder = 0;
 	$deleteOrder = sprintf("DELETE FROM OrderTemp WHERE Hospital_ID = '$ID_'");
-	mysql_query($deleteOrder);
+	mysqli_query($test, $deleteOrder);
 
 	$query_numOrder = sprintf("SELECT NumOrder FROM TreatmentInfo where Hospital_ID like '%s'", $_POST['H_ID']);
 	
 // 	echo($query_Telegram);
-	$RecordsetNumOrder = mysql_query($query_numOrder, $test) or die(mysql_error());
-	$numOrder       = mysql_fetch_assoc($RecordsetNumOrder);
+	$RecordsetNumOrder = mysqli_query($test, $query_numOrder )  ;
+	$numOrder       = mysqli_fetch_assoc($RecordsetNumOrder);
 	
 	for($j = 1; $j<=$C_Order; $j++){
 		$query_numOrder = sprintf("Update TreatmentInfo Set NumOrder = '$C_Order' where Hospital_ID like '%s'", $_POST['H_ID']);
-		mysql_query($query_numOrder);
+		mysqli_query($test, $query_numOrder);
 		$jj = $j-1;
 		$percentrecap = $Order[$jj];
 		for ($counter=0;$counter<strlen($Order[$jj]);$counter++){
@@ -1628,8 +1652,8 @@ mysql_query("set session character_set_client=latin1;");
 			}
 		}
 		$inserter = urlencode($Order[$jj]);
-		$insertOrder = sprintf("INSERT INTO OrderTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$percentrecap', %s, $j)", GetSQLValueString($OrderDate[$jj] ,"text"));
-		$insertQuery = mysql_query($insertOrder, $test);
+		$insertOrder = sprintf("INSERT INTO OrderTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$percentrecap', '%s', $j)", ($OrderDate[$jj]  ));
+		$insertQuery = mysqli_query($test, $insertOrder );
 		if($insertQuery == TRUE){
 			$C_idxOrder = $C_idxOrder + 1;
 		}
@@ -1637,15 +1661,14 @@ mysql_query("set session character_set_client=latin1;");
 
 	if (strcmp($numOrder[NumOrder],$C_Order)!=0){
 // 		Change TCRNOTICE to 1 if MD's Order was added. To appear in Top of the RTP page (Action required)
-		mysql_query("Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $ID_");
+		mysqli_query($test, "Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $ID_");
 		
 	}
 	
 	$ii=0;  	
-	mysql_select_db($database_test, $test);	
 	$Today_Date = Date("n/j/y");    
 	
-	if(strcmp(GetSQLValueString($_POST['txt_Category']),"Surgery")==0 or strcmp(GetSQLValueString($_POST['txt_Category']),"Chemotherapy")==0 or strcmp(GetSQLValueString($_POST['txt_Category']),"Previous history")==0 or strcmp(GetSQLValueString($_POST['txt_Category']),"Pathology")==0 or strcmp(GetSQLValueString($_POST['txt_Category']),"Tumor markers & other specific lab findings")==0 or strcmp(GetSQLValueString($_POST['txt_Category']),"Radiologic findings")==0){			   
+	if(strcmp(($_POST['txt_Category']),"Surgery")==0 or strcmp(($_POST['txt_Category']),"Chemotherapy")==0 or strcmp(($_POST['txt_Category']),"Previous history")==0 or strcmp(($_POST['txt_Category']),"Pathology")==0 or strcmp(($_POST['txt_Category']),"Tumor markers & other specific lab findings")==0 or strcmp(($_POST['txt_Category']),"Radiologic findings")==0){			   
 
 	}
 }
@@ -1686,39 +1709,38 @@ if(strcmp($newcourse,'to')==0){
 
 	$his = $_POST['hf_edit'];
 	$olderHistory = "select * from TreatmentInfoHist where Hospital_ID like '$his'";
-	$olders = mysql_num_rows(mysql_query($olderHistory));
+	$olders = mysqli_num_rows(mysqli_query($test, $olderHistory));
 	if($olders !=0){
 		 $maxvalquery = "select max(courseid)  AS maxhist from TreatmentInfoHist where Hospital_ID like '$his'";
-		 $numhist = (mysql_fetch_assoc(mysql_query($maxvalquery)));
+		 $numhist = (mysqli_fetch_assoc(mysqli_query($test, $maxvalquery)));
 // 		 print_r($numhist[maxhist]);
 		 $olders = $numhist[maxhist];
 	}
 	
 	$curcourse = $olders+1;
 	$coursequery = "update TreatmentInfo set courseid=$curcourse where Hospital_ID like '$his'";
-	mysql_query($coursequery);
+	mysqli_query($test, $coursequery);
 	
 	$coursequery = "update ClinicalInfo set courseid=$curcourse where Hospital_ID like '$his'";
-	mysql_query($coursequery);
+	mysqli_query($test, $coursequery);
 
 	$historyquery = "insert into TreatmentInfoHist select * from TreatmentInfo where Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	
 	$historyquery = "insert into ClinicalInfoHist select * from ClinicalInfo where Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	
 	$historyquery = "delete from TreatmentInfo where Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	
 	$historyquery = "Insert into TreatmentInfo (Hospital_ID) values ('$his')";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	
 
-	mysql_select_db($database_test, $test);
-	$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = %s",GetSQLValueString($colname_Hospital_ID, "text"));
-	$clinicalinfo = mysql_query($query_clinicalinfo, $test) or die(mysql_error());
-	$row_clinicalinfo = mysql_fetch_assoc($clinicalinfo);
-	$totalRows_clinicalinfo = mysql_num_rows($clinicalinfo);
+	$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = '%s'",$colname_Hospital_ID);
+	$clinicalinfo = mysqli_query($test, $query_clinicalinfo )  ;
+	$row_clinicalinfo = mysqli_fetch_assoc($clinicalinfo);
+	$totalRows_clinicalinfo = mysqli_num_rows($clinicalinfo);
 
 
 	
@@ -1730,12 +1752,12 @@ if(strcmp($newcourse,'to')==0){
     }
 	
 	$rthistoryquery = "update ClinicalInfo Set RadioHistory='$rthistcourse' where Hospital_ID like '$his'";
-	mysql_query($rthistoryquery);
+	mysqli_query($test, $rthistoryquery);
 // 	echo($rthistoryquery);
 	
 	
 	$historyquery = "Update TreatmentInfo Set idx='0' where Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 // 	echo($row_clinicalinfo['RadioHistory']);
 	}
 if(strcmp($newcourse,'th')==0){
@@ -1744,39 +1766,38 @@ if(strcmp($newcourse,'th')==0){
 
 	$his = $_POST['hf_edit'];
 	$olderHistory = "select * from TreatmentInfoHist where Hospital_ID like '$his'";
-	$olders = mysql_num_rows(mysql_query($olderHistory));
+	$olders = mysqli_num_rows(mysqli_query($test, $olderHistory));
 	if($olders !=0){
 		 $maxvalquery = "select max(courseid)  AS maxhist from TreatmentInfoHist where Hospital_ID like '$his'";
-		 $numhist = (mysql_fetch_assoc(mysql_query($maxvalquery)));
+		 $numhist = (mysqli_fetch_assoc(mysqli_query($test, $maxvalquery)));
 // 		 print_r($numhist[maxhist]);
 		 $olders = $numhist[maxhist];
 	}
 	
 	$curcourse = $olders+1;
 	$coursequery = "update TreatmentInfo set courseid=$curcourse where Hospital_ID like '$his'";
-	mysql_query($coursequery);
+	mysqli_query($test, $coursequery);
 	$coursequery = "update ClinicalInfo set courseid=$curcourse where Hospital_ID like '$his'";
-	mysql_query($coursequery);
+	mysqli_query($test, $coursequery);
 
 	$historyquery = "insert into TreatmentInfoHist select * from TreatmentInfo where Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	
 	$historyquery = "insert into ClinicalInfoHist select * from ClinicalInfo where Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	
 	$historyquery = "delete from TreatmentInfo where Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	
 	$historyquery = "Insert into TreatmentInfo (Hospital_ID) values ('$his')";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	$historyquery = "Update TreatmentInfo Set idx='0' whre Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 
-	mysql_select_db($database_test, $test);
-	$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-	$clinicalinfo = mysql_query($query_clinicalinfo, $test) or die(mysql_error());
-	$row_clinicalinfo = mysql_fetch_assoc($clinicalinfo);
-	$totalRows_clinicalinfo = mysql_num_rows($clinicalinfo);
+	$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+	$clinicalinfo = mysqli_query($test, $query_clinicalinfo )  ;
+	$row_clinicalinfo = mysqli_fetch_assoc($clinicalinfo);
+	$totalRows_clinicalinfo = mysqli_num_rows($clinicalinfo);
 
 
 
@@ -1795,20 +1816,20 @@ if(strcmp($newcourse,'th')==0){
 
 		
 	$historyquery = "delete from ClinicalInfo where Hospital_ID like '$his'";
-	mysql_query($historyquery);
+	mysqli_query($test, $historyquery);
 	
 	$historyquery = "Insert into ClinicalInfo (Hospital_ID) values ('$his')";
-	mysql_query($historyquery);
-	mysql_query($rthistoryquery);
+	mysqli_query($test, $historyquery);
+	mysqli_query($test, $rthistoryquery);
 
 // 	echo("<br>".$row_clinicalinfo[RadioHistory]."<br>");
 	
 /*
-	mysql_select_db($database_test, $test);
-	$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-	$clinicalinfo = mysql_query($query_clinicalinfo, $test) or die(mysql_error());
-	$row_clinicalinfo = mysql_fetch_assoc($clinicalinfo);
-	$totalRows_clinicalinfo = mysql_num_rows($clinicalinfo);
+	 
+	$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+	$clinicalinfo = mysqli_query($test, $query_clinicalinfo )  ;
+	$row_clinicalinfo = mysqli_fetch_assoc($clinicalinfo);
+	$totalRows_clinicalinfo = mysqli_num_rows($clinicalinfo);
 	
 	echo($row_clinicalinfo['RadioHistory']);
 */
@@ -1831,33 +1852,32 @@ if(strcmp($newcourse,'th')==0){
 
 
 
-mysql_select_db($database_test, $test);
-$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$clinicalinfo = mysql_query($query_clinicalinfo, $test) or die(mysql_error());
-$row_clinicalinfo = mysql_fetch_assoc($clinicalinfo);
-$totalRows_clinicalinfo = mysql_num_rows($clinicalinfo);
+ 
+$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$clinicalinfo = mysqli_query($test, $query_clinicalinfo )  ;
+$row_clinicalinfo = mysqli_fetch_assoc($clinicalinfo);
+$totalRows_clinicalinfo = mysqli_num_rows($clinicalinfo);
 
-mysql_select_db($database_test, $test);
-$query_patientinfo = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$patientinfo = mysql_query($query_patientinfo, $test) or die(mysql_error());
-$row_patientinfo = mysql_fetch_assoc($patientinfo);
-$totalRows_patientinfo = mysql_num_rows($patientinfo);
+ 
+$query_patientinfo = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$patientinfo = mysqli_query($test, $query_patientinfo )  ;
+$row_patientinfo = mysqli_fetch_assoc($patientinfo);
+$totalRows_patientinfo = mysqli_num_rows($patientinfo);
+ 
+$query_treatmentinfo = sprintf("SELECT * FROM TreatmentInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$treatmentinfo = mysqli_query($test, $query_treatmentinfo )  ;
+$row_treatmentinfo = mysqli_fetch_assoc($treatmentinfo);
+$totalRows_treatmentinfo = mysqli_num_rows($treatmentinfo);
 
-mysql_select_db($database_test, $test);
-$query_treatmentinfo = sprintf("SELECT * FROM TreatmentInfo WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$treatmentinfo = mysql_query($query_treatmentinfo, $test) or die(mysql_error());
-$row_treatmentinfo = mysql_fetch_assoc($treatmentinfo);
-$totalRows_treatmentinfo = mysql_num_rows($treatmentinfo);
+$query_TempMemo = sprintf("SELECT * FROM MemoTemp WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$MemoInfo = mysqli_query($test, $query_TempMemo )  ;
+$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
+$total_Memoinfo = mysqli_num_rows($MemoInfo);
 
-$query_TempMemo = sprintf("SELECT * FROM MemoTemp WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$MemoInfo = mysql_query($query_TempMemo, $test) or die(mysql_error());
-$row_Memoinfo = mysql_fetch_assoc($MemoInfo);
-$total_Memoinfo = mysql_num_rows($MemoInfo);
-
-$query_TempOrder = sprintf("SELECT * FROM OrderTemp WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$OrderInfo = mysql_query($query_TempOrder, $test) or die(mysql_error());
-$row_Orderinfo = mysql_fetch_assoc($OrderInfo);
-$total_Orderinfo = mysql_num_rows($OrderInfo);
+$query_TempOrder = sprintf("SELECT * FROM OrderTemp WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$OrderInfo = mysqli_query($test, $query_TempOrder )  ;
+$row_Orderinfo = mysqli_fetch_assoc($OrderInfo);
+$total_Orderinfo = mysqli_num_rows($OrderInfo);
 
 
 // AUTO REPLY
@@ -1971,7 +1991,7 @@ RT start: $sims ($daily[$dateyoilst])
 }
 $repls = $row_clinicalinfo['ConsultReply'].$replystr;
 $UPDATESQL27 = sprintf("UPDATE ClinicalInfo SET   ConsultReply='$repls' WHERE Hospital_ID='$ID_'");
-$Result46 = mysql_query($UPDATESQL27);
+$Result46 = mysqli_query($test, $UPDATESQL27);
 
 }
 
@@ -2066,38 +2086,37 @@ $replystr = $subs.$replystr;
 // echo(nl2br ($replystr));
 $repls = $row_clinicalinfo['ConsultReply'].$replystr;
 $UPDATESQL27 = sprintf("UPDATE ClinicalInfo SET   ConsultReply='$repls' WHERE Hospital_ID='$ID_'");
-$Result46 = mysql_query($UPDATESQL27);
+$Result46 = mysqli_query($test, $UPDATESQL27);
 
 }
 
 
-mysql_select_db($database_test, $test);
-$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$clinicalinfo = mysql_query($query_clinicalinfo, $test) or die(mysql_error());
-$row_clinicalinfo = mysql_fetch_assoc($clinicalinfo);
-$totalRows_clinicalinfo = mysql_num_rows($clinicalinfo);
+$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$clinicalinfo = mysqli_query($test, $query_clinicalinfo )  ;
+$row_clinicalinfo = mysqli_fetch_assoc($clinicalinfo);
+$totalRows_clinicalinfo = mysqli_num_rows($clinicalinfo);
 
-mysql_select_db($database_test, $test);
-$query_patientinfo = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$patientinfo = mysql_query($query_patientinfo, $test) or die(mysql_error());
-$row_patientinfo = mysql_fetch_assoc($patientinfo);
-$totalRows_patientinfo = mysql_num_rows($patientinfo);
 
-mysql_select_db($database_test, $test);
-$query_treatmentinfo = sprintf("SELECT * FROM TreatmentInfo WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$treatmentinfo = mysql_query($query_treatmentinfo, $test) or die(mysql_error());
-$row_treatmentinfo = mysql_fetch_assoc($treatmentinfo);
-$totalRows_treatmentinfo = mysql_num_rows($treatmentinfo);
+$query_patientinfo = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$patientinfo = mysqli_query($test, $query_patientinfo )  ;
+$row_patientinfo = mysqli_fetch_assoc($patientinfo);
+$totalRows_patientinfo = mysqli_num_rows($patientinfo);
 
-$query_TempMemo = sprintf("SELECT * FROM MemoTemp WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$MemoInfo = mysql_query($query_TempMemo, $test) or die(mysql_error());
-$row_Memoinfo = mysql_fetch_assoc($MemoInfo);
-$total_Memoinfo = mysql_num_rows($MemoInfo);
 
-$query_TempOrder = sprintf("SELECT * FROM OrderTemp WHERE Hospital_ID = %s", GetSQLValueString($colname_Hospital_ID, "text"));
-$OrderInfo = mysql_query($query_TempOrder, $test) or die(mysql_error());
-$row_Orderinfo = mysql_fetch_assoc($OrderInfo);
-$total_Orderinfo = mysql_num_rows($OrderInfo);
+$query_treatmentinfo = sprintf("SELECT * FROM TreatmentInfo WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$treatmentinfo = mysqli_query($test, $query_treatmentinfo )  ;
+$row_treatmentinfo = mysqli_fetch_assoc($treatmentinfo);
+$totalRows_treatmentinfo = mysqli_num_rows($treatmentinfo);
+
+$query_TempMemo = sprintf("SELECT * FROM MemoTemp WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$MemoInfo = mysqli_query($test, $query_TempMemo )  ;
+$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
+$total_Memoinfo = mysqli_num_rows($MemoInfo);
+
+$query_TempOrder = sprintf("SELECT * FROM OrderTemp WHERE Hospital_ID = '%s'", $colname_Hospital_ID);
+$OrderInfo = mysqli_query($test, $query_TempOrder )  ;
+$row_Orderinfo = mysqli_fetch_assoc($OrderInfo);
+$total_Orderinfo = mysqli_num_rows($OrderInfo);
 
 
 
@@ -2106,17 +2125,17 @@ $total_Orderinfo = mysql_num_rows($OrderInfo);
 // Compute prescription
 
 
-	$IdChk = GetSQLValueString($colname_Hospital_ID, "text");
-	$query_Recordset1 = mysql_query("SELECT * FROM TreatmentInfo where Hospital_ID like $IdChk");
-	$numCTs = mysql_fetch_array($query_Recordset1);	
+	$IdChk = $colname_Hospital_ID;
+	$query_Recordset1 = mysqli_query($test, "SELECT * FROM TreatmentInfo where Hospital_ID like $IdChk");
+	$numCTs = mysqli_fetch_array($query_Recordset1);	
 	for($idCTs = 0; $idCTs<$numCTs[idx]; $idCTs++){
 		$Label = $idCTs+1;
 		$CTdatLabel = "CT_Sim".$Label;
 		$CTDat = $numCTs[$CTdatLabel];
 		if(strlen($CTDat)>5){
 			$query_RecordsetCTDat = "SELECT * FROM TreatmentInfo where (CT_Sim1 like '$CTDat' or CT_Sim2 like '$CTDat' or CT_Sim3 like '$CTDat' or CT_Sim4 like '$CTDat' or CT_Sim5 like '$CTDat' or CT_Sim6 like '$CTDat' or CT_Sim7 like '$CTDat')";
-			$NumCTLabel = mysql_query($query_RecordsetCTDat, $test) or die(mysql_error());
-			$NumCTs = mysql_num_rows($NumCTLabel);
+			$NumCTLabel = mysqli_query($test, $query_RecordsetCTDat )  ;
+			$NumCTs = mysqli_num_rows($NumCTLabel);
       $chCT = date("Y-m-d",strtotime($CTDat));
 			if($NumCTs>8 and strtotime($CTDat)> strtotime(date("Y-m-d", strtotime("-1 day", time())))){
 				echo("<strong><font color=red> $chCT 의 시뮬레이션이 최대 8명을 초과하였습니다(현재 $NumCTs 명, <a href=http://10.14.26.18/simschedule.php target=_blank>스케쥴러</a>를 확인 하세요!)</font></strong><br>"); 
@@ -2124,17 +2143,17 @@ $total_Orderinfo = mysql_num_rows($OrderInfo);
 			}
 		}
 	}
-	$IdChk = GetSQLValueString($colname_Hospital_ID, "text");
-	$query_Recordset1 = mysql_query("SELECT * FROM TreatmentInfo where Hospital_ID like $IdChk");
-	$numCTs = mysql_fetch_array($query_Recordset1);	
+	$IdChk = $colname_Hospital_ID;
+	$query_Recordset1 = mysqli_query($test, "SELECT * FROM TreatmentInfo where Hospital_ID like $IdChk");
+	$numCTs = mysqli_fetch_array($query_Recordset1);	
 	for($idCTs = 0; $idCTs<1; $idCTs++){
 		$Label = $idCTs+1;
 		$CTdatLabel = "RT_start1";
 		$CTDat = $numCTs[$CTdatLabel];
 		if(strlen($CTDat)>5){
 			$query_RecordsetCTDat = "SELECT * FROM TreatmentInfo where (Linac1 like '%Versa%' and RT_start1 like '$CTDat')";
-			$NumCTLabel = mysql_query($query_RecordsetCTDat, $test) or die(mysql_error());
-			$NumCTs = mysql_num_rows($NumCTLabel);
+			$NumCTLabel = mysqli_query($test, $query_RecordsetCTDat )  ;
+			$NumCTs = mysqli_num_rows($NumCTLabel);
 			$numStartVersa = $NumCTs;
 
       $chCT = date("Y-m-d",strtotime($CTDat));
@@ -2145,9 +2164,9 @@ $total_Orderinfo = mysql_num_rows($OrderInfo);
 			}
 		}
 	}
-	$IdChk = GetSQLValueString($colname_Hospital_ID, "text");
-	$query_Recordset1 = mysql_query("SELECT * FROM TreatmentInfo where Hospital_ID like $IdChk");
-	$numCTs = mysql_fetch_array($query_Recordset1);	
+	$IdChk = $colname_Hospital_ID;
+	$query_Recordset1 = mysqli_query($test, "SELECT * FROM TreatmentInfo where Hospital_ID like $IdChk");
+	$numCTs = mysqli_fetch_array($query_Recordset1);	
 	for($idCTs = 0; $idCTs<1; $idCTs++){
 		$Label = $idCTs+1;
 		$CTdatLabel = "RT_start1";
@@ -2155,8 +2174,8 @@ $total_Orderinfo = mysql_num_rows($OrderInfo);
 		if(strlen($CTDat)>5){
 			$query_RecordsetCTDat = "SELECT * FROM TreatmentInfo where ((Linac1 like '%ix%' and RT_start1 like '$CTDat') or (Linac1 like '%iX%' and RT_start1 like '$CTDat') or (Linac1 like '%IX%' and RT_start1 like '$CTDat') or (Linac1 like '%Ix%' and RT_start1 like '$CTDat'))";
 
-			$NumCTLabel = mysql_query($query_RecordsetCTDat, $test) or die(mysql_error());
-			$NumCTs = mysql_num_rows($NumCTLabel);
+			$NumCTLabel = mysqli_query($test, $query_RecordsetCTDat )  ;
+			$NumCTs = mysqli_num_rows($NumCTLabel);
 			$numStartIx = $NumCTs;
 
       $chCT = date("Y-m-d",strtotime($CTDat));
@@ -2168,9 +2187,9 @@ $total_Orderinfo = mysql_num_rows($OrderInfo);
 		}
 	}
 
-	$IdChk = GetSQLValueString($colname_Hospital_ID, "text");
-	$query_Recordset1 = mysql_query("SELECT * FROM TreatmentInfo where Hospital_ID like $IdChk");
-	$numCTs = mysql_fetch_array($query_Recordset1);	
+	$IdChk = $colname_Hospital_ID;
+	$query_Recordset1 = mysqli_query($test, "SELECT * FROM TreatmentInfo where Hospital_ID like $IdChk");
+	$numCTs = mysqli_fetch_array($query_Recordset1);	
 	for($idCTs = 0; $idCTs<1; $idCTs++){
 		$Label = $idCTs+1;
 		$CTdatLabel = "RT_start1";
@@ -2178,8 +2197,8 @@ $total_Orderinfo = mysql_num_rows($OrderInfo);
 		if(strlen($CTDat)>5){
 			$query_RecordsetCTDat = "SELECT * FROM TreatmentInfo where ((Linac1 like '%inf%' and RT_start1 like '$CTDat') or (Linac1 like '%Inf%' and RT_start1 like '$CTDat'))";
 
-			$NumCTLabel = mysql_query($query_RecordsetCTDat, $test) or die(mysql_error());
-			$NumCTs = mysql_num_rows($NumCTLabel);
+			$NumCTLabel = mysqli_query($test, $query_RecordsetCTDat )  ;
+			$NumCTs = mysqli_num_rows($NumCTLabel);
 			$numStartInfinity = $NumCTs;
       $chCT = date("Y-m-d",strtotime($CTDat));
 			
@@ -2229,13 +2248,13 @@ $total_Orderinfo = mysql_num_rows($OrderInfo);
 
 $olderHistory = "select * from TreatmentInfoHist where Hospital_ID like '$colname_Hospital_ID'";
 // echo($olderHistory);
-$olders = mysql_num_rows(mysql_query($olderHistory));
+$olders = mysqli_num_rows(mysqli_query($test, $olderHistory));
 $olders2 =$olders;
 
 $query_Telegram = "select * from TreatmentInfo where Hospital_ID ='".$row_patientinfo['Hospital_ID']."'";
 // 	echo($query_Telegram);
-$RecordsetTelegram = mysql_query($query_Telegram, $test) or die(mysql_error());
-$row_RecordsetTelegram       = mysql_fetch_assoc($RecordsetTelegram);
+$RecordsetTelegram = mysqli_query($test, $query_Telegram )  ;
+$row_RecordsetTelegram       = mysqli_fetch_assoc($RecordsetTelegram);
 for ($statId=0;$statId<$row_RecordsetTelegram[idx];$statId++){
 	$statsId = $statId+1;
 	$Ts = "T".$statsId;
@@ -2289,7 +2308,7 @@ for ($statId=0;$statId<$row_RecordsetTelegram[idx];$statId++){
 <?php
 $olderHistory = "select * from TreatmentInfoHist where Hospital_ID like '$colname_Hospital_ID'";
 // echo($olderHistory);
-$olders = mysql_num_rows(mysql_query($olderHistory));
+$olders = mysqli_num_rows(mysqli_query($test, $olderHistory));
 $curcourse = $olders;
 // echo($olders);
 if($olders>0){ 
@@ -2465,8 +2484,8 @@ for($idcourse = 0; $idcourse<$curcourse;$idcourse++){
 		  		$curDoc = $POST_['txt_doctor'];
 		  		if(strlen($curDoc)==0 and strlen($row_treatmentinfo['Clinic'])==0){
 			  		$clinicRefQuery = "select Clinic from TreatmentInfo where diagnosis like '$row_treatmentinfo[diagnosis]'";
-			  		$querys = mysql_query($clinicRefQuery);
-			  		$querysclinic = mysql_fetch_assoc($querys);
+			  		$querys = mysqli_query($test, $clinicRefQuery);
+			  		$querysclinic = mysqli_fetch_assoc($querys);
 			  		$autoClinic = $querysclinic[Clinic];
 			  	}
 		  		
@@ -3147,8 +3166,8 @@ if (is_dir($dir)){
 		  	$chemo6w = date("y/n/j",strtotime ("+6 weeks", strtotime($lastCm2)));
 		  	
 		  	$query_RecordsetCTDat = "SELECT * FROM TreatmentInfo where (CT_Sim1 like '$CTDat' or CT_Sim2 like '$CTDat' or CT_Sim3 like '$CTDat' or CT_Sim4 like '$CTDat' or CT_Sim5 like '$CTDat' or CT_Sim6 like '$CTDat' or CT_Sim7 like '$CTDat')";
-			$NumCTLabel = mysql_query($query_RecordsetCTDat, $test) or die(mysql_error());
-			$NumCTs = mysql_num_rows($NumCTLabel);
+			$NumCTLabel = mysqli_query($test, $query_RecordsetCTDat )  ;
+			$NumCTs = mysqli_num_rows($NumCTLabel);
 
 // 		  	$daily = array('일','월','화','수','목','금','토');
 
@@ -3257,7 +3276,7 @@ if (is_dir($dir)){
   
     <?php 
 	   
-       $sql_idx_result = mysql_result($treatmentinfo,0,"idx");
+       $sql_idx_result = mysqli_result($treatmentinfo,0,"idx");
        $rt_menu_last = "rt_menu"."$sql_idx_result";
        $txt_field_last = "txt_field"."$sql_idx_result";
        $txt_linca_last = "txt_linac"."$sql_idx_result";
@@ -3613,10 +3632,10 @@ if (is_dir($dir)){
 </table> 
 
 <?php
-	$Meet_Memo = mysql_query("select Memo from MeetingList where Hospital_ID = '$colname_Hospital_ID'");
-	$Meet_Date = mysql_query("select Date from MeetingList where Hospital_ID = '$colname_Hospital_ID'"); 
-	$Meet_idx = mysql_query("select idx from MeetingList where Hospital_ID = '$colname_Hospital_ID'");
-	$total_Meetinfo = mysql_num_rows($Meet_Memo);	
+	$Meet_Memo = mysqli_query($test, "select Memo from MeetingList where Hospital_ID = '$colname_Hospital_ID'");
+	$Meet_Date = mysqli_query($test, "select Date from MeetingList where Hospital_ID = '$colname_Hospital_ID'"); 
+	$Meet_idx = mysqli_query($test, "select idx from MeetingList where Hospital_ID = '$colname_Hospital_ID'");
+	$total_Meetinfo = mysqli_num_rows($Meet_Memo);	
 ?>
   
 <table class="type1" id="MeetingTable" width="960px" border="0" cellspacing="1" cellpadding="1" align="center">
@@ -3627,8 +3646,8 @@ if (is_dir($dir)){
 		<td width="1%" scope="row" bgcolor="#339900" style="color: #FFFFFF"> &nbsp;&nbsp;   </td>
   	</tr>
   	<?php for($i=0; $i<$total_Meetinfo; $i = $i+1){ 
-	    $Memo = mysql_result($Meet_Memo, $i,"Memo");
-	    $Date = mysql_result($Meet_Date, $i,"Date");
+	    $Memo = mysqli_result($Meet_Memo, $i,"Memo");
+	    $Date = mysqli_result($Meet_Date, $i,"Date");
 	    $i_ = $i+1;
 	    $MeetPicker = "MeetPicker"."$i_";
    	?>
@@ -3676,9 +3695,9 @@ if (is_dir($dir)){
 		
 		<?php	    
 		$Today_Date = Date("n/j/y");
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = '$colname_Hospital_ID'");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = '$colname_Hospital_ID'"); 
-		$sql_idx = mysql_query("select idx from OrderTemp where Hospital_ID = '$colname_Hospital_ID'");  
+		$sql_Memo = mysqli_query($test, "select Memo1 from OrderTemp where Hospital_ID = '$colname_Hospital_ID'");
+		$sql_Date = mysqli_query($test, "select Date1 from OrderTemp where Hospital_ID = '$colname_Hospital_ID'"); 
+		$sql_idx = mysqli_query($test, "select idx from OrderTemp where Hospital_ID = '$colname_Hospital_ID'");  
 		?>
 		<table class="type1" id="OrderTable" width="470px" border="0" cellspacing="1" cellpadding="1" align="center">
 		  	<tr height="30">
@@ -3688,8 +3707,8 @@ if (is_dir($dir)){
 				<td width="1%" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"> &nbsp;&nbsp;   </td>
 		  	</tr>
 		  	<?php for($i=0; $i<$total_Orderinfo; $i = $i+1){ 
-			    $Memo = mysql_result($sql_Memo, $i,"Memo1");
-			    $Date = mysql_result($sql_Date, $i,"Date1");
+			    $Memo = mysqli_result($sql_Memo, $i,"Memo1");
+			    $Date = mysqli_result($sql_Date, $i,"Date1");
           $uD = (date('y/n/j',strtotime($Date)));
 
 			    $i_ = $i+1;
@@ -3714,9 +3733,9 @@ if (is_dir($dir)){
 
 <?php	    
 $Today_Date = Date("n/j/y");
-$sql_Memo = mysql_query("select Memo1 from MemoTemp where Hospital_ID = '$colname_Hospital_ID'");
-$sql_Date = mysql_query("select Date1 from MemoTemp where Hospital_ID = '$colname_Hospital_ID'"); 
-$sql_idx = mysql_query("select idx from MemoTemp where Hospital_ID = '$colname_Hospital_ID'");  
+$sql_Memo = mysqli_query($test, "select Memo1 from MemoTemp where Hospital_ID = '$colname_Hospital_ID'");
+$sql_Date = mysqli_query($test, "select Date1 from MemoTemp where Hospital_ID = '$colname_Hospital_ID'"); 
+$sql_idx = mysqli_query($test, "select idx from MemoTemp where Hospital_ID = '$colname_Hospital_ID'");  
 ?>
 <table class="type1" id="CommentTable" width="470px" border="0" cellspacing="1" cellpadding="1" align="center">
   	<tr height="30">
@@ -3726,8 +3745,8 @@ $sql_idx = mysql_query("select idx from MemoTemp where Hospital_ID = '$colname_H
 		<td width="1%" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"> &nbsp;&nbsp;   </td>
   	</tr>
   	<?php for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
-	    $Memo = mysql_result($sql_Memo, $i,"Memo1");
-	    $Date = mysql_result($sql_Date, $i,"Date1");
+	    $Memo = mysqli_result($sql_Memo, $i,"Memo1");
+	    $Date = mysqli_result($sql_Date, $i,"Date1");
       $uD = (date('y/n/j',strtotime($Date)));
 
 
@@ -4237,22 +4256,22 @@ if (is_dir($dirPC)){
 				  	$bCol = "#f5e7eb";				  	 /* magenta 1 (ibm design colors) */
 			  	}
 
-          mysql_query("set session character_set_client=utf8");
-          mysql_query("set session character_set_connection=utf8");  
-          mysql_query("set session character_set_results=utf8"); 
+          mysqli_query($test, "set session character_set_client=utf8");
+          mysqli_query($test, "set session character_set_connection=utf8");  
+          mysqli_query($test, "set session character_set_results=utf8"); 
 
 
           $holdate = date("Y-m-d",strtotime($tDate));
           $holquery = "Select * from Holiday where solar_date like '$holdate'";
-			  	$row_holiday = mysql_fetch_assoc(mysql_query($holquery));
+			  	$row_holiday = mysqli_fetch_assoc(mysqli_query($test, $holquery));
           if(strlen($row_holiday[memo])>0){
             $bCol = "#EEEEEE";
 
           }
           $holmarker = $row_holiday[memo];
-          mysql_query("set session character_set_connection=latin1;");
-          mysql_query("set session character_set_results=latin1;");
-          mysql_query("set session character_set_client=latin1;");
+          mysqli_query($test, "set session character_set_connection=latin1;");
+          mysqli_query($test, "set session character_set_results=latin1;");
+          mysqli_query($test, "set session character_set_client=latin1;");
 
 
 			  	?>
@@ -4266,12 +4285,12 @@ if (is_dir($dirPC)){
         $hisID = $row_patientinfo['Hospital_ID'];
 /*
         $queryStat = "Select Dose,Stat from Timer where (date1 like '$tDates' AND Hospital_ID like '$hisID')";
-        $StatInfo = mysql_query($queryStat, $test) or die(mysql_error());
-        $row_Statinfo = mysql_fetch_assoc($StatInfo);
-        $total_Statinfo = mysql_num_rows($StatInfo);
-        $sql_Stat = mysql_query($queryStat);
-          $DoseM = mysql_result($sql_Stat, 0,"Dose");
-          $Stated = mysql_result($sql_Stat, 0,"Stat");
+        $StatInfo = mysqli_query($test, $queryStat )  ;
+        $row_Statinfo = mysqli_fetch_assoc($StatInfo);
+        $total_Statinfo = mysqli_num_rows($StatInfo);
+        $sql_Stat = mysqli_query($test, $queryStat);
+          $DoseM = mysqli_result($sql_Stat, 0,"Dose");
+          $Stated = mysqli_result($sql_Stat, 0,"Stat");
 
         if($Stated>2){
           $celCanceled = "background='Cancel.png' ";
@@ -4315,9 +4334,9 @@ if (is_dir($dirPC)){
 	  		$hisID = $row_patientinfo['Hospital_ID'];
 			$queryMemo = "Select * from MeetingList where (Date like '$tDates' AND Hospital_ID like $hisID)";
 
-			$MemoInfo = mysql_query($queryMemo, $test) or die(mysql_error());
-			$row_Memoinfo = mysql_fetch_assoc($MemoInfo);
-			$total_Memoinfo = mysql_num_rows($MemoInfo);
+			$MemoInfo = mysqli_query($test, $queryMemo )  ;
+			$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
+			$total_Memoinfo = mysqli_num_rows($MemoInfo);
 			
 			if($total_Memoinfo>0){
 				$dateMarker = "<font color = #9753e1 size = '3'>EXAM </font>".$dateMarker;
@@ -4469,16 +4488,16 @@ if (is_dir($dirPC)){
 		  		$hisID = $row_patientinfo['Hospital_ID'];
 				$queryMemo = "Select * from OrderTemp where (Date1 like '$tDates' AND Hospital_ID like '$hisID')";
 
-				$MemoInfo = mysql_query($queryMemo, $test) or die(mysql_error());
-				$row_Memoinfo = mysql_fetch_assoc($MemoInfo);
-				$total_Memoinfo = mysql_num_rows($MemoInfo);
-				$sql_Memo = mysql_query($queryMemo);
+				$MemoInfo = mysqli_query($test, $queryMemo )  ;
+				$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
+				$total_Memoinfo = mysqli_num_rows($MemoInfo);
+				$sql_Memo = mysqli_query($test, $queryMemo);
 				if($total_Memoinfo>0){
 					echo("Order");
 				}
 				
 				for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
-					$Memo = mysql_result($sql_Memo, $i,"Memo1");
+					$Memo = mysqli_result($sql_Memo, $i,"Memo1");
 					 echo("<li>");echo($Memo); echo("</li><br>");
 					}
 			  	?>
@@ -4491,15 +4510,15 @@ if (is_dir($dirPC)){
 		  		$hisID = $row_patientinfo['Hospital_ID'];
 				$queryMemo = "Select * from MemoTemp where (Date1 like '$tDates' AND Hospital_ID like '$hisID')";
 
-				$MemoInfo = mysql_query($queryMemo, $test) or die(mysql_error());
-				$row_Memoinfo = mysql_fetch_assoc($MemoInfo);
-				$total_Memoinfo = mysql_num_rows($MemoInfo);
+				$MemoInfo = mysqli_query($test, $queryMemo )  ;
+				$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
+				$total_Memoinfo = mysqli_num_rows($MemoInfo);
 				if($total_Memoinfo>0){
 					echo("Notice<br>");
 				}
-				$sql_Memo = mysql_query($queryMemo);
+				$sql_Memo = mysqli_query($test, $queryMemo);
 				for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
-					$Memo = mysql_result($sql_Memo, $i,"Memo1"); 
+					$Memo = mysqli_result($sql_Memo, $i,"Memo1"); 
 						if(trim(strlen($Memo))>15){
 							$Memo = iconv_substr($Memo,0,14,"utf-8")." ...";			
 						}
@@ -4698,10 +4717,10 @@ if (is_dir($dir)){
 <?php
 	$planquery = "select * from PlanExport where Hospital_ID like '$row_patientinfo[Hospital_ID]' order by PlanID";
 
-	$planext = mysql_query($planquery);	
-			$planDetails = mysql_fetch_assoc($planext);
+	$planext = mysqli_query($test, $planquery);	
+			$planDetails = mysqli_fetch_assoc($planext);
 
-	if(mysql_num_rows($planext)>0){
+	if(mysqli_num_rows($planext)>0){
 
 ?>
 <table  width="960px" border="0" cellspacing="1" cellpadding="1" align="left">
@@ -4731,7 +4750,7 @@ if (is_dir($dir)){
 <?php
 	$planName = '';
 	$bgcolPlan = 0; #b0bef3 /* ultramarine 20 (ibm design colors) */
-	for($idr=0;$idr<mysql_num_rows($planext);$idr++){
+	for($idr=0;$idr<mysqli_num_rows($planext);$idr++){
 		if(strcmp($planName,$planDetails[PlanID])!=0){
 			$planName = $planDetails[PlanID];
 			$bgcolPlan ++;
@@ -4790,7 +4809,7 @@ if (is_dir($dir)){
 		
 		
 		echo("</tr>");
-				$planDetails = mysql_fetch_assoc($planext);
+				$planDetails = mysqli_fetch_assoc($planext);
 
 	}
 	
@@ -5128,11 +5147,11 @@ if (is_dir($dir)){
 <?php
 	
 	
-mysql_free_result($clinicalinfo);
+mysqli_free_result($clinicalinfo);
 
-mysql_free_result($patientinfo);
+mysqli_free_result($patientinfo);
 
-mysql_free_result($treatmentinfo);
+mysqli_free_result($treatmentinfo);
 ?>
 
 

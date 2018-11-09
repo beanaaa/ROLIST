@@ -5,6 +5,25 @@
 	include("configuration.php");
 ?>
 
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
 
 
 
@@ -216,9 +235,9 @@ if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
     header("Location: " . $MM_restrictGoTo);
 }
 
-$conn = mysql_connect("localhost", "root", "dbsgksqls") or die(mysql_error());
-mysql_select_db("test", $conn);
-mysql_select_db($database_test, $test);
+
+mysqli_select_db("test", $conn);
+mysqli_select_db($database_test );
 
 //오늘 날짜 출력 ex) 2013-04-10
 $today_date      = date('Y-m-d');
@@ -233,7 +252,7 @@ for ($dayCount=-1; $dayCount>-20; $dayCount--){
 	$beforeDay = date("m/d/y", strtotime($today. $dcs));
 // 		echo($beforeDay);
 	$daySql = "Select * from Holiday where solar_date like STR_TO_DATE('$beforeDay','%m/%d/%Y')";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,$daySql));	
 	$yoils = date('w', strtotime($beforeDay));
 // 	echo($sqlQuery[solar_date]); echo("&nbsp");echo($yoils); echo("&nbsp");echo($today_date);
 	$workingyest = $sqlQuery[solar_date];
@@ -248,7 +267,7 @@ for ($dayCount=1; $dayCount<20; $dayCount++){
 	$beforeDay = date("m/d/y", strtotime($today. $dcs));
 // 		echo($beforeDay);
 	$daySql = "Select * from Holiday where solar_date like STR_TO_DATE('$beforeDay','%m/%d/%Y')";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test,$daySql));	
 	$yoils = date('w', strtotime($beforeDay));
 // 	echo($sqlQuery[solar_date]); echo("&nbsp");echo($yoils); echo("&nbsp");echo($today_date);
 	$workingtom = $sqlQuery[solar_date];
@@ -296,9 +315,9 @@ if(strcmp($siteInput,"CNS")==0 or strcmp($siteInput,"HN")==0 or strcmp($siteInpu
 else{
 	$querySite = "";
 } 
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+mysqli_query($test,"set session character_set_connection=latin1;");
+mysqli_query($test,"set session character_set_results=latin1;");
+mysqli_query($test,"set session character_set_client=latin1;");
 
 
 
@@ -424,13 +443,13 @@ mysql_query("set session character_set_client=latin1;");
 	
 	$query_Recordset1 .= " ORDER BY MeetingList.Time1 ASC";
 	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+	$Recordset1 = mysqli_query($test,$query_Recordset1 ) or die(mysqli_error());
 	
 	// echo($query_Recordset1);
 	
 	
-	$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-	$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+	$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+	$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 	if($totalRows_Recordset1<1){ 
 		
@@ -651,10 +670,10 @@ print_r($query_Recordset1);
 echo("<br>");
 */
 // print_r(($totalRows_Recordset1));
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test,$query_Recordset1 ) or die(mysqli_error());
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
 //     $idss = 
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
@@ -696,7 +715,7 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
         $dateSorter[$iddd] = $s7;
     }
 //     echo($pid[$iddd]);
-//  	$sqlQuery = mysql_query("update TreatmentInfo set RT_start_cur = $dateSorter[$iddd] where Hospital_ID = $rowOrders[Hospital_ID]");		
+//  	$sqlQuery = mysqli_query($test,"update TreatmentInfo set RT_start_cur = $dateSorter[$iddd] where Hospital_ID = $rowOrders[Hospital_ID]");		
 
     
 }
@@ -1068,15 +1087,15 @@ do {
 
 	}
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
+		$sql_Memo = mysqli_query($test,"select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test,"select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
   <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
  <?php 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 	if($row_Memoinfo>0){ 
 ?>
 
@@ -1116,7 +1135,7 @@ do {
 
 <?php
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
 
 
   unset($row_Recordset1);
@@ -1181,8 +1200,8 @@ $curl_opt = array(
 </body>
 </html>
 <?php
-mysql_free_result($Recordset1);
-mysql_free_result($Recordset2);
+mysqli_free_result($Recordset1);
+mysqli_free_result($Recordset2);
 
 ?>
 

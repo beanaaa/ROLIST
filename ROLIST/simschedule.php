@@ -1,6 +1,26 @@
 <!-- 2016. 11. 4. Reject retired patient from ical hanbeanyoun -->
 
 <!doctype html>
+
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
 <meta charset="utf-8">
 
 <style type="text/css">	  
@@ -192,9 +212,9 @@ if($_POST['permit']!=''){
 	 ?>
 
 <?php
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+mysqli_query($test,"set session character_set_connection=latin1;");
+mysqli_query($test,"set session character_set_results=latin1;");
+mysqli_query($test,"set session character_set_client=latin1;");
 
 if (!isset($_SESSION)) {
 	session_start();
@@ -510,24 +530,24 @@ var detail = 0;
 				
 				$CT_query2 = sprintf("SELECT Hospital_ID, physician, Modality_var1 FROM TreatmentInfo where CT_Sim1 = '$today_date1' or CT_Sim2 = '$today_date1' or CT_Sim3 = '$today_date1'
 				or CT_Sim4 = '$today_date1' or CT_Sim5 = '$today_date1' or CT_Sim6 = '$today_date1' or CT_Sim7 = '$today_date1'  ");								
-				$query2_CT = mysql_query($CT_query2);	
+				$query2_CT = mysqli_query($test,$CT_query2);	
 
-				$j2 = mysql_num_rows($query2_CT);
+				$j2 = mysqli_num_rows($query2_CT);
 
-				$CT_querySim1 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time1, TreatmentInfo.subsite, TreatmentInfo.CT_Ce1, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim1 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim2 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time2, TreatmentInfo.subsite, TreatmentInfo.CT_Ce2, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim2 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim3 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time3, TreatmentInfo.subsite, TreatmentInfo.CT_Ce3, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim3 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim4 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time4, TreatmentInfo.subsite, TreatmentInfo.CT_Ce4, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim4 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim5 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time5, TreatmentInfo.subsite, TreatmentInfo.CT_Ce5, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim5 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim6 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time6, TreatmentInfo.subsite, TreatmentInfo.CT_Ce6, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim6 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim7 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time7, TreatmentInfo.subsite, TreatmentInfo.CT_Ce7, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim7 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$n1 = mysql_num_rows($CT_querySim1);
-				$n2 = mysql_num_rows($CT_querySim2);
-				$n3 = mysql_num_rows($CT_querySim3);
-				$n4 = mysql_num_rows($CT_querySim4);
-				$n5 = mysql_num_rows($CT_querySim5);
-				$n6 = mysql_num_rows($CT_querySim6);
-				$n7 = mysql_num_rows($CT_querySim7);
+				$CT_querySim1 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time1, TreatmentInfo.subsite, TreatmentInfo.CT_Ce1, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim1 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim2 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time2, TreatmentInfo.subsite, TreatmentInfo.CT_Ce2, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim2 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim3 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time3, TreatmentInfo.subsite, TreatmentInfo.CT_Ce3, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim3 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim4 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time4, TreatmentInfo.subsite, TreatmentInfo.CT_Ce4, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim4 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim5 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time5, TreatmentInfo.subsite, TreatmentInfo.CT_Ce5, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim5 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim6 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time6, TreatmentInfo.subsite, TreatmentInfo.CT_Ce6, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim6 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim7 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time7, TreatmentInfo.subsite, TreatmentInfo.CT_Ce7, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim7 = '$today_date1'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$n1 = mysqli_num_rows($CT_querySim1);
+				$n2 = mysqli_num_rows($CT_querySim2);
+				$n3 = mysqli_num_rows($CT_querySim3);
+				$n4 = mysqli_num_rows($CT_querySim4);
+				$n5 = mysqli_num_rows($CT_querySim5);
+				$n6 = mysqli_num_rows($CT_querySim6);
+				$n7 = mysqli_num_rows($CT_querySim7);
 				
 // 				Array Initialization
 				for($tId=0;$tId<12;$tId++){$timeTableTime[$tId]=0;}
@@ -538,93 +558,93 @@ var detail = 0;
 // 				Merge into single array
 				$tableIdx = 0;
 				for($tId = 0;$tId<$n1;$tId++){
-					$orderIndex = mysql_result($CT_querySim1,$tId,"CT_Time1");			
+					$orderIndex = mysqli_result($CT_querySim1,$tId,"CT_Time1");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"CT_Time1"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"CT_Ce1"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"Hospital_ID");
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"physician"); 
-						$timeTableCCRT[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"Modality_var1"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"CT_Time1"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"CT_Ce1"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"Hospital_ID");
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"physician"); 
+						$timeTableCCRT[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"Modality_var1"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"subsite"); 
 						$CTe[$tableIdx] = 1;
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n2;$tId++){
-					$orderIndex = mysql_result($CT_querySim2,$tId,"CT_Time2");			
+					$orderIndex = mysqli_result($CT_querySim2,$tId,"CT_Time2");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"CT_Time2"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"CT_Ce2"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim2,$tId,"physician"); 
-						$timeTableCCRT[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"Modality_var1"); 						
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim2,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"CT_Time2"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"CT_Ce2"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim2,$tId,"physician"); 
+						$timeTableCCRT[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"Modality_var1"); 						
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim2,$tId,"subsite"); 
 						$CTe[$tableIdx] = 2;
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n3;$tId++){
-					$orderIndex = mysql_result($CT_querySim3,$tId,"CT_Time3");			
+					$orderIndex = mysqli_result($CT_querySim3,$tId,"CT_Time3");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"CT_Time3"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"CT_Ce3"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim3,$tId,"physician"); 
-						$timeTableCCRT[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"Modality_var1"); 						
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim3,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"CT_Time3"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"CT_Ce3"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim3,$tId,"physician"); 
+						$timeTableCCRT[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"Modality_var1"); 						
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim3,$tId,"subsite"); 
 						$CTe[$tableIdx] = 3;						
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n4;$tId++){
-					$orderIndex = mysql_result($CT_querySim4,$tId,"CT_Time4");			
+					$orderIndex = mysqli_result($CT_querySim4,$tId,"CT_Time4");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"CT_Time4"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"CT_Ce4"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim4,$tId,"physician"); 
-						$timeTableCCRT[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"Modality_var1"); 						
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim4,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"CT_Time4"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"CT_Ce4"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim4,$tId,"physician"); 
+						$timeTableCCRT[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"Modality_var1"); 						
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim4,$tId,"subsite"); 
 						$CTe[$tableIdx] = 4;
 
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n5;$tId++){
-					$orderIndex = mysql_result($CT_querySim5,$tId,"CT_Time5");			
+					$orderIndex = mysqli_result($CT_querySim5,$tId,"CT_Time5");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"CT_Time5"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"CT_Ce5"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim5,$tId,"physician"); 
-						$timeTableCCRT[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"Modality_var1"); 						
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim5,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"CT_Time5"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"CT_Ce5"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim5,$tId,"physician"); 
+						$timeTableCCRT[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"Modality_var1"); 						
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim5,$tId,"subsite"); 
 						$CTe[$tableIdx] = 5;
 						
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n6;$tId++){
-					$orderIndex = mysql_result($CT_querySim6,$tId,"CT_Time6");			
+					$orderIndex = mysqli_result($CT_querySim6,$tId,"CT_Time6");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"CT_Time6"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"CT_Ce6"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim6,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim6,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"CT_Time6"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"CT_Ce6"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim6,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim6,$tId,"subsite"); 
 						$CTe[$tableIdx] = 6;
 						
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n7;$tId++){
-					$orderIndex = mysql_result($CT_querySim7,$tId,"CT_Time7");			
+					$orderIndex = mysqli_result($CT_querySim7,$tId,"CT_Time7");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"CT_Time7"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"CT_Ce7"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim7,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim7,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"CT_Time7"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"CT_Ce7"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim7,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim7,$tId,"subsite"); 
 						$CTe[$tableIdx] = 7;
 						
 						$tableIdx++;
@@ -638,7 +658,7 @@ var detail = 0;
 				for($tId=0;$tId<20;$tId++){$scheduledPhysician[$tId]="NULL";}
 				for($tId=0;$tId<20;$tId++){$scheduledSite[$tId]="NULL";}
 
-				$j2 = mysql_num_rows($query2_CT);
+				$j2 = mysqli_num_rows($query2_CT);
 
 // 				Initialization: Resorting scheduled simulations										
 				for($tId=0;$tId<20;$tId++){$unscheduledTime[$tId]=0;}
@@ -684,9 +704,9 @@ var detail = 0;
 				$totRows = 0;
 				for($idn = 0; $idn<count($phyInt);$idn++){
 					$AbsenceQuery = "Select * from MdAbsence where physician like '$phyInt[$idn]' and date1 like '$today_date1'";
-					$abss = mysql_query($AbsenceQuery);		
-					$Abs[$idn] = mysql_num_rows($abss);
-					$totRows = $totRows+mysql_num_rows($abss);			
+					$abss = mysqli_query($test,$AbsenceQuery);		
+					$Abs[$idn] = mysqli_num_rows($abss);
+					$totRows = $totRows+mysqli_num_rows($abss);			
 				}
 				
 
@@ -723,14 +743,14 @@ var detail = 0;
 						
 						$query1_CT_phy = $scheduledPhysician[$jj];
 						$CT_queryName = sprintf("SELECT KorName, Inp, Secondname FROM PatientInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_Name = mysql_query($CT_queryName);
+						$query1_Name = mysqli_query($test,$CT_queryName);
 
 						$CT_simEmr = sprintf("SELECT SimOrderEmr FROM ClinicalInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_simEmr = mysql_query($CT_simEmr);
+						$query1_simEmr = mysqli_query($test,$CT_simEmr);
 
 						$CT_simCCRT = sprintf("SELECT Modality_var1 FROM TreatmentInfo WHERE Hospital_ID like '$query1_CT_ID'");
-						$query1_simCCRT = mysql_query($CT_simCCRT);
-						$query1_fSimCCRT = mysql_result($query1_simCCRT,0,"Modality_var1");
+						$query1_simCCRT = mysqli_query($test,$CT_simCCRT);
+						$query1_fSimCCRT = mysqli_result($query1_simCCRT,0,"Modality_var1");
 						if(strlen(trim($query1_fSimCCRT))>0){
 							$CCRT = "CCRT";
 						}
@@ -738,11 +758,11 @@ var detail = 0;
 							$CCRT = "";							
 						}
 							
-						$query1_fSimEmr = mysql_result($query1_simEmr,0,"SimOrderEmr");
+						$query1_fSimEmr = mysqli_result($query1_simEmr,0,"SimOrderEmr");
 
-						$query1_fName = mysql_result($query1_Name,0,"KorName");
-						$query1_Inp = mysql_result($query1_Name,0,"Inp");
-						$query1_sName = mysql_result($query1_Name,0,"Secondname");
+						$query1_fName = mysqli_result($query1_Name,0,"KorName");
+						$query1_Inp = mysqli_result($query1_Name,0,"Inp");
+						$query1_sName = mysqli_result($query1_Name,0,"Secondname");
 						$ce = $scheduledCe[$jj];
 						if(strcmp($ce,"CE")==0){
 							$ce = "<font color=red><strong>".$ce."</strong></font>";
@@ -849,10 +869,10 @@ var detail = 0;
 						
 						$query1_CT_phy = $unscheduledPhysician[$jj];
 						$CT_queryName = sprintf("SELECT KorName, Secondname, KorName FROM PatientInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_Name = mysql_query($CT_queryName);
+						$query1_Name = mysqli_query($test,$CT_queryName);
 	
-						$query1_fName = mysql_result($query1_Name,0,"KorName");
-						$query1_sName = mysql_result($query1_Name,0,"Secondname");
+						$query1_fName = mysqli_result($query1_Name,0,"KorName");
+						$query1_sName = mysqli_result($query1_Name,0,"Secondname");
 						
 
 
@@ -910,14 +930,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 					
 						$mds = $rowOrders[physician];
 						$cellclr = "#FFFFFF";
@@ -1000,14 +1020,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 					
 						$mds = $rowOrders[physician];
 						$cellclr = "#FFFFFF";
@@ -1084,14 +1104,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 					
 						$mds = $rowOrders[physician];
 						$cellclr = "#FFFFFF";
@@ -1218,23 +1238,23 @@ var detail = 0;
 // 									This is for CT simulation
 				$CT_query2 = sprintf("SELECT Hospital_ID, physician FROM TreatmentInfo where CT_Sim1 = '$today_date2' or CT_Sim2 = '$today_date2' or CT_Sim3 = '$today_date2'
 				or CT_Sim4 = '$today_date2' or CT_Sim5 = '$today_date2' or CT_Sim6 = '$today_date2' or CT_Sim7 = '$today_date2'  ");								
-				$query2_CT = mysql_query($CT_query2);	
+				$query2_CT = mysqli_query($test,$CT_query2);	
 
-				$j2 = mysql_num_rows($query2_CT);
-				$CT_querySim1 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time1, TreatmentInfo.subsite, TreatmentInfo.CT_Ce1, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim1 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim2 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time2, TreatmentInfo.subsite, TreatmentInfo.CT_Ce2, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim2 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim3 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time3, TreatmentInfo.subsite, TreatmentInfo.CT_Ce3, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim3 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim4 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time4, TreatmentInfo.subsite, TreatmentInfo.CT_Ce4, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim4 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim5 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time5, TreatmentInfo.subsite, TreatmentInfo.CT_Ce5, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim5 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim6 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time6, TreatmentInfo.subsite, TreatmentInfo.CT_Ce6, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim6 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim7 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time7, TreatmentInfo.subsite, TreatmentInfo.CT_Ce7, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim7 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$n1 = mysql_num_rows($CT_querySim1);
-				$n2 = mysql_num_rows($CT_querySim2);
-				$n3 = mysql_num_rows($CT_querySim3);
-				$n4 = mysql_num_rows($CT_querySim4);
-				$n5 = mysql_num_rows($CT_querySim5);
-				$n6 = mysql_num_rows($CT_querySim6);
-				$n7 = mysql_num_rows($CT_querySim7);
+				$j2 = mysqli_num_rows($query2_CT);
+				$CT_querySim1 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time1, TreatmentInfo.subsite, TreatmentInfo.CT_Ce1, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim1 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim2 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time2, TreatmentInfo.subsite, TreatmentInfo.CT_Ce2, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim2 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim3 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time3, TreatmentInfo.subsite, TreatmentInfo.CT_Ce3, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim3 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim4 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time4, TreatmentInfo.subsite, TreatmentInfo.CT_Ce4, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim4 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim5 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time5, TreatmentInfo.subsite, TreatmentInfo.CT_Ce5, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim5 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim6 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time6, TreatmentInfo.subsite, TreatmentInfo.CT_Ce6, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim6 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim7 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time7, TreatmentInfo.subsite, TreatmentInfo.CT_Ce7, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim7 = '$today_date2'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$n1 = mysqli_num_rows($CT_querySim1);
+				$n2 = mysqli_num_rows($CT_querySim2);
+				$n3 = mysqli_num_rows($CT_querySim3);
+				$n4 = mysqli_num_rows($CT_querySim4);
+				$n5 = mysqli_num_rows($CT_querySim5);
+				$n6 = mysqli_num_rows($CT_querySim6);
+				$n7 = mysqli_num_rows($CT_querySim7);
 				
 // 				Array Initialization
 				for($tId=0;$tId<12;$tId++){$timeTableTime[$tId]=0;}
@@ -1245,86 +1265,86 @@ var detail = 0;
 // 				Merge into single array
 				$tableIdx = 0;
 				for($tId = 0;$tId<$n1;$tId++){
-					$orderIndex = mysql_result($CT_querySim1,$tId,"CT_Time1");			
+					$orderIndex = mysqli_result($CT_querySim1,$tId,"CT_Time1");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"CT_Time1"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"CT_Ce1"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"Hospital_ID");
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"CT_Time1"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"CT_Ce1"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"Hospital_ID");
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"subsite"); 
 						$CTe[$tableIdx] = 1;
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n2;$tId++){
-					$orderIndex = mysql_result($CT_querySim2,$tId,"CT_Time2");			
+					$orderIndex = mysqli_result($CT_querySim2,$tId,"CT_Time2");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"CT_Time2"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"CT_Ce2"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim2,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim2,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"CT_Time2"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"CT_Ce2"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim2,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim2,$tId,"subsite"); 
 						$CTe[$tableIdx] = 2;
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n3;$tId++){
-					$orderIndex = mysql_result($CT_querySim3,$tId,"CT_Time3");			
+					$orderIndex = mysqli_result($CT_querySim3,$tId,"CT_Time3");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"CT_Time3"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"CT_Ce3"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim3,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim3,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"CT_Time3"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"CT_Ce3"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim3,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim3,$tId,"subsite"); 
 						$CTe[$tableIdx] = 3;						
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n4;$tId++){
-					$orderIndex = mysql_result($CT_querySim4,$tId,"CT_Time4");			
+					$orderIndex = mysqli_result($CT_querySim4,$tId,"CT_Time4");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"CT_Time4"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"CT_Ce4"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim4,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim4,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"CT_Time4"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"CT_Ce4"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim4,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim4,$tId,"subsite"); 
 						$CTe[$tableIdx] = 4;
 
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n5;$tId++){
-					$orderIndex = mysql_result($CT_querySim5,$tId,"CT_Time5");			
+					$orderIndex = mysqli_result($CT_querySim5,$tId,"CT_Time5");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"CT_Time5"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"CT_Ce5"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim5,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim5,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"CT_Time5"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"CT_Ce5"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim5,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim5,$tId,"subsite"); 
 						$CTe[$tableIdx] = 5;
 						
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n6;$tId++){
-					$orderIndex = mysql_result($CT_querySim6,$tId,"CT_Time6");			
+					$orderIndex = mysqli_result($CT_querySim6,$tId,"CT_Time6");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"CT_Time6"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"CT_Ce6"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim6,$tId,"physician"); $tableIdx++;
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim6,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"CT_Time6"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"CT_Ce6"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim6,$tId,"physician"); $tableIdx++;
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim6,$tId,"subsite"); 
 						
 						}
 				}
 				for($tId = 0;$tId<$n7;$tId++){
-					$orderIndex = mysql_result($CT_querySim7,$tId,"CT_Time7");			
+					$orderIndex = mysqli_result($CT_querySim7,$tId,"CT_Time7");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"CT_Time7"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"CT_Ce7"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim7,$tId,"physician"); $tableIdx++;
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim7,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"CT_Time7"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"CT_Ce7"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim7,$tId,"physician"); $tableIdx++;
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim7,$tId,"subsite"); 
 						
 						}
 				}
@@ -1336,7 +1356,7 @@ var detail = 0;
 				for($tId=0;$tId<20;$tId++){$scheduledPhysician[$tId]="NULL";}
 				for($tId=0;$tId<20;$tId++){$scheduledSite[$tId]="NULL";}
 
-				$j2 = mysql_num_rows($query2_CT);
+				$j2 = mysqli_num_rows($query2_CT);
 
 // 				Initialization: Resorting scheduled simulations										
 				for($tId=0;$tId<20;$tId++){$unscheduledTime[$tId]=0;}
@@ -1380,9 +1400,9 @@ var detail = 0;
 				$totRows = 0;
 				for($idn = 0; $idn<count($phyInt);$idn++){
 					$AbsenceQuery = "Select * from MdAbsence where physician like '$phyInt[$idn]' and date1 like '$today_date2'";
-					$abss = mysql_query($AbsenceQuery);		
-					$Abs[$idn] = mysql_num_rows($abss);
-					$totRows = $totRows+mysql_num_rows($abss);			
+					$abss = mysqli_query($test,$AbsenceQuery);		
+					$Abs[$idn] = mysqli_num_rows($abss);
+					$totRows = $totRows+mysqli_num_rows($abss);			
 				}
 				
 
@@ -1418,13 +1438,13 @@ var detail = 0;
 						
 						$query1_CT_phy = $scheduledPhysician[$jj];
 						$CT_queryName = sprintf("SELECT KorName, Inp, Secondname FROM PatientInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_Name = mysql_query($CT_queryName);
+						$query1_Name = mysqli_query($test,$CT_queryName);
 
 						$CT_simEmr = sprintf("SELECT SimOrderEmr FROM ClinicalInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_simEmr = mysql_query($CT_simEmr);
+						$query1_simEmr = mysqli_query($test,$CT_simEmr);
 							$CT_simCCRT = sprintf("SELECT Modality_var1 FROM TreatmentInfo WHERE Hospital_ID like '$query1_CT_ID'");
-						$query1_simCCRT = mysql_query($CT_simCCRT);
-						$query1_fSimCCRT = mysql_result($query1_simCCRT,0,"Modality_var1");
+						$query1_simCCRT = mysqli_query($test,$CT_simCCRT);
+						$query1_fSimCCRT = mysqli_result($query1_simCCRT,0,"Modality_var1");
 						if(strlen(trim($query1_fSimCCRT))>0){
 							$CCRT = "CCRT";
 						}
@@ -1435,10 +1455,10 @@ var detail = 0;
 	
 	
 	
-						$query1_fSimEmr = mysql_result($query1_simEmr,0,"SimOrderEmr");
-						$query1_fName = mysql_result($query1_Name,0,"KorName");
-						$query1_Inp = mysql_result($query1_Name,0,"Inp");
-						$query1_sName = mysql_result($query1_Name,0,"Secondname");
+						$query1_fSimEmr = mysqli_result($query1_simEmr,0,"SimOrderEmr");
+						$query1_fName = mysqli_result($query1_Name,0,"KorName");
+						$query1_Inp = mysqli_result($query1_Name,0,"Inp");
+						$query1_sName = mysqli_result($query1_Name,0,"Secondname");
 						$ce = $scheduledCe[$jj];
 						if(strcmp($ce,"CE")==0){
 							$ce = "<font color=red><strong>".$ce."</strong></font>";
@@ -1557,10 +1577,10 @@ var detail = 0;
 						
 						$query1_CT_phy = $unscheduledPhysician[$jj];
 						$CT_queryName = sprintf("SELECT KorName, Secondname, KorName FROM PatientInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_Name = mysql_query($CT_queryName);
+						$query1_Name = mysqli_query($test,$CT_queryName);
 	
-						$query1_fName = mysql_result($query1_Name,0,"KorName");
-						$query1_sName = mysql_result($query1_Name,0,"Secondname");
+						$query1_fName = mysqli_result($query1_Name,0,"KorName");
+						$query1_sName = mysqli_result($query1_Name,0,"Secondname");
 
 						$physician = $query1_CT_phy;
 						$cellclr = "#FFFFFF";
@@ -1615,14 +1635,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 
 
 
@@ -1710,14 +1730,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 					
 						$mds = $rowOrders[physician];
 						$cellclr = "#FFFFFF";
@@ -1797,14 +1817,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 					
 					
 						$mds = $rowOrders[physician];
@@ -1929,23 +1949,23 @@ var detail = 0;
 // 									This is for CT simulation
 				$CT_query2 = sprintf("SELECT Hospital_ID, physician FROM TreatmentInfo where CT_Sim1 = '$today_date3' or CT_Sim2 = '$today_date3' or CT_Sim3 = '$today_date3'
 				or CT_Sim4 = '$today_date3' or CT_Sim5 = '$today_date3' or CT_Sim6 = '$today_date3' or CT_Sim7 = '$today_date3'  ");								
-				$query2_CT = mysql_query($CT_query2);	
+				$query2_CT = mysqli_query($test,$CT_query2);	
 				
-				$j2 = mysql_num_rows($query2_CT);
-				$CT_querySim1 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time1, TreatmentInfo.subsite, TreatmentInfo.CT_Ce1, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim1 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim2 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time2, TreatmentInfo.subsite, TreatmentInfo.CT_Ce2, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim2 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim3 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time3, TreatmentInfo.subsite, TreatmentInfo.CT_Ce3, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim3 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim4 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time4, TreatmentInfo.subsite, TreatmentInfo.CT_Ce4, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim4 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim5 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time5, TreatmentInfo.subsite, TreatmentInfo.CT_Ce5, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim5 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim6 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time6, TreatmentInfo.subsite, TreatmentInfo.CT_Ce6, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim6 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$CT_querySim7 = mysql_query(sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time7, TreatmentInfo.subsite, TreatmentInfo.CT_Ce7, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim7 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
-				$n1 = mysql_num_rows($CT_querySim1);
-				$n2 = mysql_num_rows($CT_querySim2);
-				$n3 = mysql_num_rows($CT_querySim3);
-				$n4 = mysql_num_rows($CT_querySim4);
-				$n5 = mysql_num_rows($CT_querySim5);
-				$n6 = mysql_num_rows($CT_querySim6);
-				$n7 = mysql_num_rows($CT_querySim7);
+				$j2 = mysqli_num_rows($query2_CT);
+				$CT_querySim1 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time1, TreatmentInfo.subsite, TreatmentInfo.CT_Ce1, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim1 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim2 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time2, TreatmentInfo.subsite, TreatmentInfo.CT_Ce2, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim2 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim3 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time3, TreatmentInfo.subsite, TreatmentInfo.CT_Ce3, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim3 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim4 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time4, TreatmentInfo.subsite, TreatmentInfo.CT_Ce4, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim4 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim5 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time5, TreatmentInfo.subsite, TreatmentInfo.CT_Ce5, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim5 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim6 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time6, TreatmentInfo.subsite, TreatmentInfo.CT_Ce6, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim6 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$CT_querySim7 = mysqli_query($test,sprintf("SELECT TreatmentInfo.Hospital_ID, TreatmentInfo.physician, TreatmentInfo.CT_Time7, TreatmentInfo.subsite, TreatmentInfo.CT_Ce7, PatientInfo.CurrentStatus from PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where (CT_Sim7 = '$today_date3'  AND (PatientInfo.CurrentStatus like 0 OR PatientInfo.CurrentStatus is NULL))"));
+				$n1 = mysqli_num_rows($CT_querySim1);
+				$n2 = mysqli_num_rows($CT_querySim2);
+				$n3 = mysqli_num_rows($CT_querySim3);
+				$n4 = mysqli_num_rows($CT_querySim4);
+				$n5 = mysqli_num_rows($CT_querySim5);
+				$n6 = mysqli_num_rows($CT_querySim6);
+				$n7 = mysqli_num_rows($CT_querySim7);
 				
 // 				Array Initialization
 				for($tId=0;$tId<12;$tId++){$timeTableTime[$tId]=0;}
@@ -1956,86 +1976,86 @@ var detail = 0;
 // 				Merge into single array
 				$tableIdx = 0;
 				for($tId = 0;$tId<$n1;$tId++){
-					$orderIndex = mysql_result($CT_querySim1,$tId,"CT_Time1");			
+					$orderIndex = mysqli_result($CT_querySim1,$tId,"CT_Time1");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"CT_Time1"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"CT_Ce1"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"Hospital_ID");
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim1,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 		= mysql_result($CT_querySim1,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"CT_Time1"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"CT_Ce1"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"Hospital_ID");
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim1,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 		= mysqli_result($CT_querySim1,$tId,"subsite"); 
 						$CTe[$tableIdx] = 1;
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n2;$tId++){
-					$orderIndex = mysql_result($CT_querySim2,$tId,"CT_Time2");			
+					$orderIndex = mysqli_result($CT_querySim2,$tId,"CT_Time2");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"CT_Time2"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"CT_Ce2"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim2,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim2,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim2,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"CT_Time2"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"CT_Ce2"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim2,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim2,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim2,$tId,"subsite"); 
 						$CTe[$tableIdx] = 2;
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n3;$tId++){
-					$orderIndex = mysql_result($CT_querySim3,$tId,"CT_Time3");			
+					$orderIndex = mysqli_result($CT_querySim3,$tId,"CT_Time3");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"CT_Time3"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"CT_Ce3"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim3,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim3,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim3,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"CT_Time3"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"CT_Ce3"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim3,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim3,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim3,$tId,"subsite"); 
 						$CTe[$tableIdx] = 3;						
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n4;$tId++){
-					$orderIndex = mysql_result($CT_querySim4,$tId,"CT_Time4");			
+					$orderIndex = mysqli_result($CT_querySim4,$tId,"CT_Time4");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"CT_Time4"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"CT_Ce4"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim4,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim4,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim4,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"CT_Time4"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"CT_Ce4"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim4,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim4,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim4,$tId,"subsite"); 
 						$CTe[$tableIdx] = 4;
 
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n5;$tId++){
-					$orderIndex = mysql_result($CT_querySim5,$tId,"CT_Time5");			
+					$orderIndex = mysqli_result($CT_querySim5,$tId,"CT_Time5");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"CT_Time5"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"CT_Ce5"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim5,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim5,$tId,"physician"); 
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim5,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"CT_Time5"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"CT_Ce5"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim5,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim5,$tId,"physician"); 
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim5,$tId,"subsite"); 
 						$CTe[$tableIdx] = 5;
 						
 						$tableIdx++;
 						}
 				}
 				for($tId = 0;$tId<$n6;$tId++){
-					$orderIndex = mysql_result($CT_querySim6,$tId,"CT_Time6");			
+					$orderIndex = mysqli_result($CT_querySim6,$tId,"CT_Time6");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"CT_Time6"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"CT_Ce6"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim6,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim6,$tId,"physician"); $tableIdx++;
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim6,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"CT_Time6"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"CT_Ce6"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim6,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim6,$tId,"physician"); $tableIdx++;
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim6,$tId,"subsite"); 
 						
 						}
 				}
 				for($tId = 0;$tId<$n7;$tId++){
-					$orderIndex = mysql_result($CT_querySim7,$tId,"CT_Time7");			
+					$orderIndex = mysqli_result($CT_querySim7,$tId,"CT_Time7");			
 					if($orderIndex != "NULL"){ 							
-						$timeTableTime[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"CT_Time7"); 
-						$timeTableCe[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"CT_Ce7"); 
-						$timeTableID[$tableIdx] 		= mysql_result($CT_querySim7,$tId,"Hospital_ID"); 
-						$timeTablePhysician[$tableIdx] 	= mysql_result($CT_querySim7,$tId,"physician"); $tableIdx++;
-						$timeTableSite[$tableIdx] 	= mysql_result($CT_querySim7,$tId,"subsite"); 
+						$timeTableTime[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"CT_Time7"); 
+						$timeTableCe[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"CT_Ce7"); 
+						$timeTableID[$tableIdx] 		= mysqli_result($CT_querySim7,$tId,"Hospital_ID"); 
+						$timeTablePhysician[$tableIdx] 	= mysqli_result($CT_querySim7,$tId,"physician"); $tableIdx++;
+						$timeTableSite[$tableIdx] 	= mysqli_result($CT_querySim7,$tId,"subsite"); 
 						
 						}
 				}
@@ -2047,7 +2067,7 @@ var detail = 0;
 				for($tId=0;$tId<20;$tId++){$scheduledPhysician[$tId]="NULL";}
 				for($tId=0;$tId<20;$tId++){$scheduledSite[$tId]="NULL";}
 
-				$j2 = mysql_num_rows($query2_CT);
+				$j2 = mysqli_num_rows($query2_CT);
 
 // 				Initialization: Resorting scheduled simulations										
 				for($tId=0;$tId<20;$tId++){$unscheduledTime[$tId]=0;}
@@ -2090,9 +2110,9 @@ var detail = 0;
 				$totRows = 0;
 				for($idn = 0; $idn<count($phyInt);$idn++){
 					$AbsenceQuery = "Select * from MdAbsence where physician like '$phyInt[$idn]' and date1 like '$today_date3'";
-					$abss = mysql_query($AbsenceQuery);		
-					$Abs[$idn] = mysql_num_rows($abss);
-					$totRows = $totRows+mysql_num_rows($abss);			
+					$abss = mysqli_query($test,$AbsenceQuery);		
+					$Abs[$idn] = mysqli_num_rows($abss);
+					$totRows = $totRows+mysqli_num_rows($abss);			
 				}
 				
 
@@ -2131,23 +2151,23 @@ var detail = 0;
 
 						$query1_CT_phy = $scheduledPhysician[$jj];
 						$CT_queryName = sprintf("SELECT KorName, Inp, Secondname FROM PatientInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_Name = mysql_query($CT_queryName);
+						$query1_Name = mysqli_query($test,$CT_queryName);
 
 						$CT_simEmr = sprintf("SELECT SimOrderEmr FROM ClinicalInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_simEmr = mysql_query($CT_simEmr);
+						$query1_simEmr = mysqli_query($test,$CT_simEmr);
 	
-						$query1_fSimEmr = mysql_result($query1_simEmr,0,"SimOrderEmr");
-						$query1_fName = mysql_result($query1_Name,0,"KorName");
-						$query1_Inp = mysql_result($query1_Name,0,"Inp");
-						$query1_sName = mysql_result($query1_Name,0,"Secondname");
+						$query1_fSimEmr = mysqli_result($query1_simEmr,0,"SimOrderEmr");
+						$query1_fName = mysqli_result($query1_Name,0,"KorName");
+						$query1_Inp = mysqli_result($query1_Name,0,"Inp");
+						$query1_sName = mysqli_result($query1_Name,0,"Secondname");
 						$ce = $scheduledCe[$jj];
 						if(strcmp($ce,"CE")==0){
 							$ce = "<font color=red><strong>".$ce."</strong></font>";
 						}
 						$site = $scheduledSite[$jj];
 						$CT_simCCRT = sprintf("SELECT Modality_var1 FROM TreatmentInfo WHERE Hospital_ID like '$query1_CT_ID'");
-						$query1_simCCRT = mysql_query($CT_simCCRT);
-						$query1_fSimCCRT = mysql_result($query1_simCCRT,0,"Modality_var1");
+						$query1_simCCRT = mysqli_query($test,$CT_simCCRT);
+						$query1_fSimCCRT = mysqli_result($query1_simCCRT,0,"Modality_var1");
 						if(strlen(trim($query1_fSimCCRT))>0){
 							$CCRT = "CCRT";
 						}
@@ -2268,10 +2288,10 @@ var detail = 0;
 						
 						$query1_CT_phy = $unscheduledPhysician[$jj];
 						$CT_queryName = sprintf("SELECT KorName, Secondname, KorName FROM PatientInfo WHERE Hospital_ID = '$query1_CT_ID'");
-						$query1_Name = mysql_query($CT_queryName);
+						$query1_Name = mysqli_query($test,$CT_queryName);
 	
-						$query1_fName = mysql_result($query1_Name,0,"KorName");
-						$query1_sName = mysql_result($query1_Name,0,"Secondname");
+						$query1_fName = mysqli_result($query1_Name,0,"KorName");
+						$query1_sName = mysqli_result($query1_Name,0,"Secondname");
 						
 						
 						$physician = $query1_CT_phy;
@@ -2325,14 +2345,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 					
 						$mds = $rowOrders[physician];
 						$cellclr = "#FFFFFF";
@@ -2410,14 +2430,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 					
 							$mds = $rowOrders[physician];
 						$cellclr = "#FFFFFF";
@@ -2491,14 +2511,14 @@ var detail = 0;
 				 (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 				
 // 				echo($query_starts);
-				$Recordset1 = mysql_query($query_starts, $test) or die(mysql_error());
-// 				$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-				$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+				$Recordset1 = mysqli_query($test,$query_starts ) or die(mysqli_error());
+// 				$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+				$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 				
 // 				echo($totalRows_Recordset1);
 				
 				for($idCal = 0; $idCal<$totalRows_Recordset1; $idCal++){
-					$rowOrders = mysql_fetch_assoc($Recordset1);
+					$rowOrders = mysqli_fetch_assoc($Recordset1);
 					
 						$mds = $rowOrders[physician];
 						$cellclr = "#FFFFFF";

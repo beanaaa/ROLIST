@@ -1,6 +1,24 @@
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/jquery.min.js"></script>
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
     
 <script>
 $(function() {
@@ -12,8 +30,7 @@ $(function() {
     
 <?php
 include("configuration.php");
-$conn = mysql_connect("localhost", "root", "dbsgksqls") or die(mysql_error());
-mysql_select_db("test", $conn);
+	require_once('Connections/test.php'); 
 
 	
 $uid = $_POST['username'];
@@ -22,7 +39,7 @@ $content = $_POST['txt_content'];
 $mds = $_POST['physcianName'];
 $deleteId = $_POST['ids'];
 $DeleteQuery = sprintf("Delete from MdAbsence where id = '%s'", $deleteId);
-$abss = mysql_query($DeleteQuery);
+$abss = mysqli_query($test, $DeleteQuery);
 
 
 
@@ -32,12 +49,12 @@ $abss = mysql_query($DeleteQuery);
 if(strlen($dates)>3){ 
 	$InsertQuery = sprintf("Insert into MdAbsence (physician, date1, content) values ('%s', '%s', '%s')", $mds, $dates, $content);
 	echo($InsertQuery);
-	$abss = mysql_query($InsertQuery);
+	$abss = mysqli_query($test, $InsertQuery);
 }
 
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+mysqli_query($test, "set session character_set_connection=latin1;");
+mysqli_query($test, "set session character_set_results=latin1;");
+mysqli_query($test, "set session character_set_client=latin1;");
 
 
 ?>
@@ -99,14 +116,14 @@ mysql_query("set session character_set_client=latin1;");
 
 <?php
 $AbsenceQuery = "Select * from MdAbsence order by date1";
-$abss = mysql_query($AbsenceQuery);
-$numbers = mysql_num_rows($abss);
+$abss = mysqli_query($test, $AbsenceQuery);
+$numbers = mysqli_num_rows($abss);
 
 // echo($numbers);
 
 
 for($idx = 0;$idx<$numbers;$idx++){
-	$data = mysql_fetch_assoc($abss);
+	$data = mysqli_fetch_assoc($abss);
 	
 	$cellClr = "#FFFFFF";
 	for($phyidss=0;$phyidss<$numphyss;$phyidss++){

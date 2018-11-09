@@ -1,5 +1,25 @@
 <!doctype html>
 <?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
+
+<?php
 include("configuration.php");
 
 ?>
@@ -126,9 +146,9 @@ if($_POST['permit']!=''){
 	require_once('Connections/test.php'); 
 
 	}
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+mysqli_query($test, "set session character_set_connection=latin1;");
+mysqli_query($test, "set session character_set_results=latin1;");
+mysqli_query($test, "set session character_set_client=latin1;");
 	
 	 ?>
 
@@ -504,19 +524,19 @@ var detail = 0;
 				
 				
 				$Meeting_query2 = sprintf("SELECT Hospital_ID, Time1, Memo FROM MeetingList where Date = '$today_date2' and (CHAR_LENGTH(Time1)>=3) order by Time1 ASC");	
-				$query2_Meeting = mysql_query($Meeting_query2);	
-				$numUn = mysql_num_rows($query2_Meeting);
+				$query2_Meeting = mysqli_query($test, $Meeting_query2);	
+				$numUn = mysqli_num_rows($query2_Meeting);
 
 
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'KI' and date1 like '$today_date2'";
- 				$abss = mysql_query($AbsenceQuery);
-				$AbsKi = mysql_num_rows($abss);
+ 				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsKi = mysqli_num_rows($abss);
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'JJ' and date1 like '$today_date2'";
-				$abss = mysql_query($AbsenceQuery);
-				$AbsJJ = mysql_num_rows($abss);
+				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsJJ = mysqli_num_rows($abss);
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'JuL' and date1 like '$today_date2'";
-				$abss = mysql_query($AbsenceQuery);
-				$AbsJuL = mysql_num_rows($abss);
+				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsJuL = mysqli_num_rows($abss);
 
 				if($AbsKi+$AbsJJ+$AbsJuL !=0){ 
 
@@ -588,20 +608,20 @@ var detail = 0;
 				echo "<table  width='100%' cellpadding='0' cellspacing='0'>";		
 				 		
 				
-				while($j2 = mysql_fetch_array($query2_Meeting)){ 
+				while($j2 = mysqli_fetch_array($query2_Meeting)){ 
 					
 
 							$Informs = sprintf("SELECT Inp, KorName FROM PatientInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
-							$query1_Name = mysql_query($Informs);
-							$query1_fName = mysql_result($query1_Name,0,"KorName");							
-							$query1_Inp = mysql_result($query1_Name,0,"Inp");	
+							$query1_Name = mysqli_query($test, $Informs);
+							$query1_fName = mysqli_result($query1_Name,0,"KorName");							
+							$query1_Inp = mysqli_result($query1_Name,0,"Inp");	
 													
 							$InformsTreat = sprintf("SELECT physician, primarysite, subsite FROM TreatmentInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
 							
-							$query1_Treat = mysql_query($InformsTreat);
-							$query1_phys = mysql_result($query1_Treat,0,"physician");							
-							$query1_subs = mysql_result($query1_Treat,0,"subsite");							
-							$query1_prims = mysql_result($query1_Treat,0,"primarysite");							
+							$query1_Treat = mysqli_query($test, $InformsTreat);
+							$query1_phys = mysqli_result($query1_Treat,0,"physician");							
+							$query1_subs = mysqli_result($query1_Treat,0,"subsite");							
+							$query1_prims = mysqli_result($query1_Treat,0,"primarysite");							
 															
 															
 										
@@ -683,8 +703,8 @@ var detail = 0;
 
 // UNSCHEDULED!!!!!!
 				$Meeting_query2 = sprintf("SELECT Hospital_ID, Time1, Memo FROM MeetingList where Date = '$today_date2' and (Time1 is null or CHAR_LENGTH(Time1)<3)");	
-				$query2_Meeting = mysql_query($Meeting_query2);	
-				$numUn = mysql_num_rows($query2_Meeting);
+				$query2_Meeting = mysqli_query($test, $Meeting_query2);	
+				$numUn = mysqli_num_rows($query2_Meeting);
 
 
 				if($numUn!=0){ 	
@@ -696,20 +716,20 @@ var detail = 0;
 				echo "<table  width='100%' cellpadding='0' cellspacing='0'>";		
 				 		
 				
-				while($j2 = mysql_fetch_array($query2_Meeting)){ 
+				while($j2 = mysqli_fetch_array($query2_Meeting)){ 
 
 
 							$Informs = sprintf("SELECT Inp, KorName FROM PatientInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
-							$query1_Name = mysql_query($Informs);
-							$query1_fName = mysql_result($query1_Name,0,"KorName");							
-							$query1_Inp = mysql_result($query1_Name,0,"Inp");	
+							$query1_Name = mysqli_query($test, $Informs);
+							$query1_fName = mysqli_result($query1_Name,0,"KorName");							
+							$query1_Inp = mysqli_result($query1_Name,0,"Inp");	
 													
 							$InformsTreat = sprintf("SELECT physician, primarysite, subsite FROM TreatmentInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
 							
-							$query1_Treat = mysql_query($InformsTreat);
-							$query1_phys = mysql_result($query1_Treat,0,"physician");							
-							$query1_subs = mysql_result($query1_Treat,0,"subsite");							
-							$query1_prims = mysql_result($query1_Treat,0,"primarysite");							
+							$query1_Treat = mysqli_query($test, $InformsTreat);
+							$query1_phys = mysqli_result($query1_Treat,0,"physician");							
+							$query1_subs = mysqli_result($query1_Treat,0,"subsite");							
+							$query1_prims = mysqli_result($query1_Treat,0,"primarysite");							
 																				
 						for($phyidss=0;$phyidss<$numphyss;$phyidss++){
 							if(strcmp(trim($query1_phys),$phyIdd[$phyidss])==0){
@@ -812,8 +832,8 @@ var detail = 0;
 				}
 
 				$Meeting_query2 = sprintf("SELECT Hospital_ID, Time1, Memo FROM MeetingList where Date = '$today_date2' and (CHAR_LENGTH(Time1)>=3) order by Time1 ASC");	
-				$query2_Meeting = mysql_query($Meeting_query2);	
-				$numUn = mysql_num_rows($query2_Meeting);
+				$query2_Meeting = mysqli_query($test, $Meeting_query2);	
+				$numUn = mysqli_num_rows($query2_Meeting);
 
 // 				SCHEDULED!!!!!!!
 				if($numUn!=0){ 	
@@ -821,14 +841,14 @@ var detail = 0;
 
 
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'KI' and date1 like '$today_date2'";
- 				$abss = mysql_query($AbsenceQuery);
-				$AbsKi = mysql_num_rows($abss);
+ 				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsKi = mysqli_num_rows($abss);
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'JJ' and date1 like '$today_date2'";
-				$abss = mysql_query($AbsenceQuery);
-				$AbsJJ = mysql_num_rows($abss);
+				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsJJ = mysqli_num_rows($abss);
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'JuL' and date1 like '$today_date2'";
-				$abss = mysql_query($AbsenceQuery);
-				$AbsJuL = mysql_num_rows($abss);
+				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsJuL = mysqli_num_rows($abss);
 
 				if($AbsKi+$AbsJJ+$AbsJuL !=0){ 
 
@@ -898,20 +918,20 @@ var detail = 0;
 				echo "<table  width='100%' cellpadding='0' cellspacing='0'>";		
 				 		
 				
-				while($j2 = mysql_fetch_array($query2_Meeting)){ 
+				while($j2 = mysqli_fetch_array($query2_Meeting)){ 
 
 
 							$Informs = sprintf("SELECT Inp, KorName FROM PatientInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
-							$query1_Name = mysql_query($Informs);
-							$query1_fName = mysql_result($query1_Name,0,"KorName");							
-							$query1_Inp = mysql_result($query1_Name,0,"Inp");	
+							$query1_Name = mysqli_query($test, $Informs);
+							$query1_fName = mysqli_result($query1_Name,0,"KorName");							
+							$query1_Inp = mysqli_result($query1_Name,0,"Inp");	
 													
 							$InformsTreat = sprintf("SELECT physician, primarysite, subsite FROM TreatmentInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
 							
-							$query1_Treat = mysql_query($InformsTreat);
-							$query1_phys = mysql_result($query1_Treat,0,"physician");							
-							$query1_subs = mysql_result($query1_Treat,0,"subsite");							
-							$query1_prims = mysql_result($query1_Treat,0,"primarysite");							
+							$query1_Treat = mysqli_query($test, $InformsTreat);
+							$query1_phys = mysqli_result($query1_Treat,0,"physician");							
+							$query1_subs = mysqli_result($query1_Treat,0,"subsite");							
+							$query1_prims = mysqli_result($query1_Treat,0,"primarysite");							
 																				
 						for($phyidss=0;$phyidss<$numphyss;$phyidss++){
 							if(strcmp(trim($query1_phys),$phyIdd[$phyidss])==0){
@@ -994,8 +1014,8 @@ var detail = 0;
 
 // UNSCHEDULED!!!!!!
 				$Meeting_query2 = sprintf("SELECT Hospital_ID, Time1, Memo FROM MeetingList where Date = '$today_date2' and (Time1 is null or CHAR_LENGTH(Time1)<3)");	
-				$query2_Meeting = mysql_query($Meeting_query2);	
-				$numUn = mysql_num_rows($query2_Meeting);
+				$query2_Meeting = mysqli_query($test, $Meeting_query2);	
+				$numUn = mysqli_num_rows($query2_Meeting);
 
 
 				if($numUn!=0){ 	
@@ -1012,20 +1032,20 @@ var detail = 0;
 
 				 		
 				
-				while($j2 = mysql_fetch_array($query2_Meeting)){ 
+				while($j2 = mysqli_fetch_array($query2_Meeting)){ 
 
 
 							$Informs = sprintf("SELECT Inp, KorName FROM PatientInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
-							$query1_Name = mysql_query($Informs);
-							$query1_fName = mysql_result($query1_Name,0,"KorName");							
-							$query1_Inp = mysql_result($query1_Name,0,"Inp");	
+							$query1_Name = mysqli_query($test, $Informs);
+							$query1_fName = mysqli_result($query1_Name,0,"KorName");							
+							$query1_Inp = mysqli_result($query1_Name,0,"Inp");	
 													
 							$InformsTreat = sprintf("SELECT physician, primarysite, subsite FROM TreatmentInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
 							
-							$query1_Treat = mysql_query($InformsTreat);
-							$query1_phys = mysql_result($query1_Treat,0,"physician");							
-							$query1_subs = mysql_result($query1_Treat,0,"subsite");							
-							$query1_prims = mysql_result($query1_Treat,0,"primarysite");							
+							$query1_Treat = mysqli_query($test, $InformsTreat);
+							$query1_phys = mysqli_result($query1_Treat,0,"physician");							
+							$query1_subs = mysqli_result($query1_Treat,0,"subsite");							
+							$query1_prims = mysqli_result($query1_Treat,0,"primarysite");							
 																				
 						for($phyidss=0;$phyidss<$numphyss;$phyidss++){
 							if(strcmp(trim($query1_phys),$phyIdd[$phyidss])==0){
@@ -1157,22 +1177,22 @@ var detail = 0;
 
 
 				$Meeting_query2 = sprintf("SELECT Hospital_ID, Time1, Memo FROM MeetingList where Date = '$today_date2' and (CHAR_LENGTH(Time1)>=3) order by Time1 ASC");	
-				$query2_Meeting = mysql_query($Meeting_query2);	
-				$numUn = mysql_num_rows($query2_Meeting);
+				$query2_Meeting = mysqli_query($test, $Meeting_query2);	
+				$numUn = mysqli_num_rows($query2_Meeting);
 
 // 				SCHEDULED!!!!!!!
 				if($numUn!=0){ 	
 				echo("<br>");		
 				
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'KI' and date1 like '$today_date2'";
- 				$abss = mysql_query($AbsenceQuery);
-				$AbsKi = mysql_num_rows($abss);
+ 				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsKi = mysqli_num_rows($abss);
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'JJ' and date1 like '$today_date2'";
-				$abss = mysql_query($AbsenceQuery);
-				$AbsJJ = mysql_num_rows($abss);
+				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsJJ = mysqli_num_rows($abss);
 				$AbsenceQuery = "Select * from MdAbsence where physician like 'JuL' and date1 like '$today_date2'";
-				$abss = mysql_query($AbsenceQuery);
-				$AbsJuL = mysql_num_rows($abss);
+				$abss = mysqli_query($test, $AbsenceQuery);
+				$AbsJuL = mysqli_num_rows($abss);
 
 				if($AbsKi+$AbsJJ+$AbsJuL !=0){ 
 
@@ -1240,21 +1260,21 @@ var detail = 0;
 				echo "<table  width='100%' cellpadding='0' cellspacing='0'>";		
 				 		
 				
-				while($j2 = mysql_fetch_array($query2_Meeting)){ 
+				while($j2 = mysqli_fetch_array($query2_Meeting)){ 
 					echo "<tr>";
 
 
 							$Informs = sprintf("SELECT Inp, KorName FROM PatientInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
-							$query1_Name = mysql_query($Informs);
-							$query1_fName = mysql_result($query1_Name,0,"KorName");							
-							$query1_Inp = mysql_result($query1_Name,0,"Inp");	
+							$query1_Name = mysqli_query($test, $Informs);
+							$query1_fName = mysqli_result($query1_Name,0,"KorName");							
+							$query1_Inp = mysqli_result($query1_Name,0,"Inp");	
 													
 							$InformsTreat = sprintf("SELECT physician, primarysite, subsite FROM TreatmentInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
 							
-							$query1_Treat = mysql_query($InformsTreat);
-							$query1_phys = mysql_result($query1_Treat,0,"physician");							
-							$query1_subs = mysql_result($query1_Treat,0,"subsite");							
-							$query1_prims = mysql_result($query1_Treat,0,"primarysite");							
+							$query1_Treat = mysqli_query($test, $InformsTreat);
+							$query1_phys = mysqli_result($query1_Treat,0,"physician");							
+							$query1_subs = mysqli_result($query1_Treat,0,"subsite");							
+							$query1_prims = mysqli_result($query1_Treat,0,"primarysite");							
 																				
 						for($phyidss=0;$phyidss<$numphyss;$phyidss++){
 							if(strcmp(trim($query1_phys),$phyIdd[$phyidss])==0){
@@ -1337,8 +1357,8 @@ var detail = 0;
 
 // UNSCHEDULED!!!!!!
 				$Meeting_query2 = sprintf("SELECT Hospital_ID, Time1, Memo FROM MeetingList where Date = '$today_date2' and (Time1 is null or CHAR_LENGTH(Time1)<3)");	
-				$query2_Meeting = mysql_query($Meeting_query2);	
-				$numUn = mysql_num_rows($query2_Meeting);
+				$query2_Meeting = mysqli_query($test, $Meeting_query2);	
+				$numUn = mysqli_num_rows($query2_Meeting);
 
 
 				if($numUn!=0){ 	
@@ -1350,20 +1370,20 @@ var detail = 0;
 				echo "<table  width='100%' cellpadding='0' cellspacing='0'>";		
 				 		
 				
-				while($j2 = mysql_fetch_array($query2_Meeting)){ 
+				while($j2 = mysqli_fetch_array($query2_Meeting)){ 
 
 
 							$Informs = sprintf("SELECT Inp, KorName FROM PatientInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
-							$query1_Name = mysql_query($Informs);
-							$query1_fName = mysql_result($query1_Name,0,"KorName");							
-							$query1_Inp = mysql_result($query1_Name,0,"Inp");	
+							$query1_Name = mysqli_query($test, $Informs);
+							$query1_fName = mysqli_result($query1_Name,0,"KorName");							
+							$query1_Inp = mysqli_result($query1_Name,0,"Inp");	
 													
 							$InformsTreat = sprintf("SELECT physician, primarysite, subsite FROM TreatmentInfo WHERE Hospital_ID = '$j2[Hospital_ID]'");
 							
-							$query1_Treat = mysql_query($InformsTreat);
-							$query1_phys = mysql_result($query1_Treat,0,"physician");							
-							$query1_subs = mysql_result($query1_Treat,0,"subsite");							
-							$query1_prims = mysql_result($query1_Treat,0,"primarysite");							
+							$query1_Treat = mysqli_query($test, $InformsTreat);
+							$query1_phys = mysqli_result($query1_Treat,0,"physician");							
+							$query1_subs = mysqli_result($query1_Treat,0,"subsite");							
+							$query1_prims = mysqli_result($query1_Treat,0,"primarysite");							
 																				
 						for($phyidss=0;$phyidss<$numphyss;$phyidss++){
 							if(strcmp(trim($query1_phys),$phyIdd[$phyidss])==0){

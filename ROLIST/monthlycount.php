@@ -1,5 +1,24 @@
 <!doctype html>
 <?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
+<?php
 include("configuration.php");
 	
 ?>
@@ -305,9 +324,9 @@ if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
     header("Location: " . $MM_restrictGoTo);
 }
 
-$conn = mysql_connect("localhost", "root", "dbsgksqls") or die(mysql_error());
-mysql_select_db("test", $conn);
-mysql_select_db($database_test, $test);
+$conn = mysqli_connect("localhost", "root", "dbsgksqls") or die(mysqli_error());
+mysqli_select_db("test", $conn);
+mysqli_select_db($database_test );
 
 //오늘 날짜 출력 ex) 2013-04-10
 $today_date      = date('Y-m-d');
@@ -446,8 +465,8 @@ $today_date2 = $years. "-". $months. "-31";
 			(PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND 
 			(PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND 
 			TreatmentInfo.primarysite LIKE '%$site[$idSite]%'" ;	
-			$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-			$live = mysql_num_rows($Recordset1);
+			$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+			$live = mysqli_num_rows($Recordset1);
 			$tVal[$idMd][$idSite] = $live;
 			$live = 0;
 			$Recordset1 = 0;
@@ -511,8 +530,8 @@ $today_date2 = $years. "-". $months. "-31";
 			(PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND 
 			(PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND 
 			TreatmentInfo.Linac1 LIKE '%$linacs[$idSite]%'" ;	
-			$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-			$live = mysql_num_rows($Recordset1);
+			$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+			$live = mysqli_num_rows($Recordset1);
 			$tVal2[$idMd][$idSite] = $live;
 			$live = 0;
 			$Recordset1 = 0;
@@ -577,8 +596,8 @@ $today_date2 = $years. "-". $months. "-31";
 			(STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') >= '$today_date' and STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date2')AND 
  
 			TreatmentInfo.RT_method1 LIKE '%$linacs[$idSite]%'" ;	
-			$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-			$live = mysql_num_rows($Recordset1);
+			$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+			$live = mysqli_num_rows($Recordset1);
 			$tVal2[$idMd][$idSite] = $live;
 			$live = 0;
 			$Recordset1 = 0;
@@ -664,8 +683,8 @@ $today_date2 = $years. "-". $months. "-31";
 			(PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND 
 			(PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND 
 			TreatmentInfo.primarysite LIKE '%$site[$idSite]%'" ;	
-			$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-			$live = mysql_num_rows($Recordset1);
+			$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+			$live = mysqli_num_rows($Recordset1);
 			$tVal[$idMd][$idSite] = $live;
 			$live = 0;
 			$Recordset1 = 0;
@@ -738,8 +757,8 @@ $today_date2 = $years. "-". $months. "-31";
 			(PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND 
 			(PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND 
 			TreatmentInfo.Linac1 LIKE '%$linacs[$idSite]%'" ;	
-			$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-			$live = mysql_num_rows($Recordset1);
+			$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+			$live = mysqli_num_rows($Recordset1);
 			$tVal2[$idMd][$idSite] = $live;
 			$live = 0;
 			$Recordset1 = 0;
@@ -772,60 +791,60 @@ $today_date2 = $years. "-". $months. "-31";
 /*
 // 	Per site
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%CNS%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveCNS = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveCNS = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%HN%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveHN = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveHN = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%THX%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveTHX = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveTHX = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%BRST%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveBRST = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveBRST = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%GI%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveGI = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveGI = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%GU%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveGU = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveGU = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%GY%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveGY = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveGY = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%MS%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveMS = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveMS = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%SKIN%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveSKIN = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveSKIN = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%HMT%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveHMT = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveHMT = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%PD%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$livePD = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$livePD = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%BENIGN%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveBENIGN = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveBENIGN = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%CUPS%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveCUPS = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveCUPS = mysqli_num_rows($Recordset1);
 
 	$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD STR_TO_DATE(TreatmentInfo.RT_fin_f, '%m/%d/%Y') >= '$today_date' AND STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date' AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL) AND TreatmentInfo.primarysite LIKE '%OTHER%'" ;	
-	$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-	$liveOTHER = mysql_num_rows($Recordset1);
+	$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+	$liveOTHER = mysqli_num_rows($Recordset1);
 */
 
 
@@ -964,8 +983,8 @@ $curl_opt = array(
 </body>
 </html>
 <?php
-mysql_free_result($Recordset1);
-mysql_free_result($Recordset2);
+mysqli_free_result($Recordset1);
+mysqli_free_result($Recordset2);
 ?>
 
 
