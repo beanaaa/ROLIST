@@ -21,6 +21,27 @@ Dedicated to Small RO Department인 이유는 CT 시뮬레이터를 한대만 �
  
 업로드된 파일은 php7으로 마이그레이션 하고 있지만 샘플 사이트는 php5.6 기준입니다. 
 
+## 주요기능
+### Physician's Todo List
+target delineation, plan approval등 Todolist 표시. 체크박스를 통해 RTP, 치료실, 접수등과 데이터 연동
+![스크린샷](https://github.com/beanaaa/ROLIST/blob/master/SC_%202018-11-13%2009.12.57.png)
+### Active, Scheduled, Unscheduled Patients
+치료중이 환자, 시뮬레이션이 예정된 환자등의 리스트 표시 및 모니터링
+![스크린샷](https://github.com/beanaaa/ROLIST/blob/master/SC_%202018-11-13%2009.13.08.png)
+### RTP's Todo List
+신환, RF 환자등 스케쥴별 Plan Todo list, 치료실, 접수등에서 Note된 환자 리스트를 Planner별, Physician별 표시
+![스크린샷](https://github.com/beanaaa/ROLIST/blob/master/SC_%202018-11-13%2009.14.39.png)
+### 자동 스케쥴링
+시뮬레이션, 시작날짜 및 처방선량을 입력하면 RF를 포함하여 자동 스케쥴링. 휴일 및 주말 고려등등
+![스크린샷](https://github.com/beanaaa/ROLIST/blob/master/SC_%202018-11-13%2009.16.53.png)
+### Monthly Calendar
+치료일정을 카테고리별로 분류하여 캘린더 형태로 표시
+![스크린샷](https://github.com/beanaaa/ROLIST/blob/master/SC_%202018-11-13%2009.18.35.png)
+### Advanced Search
+빅데이터/딥러닝 연구등으 목적으로 입력된 케이스를 다양한 방법으로 정렬. MIM/Matlab/Java 플러그인을 이용해 RTdose, RTst등을 추출
+
+
+
 ## 사용법
  - 신환등록: 우상단 New-Patient 버튼 또는 왼쪽 연필 아이콘 클릭후 원하느 환자 아이디를 입력한다. 환자 아이디는 숫자 형태만 지원
  - 정보입력: 신환을 등록한 후 자세한 정보를 입력한다. 외쪽 초록색 아이콘중 Add schedule 버튼을 클릭하여 치료일정을 추가한다. 
