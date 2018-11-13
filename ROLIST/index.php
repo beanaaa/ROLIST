@@ -68,7 +68,7 @@ if (isset($_POST['ID_txt'])) {
   $MM_redirectLoginSuccess = "activelistctrlr.php";
   }
   else{
-  $MM_redirectLoginSuccess = "daily_report_backup.php";
+  $MM_redirectLoginSuccess = "daily_report.php";
 	  
   }
   
@@ -101,7 +101,7 @@ echo("redirected?");
       $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
     }
 
-    header("Location: " . "daily_report_backup.php" );
+    header("Location: " . "daily_report.php" );
   }
   else {
     echo($loginFoundUser);
