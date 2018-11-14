@@ -800,14 +800,6 @@ $Today_date_nextweek     = date("Y-m-d",strtotime("+1 week")); // n : ì›” 1~12 ë
 			
 	</form>
 </th>
-<th valign="middle" align=right>
-	<form method=post target=_blank  action="simschedulertp.php">
-		<input  class="selector" type=submit name=btn_home id=btn_home value=Sch   style="width: 40px; height: 20px">
-		<input  name=permit type=hidden id=permit value= <?php echo $permitUser ?>/>
-		<input  type = hidden name = username id = username value = <?php echo $uid; ?> />				
-			
-	</form>
-</th>
 
 
 
@@ -1456,32 +1448,32 @@ do {
 	
 	
 // 	Prescription 
-	$cropN = 8;
-	echo "<td bgcolor=$bgcolorF width='180' align='left'><div class='memo'>";
+$cropN = 100;
+echo "<td bgcolor=$bgcolorF width='200' align='left'><div class='memo'><font color=$fontColorF>"; 
+$fxDose = (float)$row_Recordset1['dose_sum']/(float)$row_Recordset1['Fx_sum'];
+$fxDoseStr = sprintf("%.2f", $fxDose);		  			
+echo "<font  face=arial></font><font color=blue face=arial><strong>$row_Recordset1[dose_sum] Gy ($fxDoseStr Gy X $row_Recordset1[Fx_sum] fx.)</strong><br></font>";
 
-    for($planIdx=1;$planIdx<$idx+1;$planIdx++){
-		    
-		$SiteX       = "Site" . "$planIdx";
-		$SiteX=(substr($row_Recordset1[$SiteX],0,$cropN));
-		if(strlen($SiteX)==0){
-			$SiteX = "N/A";
-		}
-		$doseX     = "dose" . "$planIdx";
-		$fxX       = "Fx" . "$planIdx";
-				
-		if($planIdx==$pid[$tCount]){
-			echo "<font color=gray face=arial>&nbsp$planIdx.$SiteX:</font><font color=red face=arial>$row_Recordset1[$doseX]/$row_Recordset1[$fxX]</font>";
-		}
-		else{
-			echo "<font color=gray face=arial>&nbsp$planIdx.$SiteX:$row_Recordset1[$doseX]/$row_Recordset1[$fxX]</font>";
+for($planIdx=1;$planIdx<$idx+1;$planIdx++){
+		
+	$SiteX       = "Site" . "$planIdx";
+	$SiteX=(substr($row_Recordset1[$SiteX],0,$cropN));
+	if(strlen($SiteX)==0){
+		$SiteX = "N/A";
+	}
+	$doseX     = "dose" . "$planIdx";
+	$fxX       = "Fx" . "$planIdx";
 			
-		}
-		if($planIdx%2==0){
-			echo("<br>");
-		}
+	if($planIdx==$pid[$tCount]){
+		echo "<font  face=arial>$planIdx.$SiteX:&nbsp;</font><font color=red face=arial>$row_Recordset1[$doseX](&nbsp($row_Recordset1[$fxX])&nbsp;</font>";
+	}
+	else{
+		echo "<font  face=arial>$planIdx.$SiteX:&nbsp;$row_Recordset1[$doseX]($row_Recordset1[$fxX]) &nbsp;</font>";
+		
+	}
 
-    }
-    echo "</div></td>";
+}
+echo "</font></div></td>";
     
 
 // Prescription ends
@@ -1644,17 +1636,6 @@ do {
                 
     echo "<input name=hf_edit type=hidden id=hf_edit value= $row_Recordset1[Hospital_ID] /></a></form></td>";
               
-    if ($permitUser == 2 ) {
-    echo "<form id=form111 name=form111></form>";
-    echo "<td bgcolor=$bgcolorF><form id=form3 name=form3 method=post target=_blank action=rpt.php>";                                  
-    echo "<input class=tag type=submit name=btn_edit id=btn_edit value=T>";
-    echo "<input name=permit type=hidden id=permit  value=$permitUser/>";            
-    echo "<input name=nowa type=hidden id=nowa  value=$curI>";
-    echo "<input name=toda type=hidden id=toda  value=$a_week_after>";    
-                
-    echo "<input name=hf_edit type=hidden id=hf_edit value= $row_Recordset1[Hospital_ID] /></a></form></td>";      
-        
-    }
 
 ?>
 
@@ -2404,22 +2385,13 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
       echo "<input name=username type=hidden id=username  value=$uid/>";      
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
     }
 
 ?>
@@ -3084,22 +3056,13 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
       echo "<input name=username type=hidden id=username  value=$uid/>";      
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shorttcr.php >";
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
     }
 
 ?>
@@ -3704,22 +3667,13 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
       echo "<input name=username type=hidden id=username  value=$uid/>";      
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shorttcr.php >";
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
     }
 
 ?>
@@ -4348,7 +4302,7 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
@@ -4356,16 +4310,6 @@ do {
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
     }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shorttcr.php >"; /* cerulean 50 (ibm design colors) */
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
-    }
-
 ?>
 
 
@@ -5056,7 +5000,7 @@ do {
 
     	<?php 
 		if(strlen($Memo)>30){
-			$Memo = mb_substr($Memo,0,30,"EUC-KR")." ...";
+			$Memo = mb_substr($Memo,0,25,"EUC-KR")." ...";
 		}
 	?>
     <div class="memo"><?php echo $Memo ?></div>
@@ -5067,22 +5011,13 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
       echo "<input name=username type=hidden id=username  value=$uid/>";      
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
     }
 
 ?>
@@ -5733,7 +5668,7 @@ do {
 
     	<?php 
 		if(strlen($Memo)>30){
-			$Memo = mb_substr($Memo,0,30,"EUC-KR")." ...";
+			$Memo = mb_substr($Memo,0,25,"EUC-KR")." ...";
 		}
 	?>
     <div class="memo"><?php echo $Memo ?></div>
@@ -5744,22 +5679,13 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
       echo "<input name=username type=hidden id=username  value=$uid/>";      
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
     }
 
 ?>
@@ -6371,7 +6297,7 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
@@ -6380,16 +6306,6 @@ do {
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
     }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
-    }
-
 ?>
 
 
@@ -7041,22 +6957,13 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
       echo "<input name=username type=hidden id=username  value=$uid/>";      
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
     }
 
 ?>
@@ -7704,7 +7611,7 @@ do {
 
 //  Report edit button generation
     echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
+    if ($permitUser == 1 || $permitUser == 2) {        
 	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
       echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
       echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
@@ -7712,15 +7619,6 @@ do {
       
 	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
               
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=#047cc0><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input class = comment type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
     }
 
 ?>

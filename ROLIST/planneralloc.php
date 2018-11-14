@@ -1,6 +1,23 @@
 <!doctype html>
 <meta charset="utf-8">
-
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
 <link rel="stylesheet" href="normalize.css">
 <?php 	
 if (!isset($_SESSION)) {
@@ -34,6 +51,7 @@ session_start();
 $permitUser = $_SESSION['MM_UserGroup'];
 
 include("idc.php");
+include("configuration.php");
 
 if($_POST['permit']!=''){
 	$permitUser = $_POST['permit'];
@@ -103,9 +121,9 @@ if($_POST['permit']!=''){
 	 ?>
 
 <?php
-mysql_query("set session character_set_connection=latin1;");
-mysql_query("set session character_set_results=latin1;");
-mysql_query("set session character_set_client=latin1;");
+mysqli_query($test, "set session character_set_connection=latin1;");
+mysqli_query($test, "set session character_set_results=latin1;");
+mysqli_query($test, "set session character_set_client=latin1;");
 
 if (!isset($_SESSION)) {
 	session_start();
@@ -189,16 +207,16 @@ if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
 <!-- Body starts here!!! -->
 
 <?php
-mysql_query("set session character_set_client=utf8");
-mysql_query("set session character_set_connection=utf8");  
-mysql_query("set session character_set_results=utf8"); 
+mysqli_query($test, "set session character_set_client=utf8");
+mysqli_query($test, "set session character_set_connection=utf8");  
+mysqli_query($test, "set session character_set_results=utf8"); 
 
 
 $spcTime = $_POST[spctime];	
 $dateTime = $_POST[hNum];	
 if(strlen($dateTime)>5){ 
 	$queryTime = "Update Holiday set memo='$spcTime' where solar_date like '$dateTime'";
-	mysql_query($queryTime, $test) or die(mysql_error());
+	mysqli_query($test, $queryTime) or die(mysqli_error());
 	echo "$queryTime";
 }
 
@@ -209,7 +227,7 @@ $idsa = $_POST[hidTime];
 
 for($Idtx = 0; $Idtx<count($forced); $Idtx++){
 	$queryTime = "Update TreatmentInfo set planner='$forced[$Idtx]' where Hospital_ID like '$idsa[$Idtx]'";
-	$Recordset1 = mysql_query($queryTime, $test) or die(mysql_error());
+	$Recordset1 = mysqli_query($test, $queryTime) or die(mysqli_error());
 }
 
 
@@ -238,9 +256,9 @@ if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
     header("Location: " . $MM_restrictGoTo);
 }
 
-$conn = mysql_connect("localhost", "root", "dbsgksqls") or die(mysql_error());
-mysql_select_db("test", $conn);
-mysql_select_db($database_test, $test);
+$conn = mysqli_connect("localhost", "root", "dbsgksqls") or die(mysqli_error());
+mysqli_select_db("test", $conn);
+mysqli_select_db($database_test);
 
 //오늘 날짜 출력 ex) 2013-04-10
 $today_date      = date('Y-m-d');
@@ -255,7 +273,7 @@ for ($dayCount=-1; $dayCount>-20; $dayCount--){
 	$beforeDay = date("m/d/y", strtotime($today. $dcs));
 // 		echo($beforeDay);
 	$daySql = "Select * from Holiday where solar_date like STR_TO_DATE('$beforeDay','%m/%d/%Y')";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, $daySql));	
 	$yoils = date('w', strtotime($beforeDay));
 // 	echo($sqlQuery[solar_date]); echo("&nbsp");echo($yoils); echo("&nbsp");echo($today_date);
 	$workingyest = $sqlQuery[solar_date];
@@ -270,7 +288,7 @@ for ($dayCount=1; $dayCount<20; $dayCount++){
 	$beforeDay = date("m/d/y", strtotime($today. $dcs));
 // 		echo($beforeDay);
 	$daySql = "Select * from Holiday where solar_date like STR_TO_DATE('$beforeDay','%m/%d/%Y')";
-	$sqlQuery = mysql_fetch_assoc(mysql_query($daySql));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, $daySql));	
 	$yoils = date('w', strtotime($beforeDay));
 // 	echo($sqlQuery[solar_date]); echo("&nbsp");echo($yoils); echo("&nbsp");echo($today_date);
 	$workingtom = $sqlQuery[solar_date];
@@ -330,7 +348,6 @@ elseif(strcmp($pl2,"HaJ")==0){
 elseif(strcmp($pl2,"HoJ")==0){
 	$queryPL = "(TreatmentInfo.planner LIKE '$pl2' OR CHAR_LENGTH(TreatmentInfo.planner) < 1) AND ";
 } 
-
 else{
 	$queryPL = " ";
 } 
@@ -339,18 +356,12 @@ if(strcmp($pl2,"Total")==0){
 }	
 
 
-
-
-
-
-
 if(strcmp($siteInput,"CNS")==0 or strcmp($siteInput,"HN")==0 or strcmp($siteInput,"BRST")==0 or strcmp($siteInput,"THX")==0 or strcmp($siteInput,"GI")==0 or strcmp($siteInput,"GU")==0 or strcmp($siteInput,"GY")==0){
 	$querySite = "(TreatmentInfo.primarysite LIKE '$siteInput') AND ";
 } 
 else{
 	$querySite = "";
 } 
-
 
 ?>
 
@@ -376,9 +387,9 @@ for($idstat = 0; $idstat<count($StatT); $idstat++){
 	$sId = substr($StatT[$idstat],9,2);
 	
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $sId from TreatmentInfo where Hospital_ID = $hId"));	
-	$sqlQueryPhys = mysql_fetch_assoc(mysql_query("select physician from TreatmentInfo where Hospital_ID = $hId"));	
-	$sqlQueryName = mysql_fetch_assoc(mysql_query("select Firstname, Secondname from PatientInfo where Hospital_ID = $hId"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $sId from TreatmentInfo where Hospital_ID = $hId"));	
+	$sqlQueryPhys = mysqli_fetch_assoc(mysqli_query($test, "select physician from TreatmentInfo where Hospital_ID = $hId"));	
+	$sqlQueryName = mysqli_fetch_assoc(mysqli_query($test, "select Firstname, Secondname from PatientInfo where Hospital_ID = $hId"));	
 	if($sqlQuery[$sId]==0){ 
 
 		$post_title = "$sId 의 상태가 완료됨으로 체크 되었습니다(by $uid)";
@@ -389,7 +400,7 @@ for($idstat = 0; $idstat<count($StatT); $idstat++){
 		$api_code = '460837379:AAEMQO7cETGDbz7sF9ACdDwWjJMhgAyEwpk';
 	}
 	echo("");
- 	$sqlQuery = mysql_query("update TreatmentInfo set $sId = 1 where Hospital_ID = $hId");		
+ 	$sqlQuery = mysqli_query($test, "update TreatmentInfo set $sId = 1 where Hospital_ID = $hId");		
 }	
 // Status change!!!!
 for($idstat = 0; $idstat<count($Actss); $idstat++){
@@ -397,9 +408,9 @@ for($idstat = 0; $idstat<count($Actss); $idstat++){
 
 	
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $sId from TreatmentInfo where Hospital_ID = $hId"));	
-	$sqlQueryPhys = mysql_fetch_assoc(mysql_query("select physician from TreatmentInfo where Hospital_ID = $hId"));	
-	$sqlQueryName = mysql_fetch_assoc(mysql_query("select Firstname, Secondname from PatientInfo where Hospital_ID = $hId"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $sId from TreatmentInfo where Hospital_ID = $hId"));	
+	$sqlQueryPhys = mysqli_fetch_assoc(mysqli_query($test, "select physician from TreatmentInfo where Hospital_ID = $hId"));	
+	$sqlQueryName = mysqli_fetch_assoc(mysqli_query($test, "select Firstname, Secondname from PatientInfo where Hospital_ID = $hId"));	
 	if($sqlQuery[$sId]==0){ 
 
 		$post_title = "$sId 의 상태가 완료됨으로 체크 되었습니다(by $uid)";
@@ -410,7 +421,7 @@ for($idstat = 0; $idstat<count($Actss); $idstat++){
 		$api_code = '460837379:AAEMQO7cETGDbz7sF9ACdDwWjJMhgAyEwpk';
 	}
 	echo("");
- 	$sqlQuery = mysql_query("update TreatmentInfo set TrcNotice = 0 where Hospital_ID = $hId");		
+ 	$sqlQuery = mysqli_query($test, "update TreatmentInfo set TrcNotice = 0 where Hospital_ID = $hId");		
 //  	"Update TreatmentInfo Set TrcNotice='1' where Hospital_ID like $h_id"
 }	
 ?>
@@ -585,16 +596,16 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -668,10 +679,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -896,14 +907,14 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $tChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $pChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $aChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	?>
@@ -918,7 +929,6 @@ do {
 		else{
 			$fontColorInp = "#aa231f"; /* red 60 (ibm design colors) */
 		}
-    echo "<td bgcolor=$bgcolorF width = '40px' align='left'>  <strong><font color=$fontColorF>$row_Recordset1[KorName]</font><br><font color=$fontColorInp>$row_Recordset1[InP]</font></strong></td>"; 
     
     echo "<form id=form111 name=form111></form>";
     echo "<td bgcolor=$bgcolorF><form id=form3 name=form3 method=post target=_blank action=N_edit_all.php>";                        
@@ -1004,94 +1014,59 @@ do {
 	$weekyoil = $yoil[date('w', strtotime($row_Recordset1[RT_fin_f]))];
     echo "<td rowspan = 1 width = '20px' align='left' bgcolor=$bgcolorF>$cropDateFin<br>$weekyoil</td>";
     
-	if (strcasecmp(trim($row_Recordset1[$Method_f]),"3D Conformal")==0){
-		$tempTech = substr(trim($row_Recordset1[$Method_f]), 0, 3); echo "<td bgcolor=$bgcolorF width = '15' align='center'>3D </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"VMAT")==0){echo "<td bgcolor=#F0E768 width = '15' align='center'>VM </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"IMRT")==0){echo "<td bgcolor=$bgcolorF width = '15' align='center'>IM </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"2D Conventional")==0){
-		$tempTech = substr(trim($row_Recordset1[$Method_f]), 0, 3); echo "<td bgcolor=$bgcolorF align='center'>2D</td>";
+	for($idphyss=0;$idphyss<$numtech;$idphyss++){
+
+		if (strcasecmp(trim($row_Recordset1[$Method_f]),$techIdd[$idphyss])==0){
+			$phyMark = "<td bgcolor=$techCol[$idphyss] width = '15' align='center'>$techInt[$idphyss] </td>";
+		} 	 /* #33FF00 (web safe colors) */
+
+	}
+	echo($phyMark) ;
+
+    $txtLinac = "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";
+    for($idlinac=0; $idlinac<$numrooms;$idlinac++){
+		if (strcasecmp(substr(trim($row_Recordset1[$Linac_f]),0,2),substr(trim($rmsInt[$idlinac]),0,2))==0){     	
+			$txtLinac = "<td bgcolor=$rmsCol[$idlinac] align=center width = '15'>   $rmsIdd[$idlinac] </td>";
 		}
-	elseif (strcasecmp(trim($$row_Recordset1[$Method_f]),"EB")==0){echo "<td bgcolor=#469BBB>EB </td>";}
-	elseif (strcasecmp(trim($$row_Recordset1[$Method_f]),"electron")==0){echo "<td bgcolor=#469BBB>EB </td>";}
-	else{echo "<td bgcolor=$bgcolorF align='center'>$row_Recordset1[$Method_f]</td>";}
-
-	if (strcasecmp(trim($row_Recordset1[$Linac_f]),"Versa")==0){echo "<td bgcolor=#DBA67B align=center width = '15'>   1 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"IX")==0){echo "<td bgcolor=#458985 align=center width = '15'>   2 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"Infinity")==0){echo "<td bgcolor=#D7D6A5 align=center width = '15'>   3 </td>";}
-	else{echo "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";}
-
-	if (strcasecmp(trim($row_Recordset1[physician]),"myki")==0){echo "<td bgcolor=#33FF00 width = '15' align='center'>   KI </td>";} 	 /* #33FF00 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjlee")==0){echo "<td bgcolor=#CC6699 width = '15' align='center'>   Ja </td>";} /* #CC6699 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mhlee")==0){echo "<td bgcolor=#00CCFF width = '15' align='center'>   Ju </td>";} /* #00CCFF (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjnam")==0){echo "<td bgcolor=#CCFFFF width = '15' align='center'>   JN </td>";} /* #CCFFFF (web safe colors) */
-	else{echo "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";}
-
+    }
+   	echo "$txtLinac";
+	   $phyMark = "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";
+	   for($idphyss=0;$idphyss<$numphyss;$idphyss++){
+   
+		   if (strcasecmp(trim($row_Recordset1[physician]),$phyIdd[$idphyss])==0){
+			   $phyMark = "<td bgcolor=$phyCol[$idphyss] width = '15' align='center'>   $phyInt[$idphyss] </td>";
+		   } 	 /* #33FF00 (web safe colors) */
+   
+	   }
+	   echo($phyMark) ;
+   
 
 // 	강제 고정 여부 결정
     echo "<td bgcolor=$bgcolorF  bgcolor=$bgcolorF width = '20px'>";
-//     echo "<input class='form-control' style='width:8px' type='text' name='durtime[]' value=$row_Recordset1[Duration] >";
 
-
+	echo "<select class='form-control' style='width:50px' type='text' name='forced[]'>";
 	
-    echo "<select class='form-control' style='width:50px' type='text' name='forced[]'>";
-
-    echo "<option value=HY>HY</option>";
-    echo "<option value=TJ>TJ</option>";    
-    echo "<option value=HaJ>HaJ</option>";    
-    echo "<option value=HoJ>HoJ</option>";    
+	for($idplanners=0;$idplanners<$numplnss;$idplanners++){
+		echo "<option value=$plnInt[$idplanners]>$plnInt[$idplanners]</option>";
+	}
 	echo "</select>";
     echo "<input name=hidTime[] type=hidden id=hf_edit value= $row_Recordset1[Hospital_ID] >"; 
 
     echo "</td>"; 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
-?>
-
-  <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
- <?php 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
-	if($row_Memoinfo>0){ 
-?>
-
-    <div class="memo"><?php echo $Memo ?></div>
-
-<?php
-	}
-
-//  Report edit button generation
-    echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-              
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
-    }
-
+		$sql_Memo = mysqli_query($test, "select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test, "select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
 
-</td>
 </tr>
 
 
 <?php
 }
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -1130,8 +1105,7 @@ do {
 						<td bgcolor="#777777" ><font color="white"></font></td>
 			<td bgcolor="#777777" ><font color="white">Chart No.</font></td>
 
-			<td bgcolor="#777777"><font color="white">C</font></td>
-			<td bgcolor="#777777"><font color="white">Name</font></td>
+			<td bgcolor="#777777"><font color="white">C</font></td>			
 			<td bgcolor="#777777"><font color="white">S/A</font></td>
 			<td bgcolor="#777777" align="left"><font color="white">Diagnosis</font></td>
 			<td bgcolor="#777777" align="left"><font color="white">Pathology</font></td>
@@ -1144,11 +1118,6 @@ do {
 			<td bgcolor="#777777"><font color="white">LA</font></td>
 			<td bgcolor="#777777"><font color="white">Ph</font></td>
 			<td bgcolor="#777777"><font color="white">Pl</font></td>
-			<?php
-			if ($permitUser == 1 || $permitUser == 2 || $permitUser == 3) {
-				echo "<td colspan=3 bgcolor=#777777 scope=col><font color=white>Detail/Remark</font></td>";
-			}
-			?>
 		</tr>
 
 <?php
@@ -1192,16 +1161,16 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -1275,10 +1244,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -1504,14 +1473,14 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $tChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $pChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $aChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	?>
@@ -1526,7 +1495,6 @@ do {
 		else{
 			$fontColorInp = "#aa231f"; /* red 60 (ibm design colors) */
 		}
-    echo "<td bgcolor=$bgcolorF width = '40px' align='left'>  <strong><font color=$fontColorF>$row_Recordset1[KorName]</font><br><font color=$fontColorInp>$row_Recordset1[InP]</font></strong></td>"; 
     
     echo "<form id=form111 name=form111></form>";
     echo "<td bgcolor=$bgcolorF><form id=form3 name=form3 method=post target=_blank action=N_edit_all.php>";                        
@@ -1612,28 +1580,33 @@ do {
 	$weekyoil = $yoil[date('w', strtotime($row_Recordset1[RT_fin_f]))];
     echo "<td rowspan = 1 width = '20px' align='left' bgcolor=$bgcolorF>$cropDateFin<br>$weekyoil</td>";
     
-	if (strcasecmp(trim($row_Recordset1[$Method_f]),"3D Conformal")==0){
-		$tempTech = substr(trim($row_Recordset1[$Method_f]), 0, 3); echo "<td bgcolor=$bgcolorF width = '15' align='center'>3D </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"VMAT")==0){echo "<td bgcolor=#F0E768 width = '15' align='center'>VM </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"IMRT")==0){echo "<td bgcolor=$bgcolorF width = '15' align='center'>IM </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"2D Conventional")==0){
-		$tempTech = substr(trim($row_Recordset1[$Method_f]), 0, 3); echo "<td bgcolor=$bgcolorF align='center'>2D</td>";
+	for($idphyss=0;$idphyss<$numtech;$idphyss++){
+
+		if (strcasecmp(trim($row_Recordset1[$Method_f]),$techIdd[$idphyss])==0){
+			$phyMark = "<td bgcolor=$techCol[$idphyss] width = '15' align='center'>$techInt[$idphyss] </td>";
+		} 	 /* #33FF00 (web safe colors) */
+
+	}
+	echo($phyMark) ;
+
+    $txtLinac = "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";
+    for($idlinac=0; $idlinac<$numrooms;$idlinac++){
+		if (strcasecmp(substr(trim($row_Recordset1[$Linac_f]),0,2),substr(trim($rmsInt[$idlinac]),0,2))==0){     	
+			$txtLinac = "<td bgcolor=$rmsCol[$idlinac] align=center width = '15'>   $rmsIdd[$idlinac] </td>";
 		}
-	elseif (strcasecmp(trim($$row_Recordset1[$Method_f]),"EB")==0){echo "<td bgcolor=#469BBB>EB </td>";}
-	elseif (strcasecmp(trim($$row_Recordset1[$Method_f]),"electron")==0){echo "<td bgcolor=#469BBB>EB </td>";}
-	else{echo "<td bgcolor=$bgcolorF align='center'>$row_Recordset1[$Method_f]</td>";}
+    }
+   	echo "$txtLinac";
 
-	if (strcasecmp(trim($row_Recordset1[$Linac_f]),"Versa")==0){echo "<td bgcolor=#DBA67B align=center width = '15'>   1 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"IX")==0){echo "<td bgcolor=#458985 align=center width = '15'>   2 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"Infinity")==0){echo "<td bgcolor=#D7D6A5 align=center width = '15'>   3 </td>";}
-	else{echo "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";}
-
-	if (strcasecmp(trim($row_Recordset1[physician]),"myki")==0){echo "<td bgcolor=#33FF00 width = '15' align='center'>   KI </td>";} 	 /* #33FF00 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjlee")==0){echo "<td bgcolor=#CC6699 width = '15' align='center'>   Ja </td>";} /* #CC6699 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mhlee")==0){echo "<td bgcolor=#00CCFF width = '15' align='center'>   Ju </td>";} /* #00CCFF (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjnam")==0){echo "<td bgcolor=#CCFFFF width = '15' align='center'>   JN </td>";} /* #CCFFFF (web safe colors) */
-	else{echo "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";}
-
+	   $phyMark = "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";
+	   for($idphyss=0;$idphyss<$numphyss;$idphyss++){
+   
+		   if (strcasecmp(trim($row_Recordset1[physician]),$phyIdd[$idphyss])==0){
+			   $phyMark = "<td bgcolor=$phyCol[$idphyss] width = '15' align='center'>   $phyInt[$idphyss] </td>";
+		   } 	 /* #33FF00 (web safe colors) */
+   
+	   }
+	   echo($phyMark) ;
+   
 
 // 	강제 고정 여부 결정
     echo "<td bgcolor=$bgcolorF  bgcolor=$bgcolorF width = '20px'>";
@@ -1643,63 +1616,27 @@ do {
 	
     echo "<select class='form-control' style='width:50px' type='text' name='forced[]'>";
 
-    echo "<option value=HY>HY</option>";
-    echo "<option value=TJ>TJ</option>";    
-    echo "<option value=HaJ>HaJ</option>";    
-    echo "<option value=HoJ>HoJ</option>";    
+	for($idplanners=0;$idplanners<$numplnss;$idplanners++){
+		echo "<option value=$plnInt[$idplanners]>$plnInt[$idplanners]</option>";
+	}
 	echo "</select>";
     echo "<input name=hidTime[] type=hidden id=hf_edit value= $row_Recordset1[Hospital_ID] >"; 
 
     echo "</td>"; 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
-?>
-
-  <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
- <?php 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
-	if($row_Memoinfo>0){ 
-?>
-
-    <div class="memo"><?php echo $Memo ?></div>
-
-<?php
-	}
-
-//  Report edit button generation
-    echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-              
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
-    }
-
+		$sql_Memo = mysqli_query($test, "select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test, "select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
 
-</td>
 </tr>
 
 
 <?php
 }
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -1749,16 +1686,16 @@ if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
     $order = 'DESC';
 }
 $query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1       = mysql_fetch_assoc($Recordset1);
-$totalRows_Recordset1 = mysql_num_rows($Recordset1);
+$Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -1832,10 +1769,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -2021,14 +1958,14 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $tChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $tChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$tChecked]==1){ $chkCurT = "	checked='checked'";}
 	else{ $chkCurT = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $pChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $aChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}	
 	?>
@@ -2044,7 +1981,6 @@ do {
 		else{
 			$fontColorInp = "#aa231f"; /* red 80 (ibm design colors) */
 		}
-    echo "<td bgcolor=$bgcolorF width = '40px' align='left'>  <strong><font color=$fontColorF>$row_Recordset1[KorName]</font><br><font color=$fontColorInp>$row_Recordset1[InP]</font></strong></td>"; 
         echo "<form id=form111 name=form111></form>";
     echo "<td bgcolor=$bgcolorF><form id=form3 name=form3 method=post target=_blank action=N_edit_all.php>";                        
     echo "<a href=edit.php>";            
@@ -2129,28 +2065,32 @@ do {
 	$weekyoil = $yoil[date('w', strtotime($row_Recordset1[RT_fin_f]))];
     echo "<td rowspan = 1 width = '20px' align='left' bgcolor=$bgcolorF>$cropDateFin<br>$weekyoil</td>";
     
-	if (strcasecmp(trim($row_Recordset1[$Method_f]),"3D Conformal")==0){
-		$tempTech = substr(trim($row_Recordset1[$Method_f]), 0, 3); echo "<td bgcolor=$bgcolorF width = '15' align='center'>3D </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"VMAT")==0){echo "<td bgcolor=#F0E768 width = '15' align='center'>VM </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"IMRT")==0){echo "<td bgcolor=$bgcolorF width = '15' align='center'>IM </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"2D Conventional")==0){
-		$tempTech = substr(trim($row_Recordset1[$Method_f]), 0, 3); echo "<td bgcolor=$bgcolorF align='center'>2D</td>";
+	for($idphyss=0;$idphyss<$numtech;$idphyss++){
+
+		if (strcasecmp(trim($row_Recordset1[$Method_f]),$techIdd[$idphyss])==0){
+			$phyMark = "<td bgcolor=$techCol[$idphyss] width = '15' align='center'>$techInt[$idphyss] </td>";
+		} 	 /* #33FF00 (web safe colors) */
+
+	}
+	echo($phyMark) ;
+    $txtLinac = "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";
+    for($idlinac=0; $idlinac<$numrooms;$idlinac++){
+		if (strcasecmp(substr(trim($row_Recordset1[$Linac_f]),0,2),substr(trim($rmsInt[$idlinac]),0,2))==0){     	
+			$txtLinac = "<td bgcolor=$rmsCol[$idlinac] align=center width = '15'>   $rmsIdd[$idlinac] </td>";
 		}
-	elseif (strcasecmp(trim($$row_Recordset1[$Method_f]),"EB")==0){echo "<td bgcolor=#469BBB>EB </td>";}
-	elseif (strcasecmp(trim($$row_Recordset1[$Method_f]),"electron")==0){echo "<td bgcolor=#469BBB>EB </td>";}
-	else{echo "<td bgcolor=$bgcolorF align='center'>$row_Recordset1[$Method_f]</td>";}
+    }
+   	echo "$txtLinac";
 
-	if (strcasecmp(trim($row_Recordset1[$Linac_f]),"Versa")==0){echo "<td bgcolor=#DBA67B align=center width = '15'>   1 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"IX")==0){echo "<td bgcolor=#458985 align=center width = '15'>   2 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"Infinity")==0){echo "<td bgcolor=#D7D6A5 align=center width = '15'>   3 </td>";}
-	else{echo "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";}
-
-	if (strcasecmp(trim($row_Recordset1[physician]),"myki")==0){echo "<td bgcolor=#33FF00 width = '15' align='center'>   KI </td>";} 	 /* #33FF00 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjlee")==0){echo "<td bgcolor=#CC6699 width = '15' align='center'>   Ja </td>";} /* #CC6699 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mhlee")==0){echo "<td bgcolor=#00CCFF width = '15' align='center'>   Ju </td>";} /* #00CCFF (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjnam")==0){echo "<td bgcolor=#CCFFFF width = '15' align='center'>   JN </td>";} /* #CCFFFF (web safe colors) */
-	else{echo "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";}
-
+	   $phyMark = "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";
+	   for($idphyss=0;$idphyss<$numphyss;$idphyss++){
+   
+		   if (strcasecmp(trim($row_Recordset1[physician]),$phyIdd[$idphyss])==0){
+			   $phyMark = "<td bgcolor=$phyCol[$idphyss] width = '15' align='center'>   $phyInt[$idphyss] </td>";
+		   } 	 /* #33FF00 (web safe colors) */
+   
+	   }
+	   echo($phyMark) ;
+   
 	if (strcasecmp(trim($row_Recordset1[planner]),"HY")==0){echo "<td bgcolor=#b0bef3 width = '15' align='center'>   HY </td>";} 	 /* ultramarine 20 (ibm design colors) */
 	elseif (strcasecmp(trim($row_Recordset1[planner]),"TJ")==0){echo "<td bgcolor=#71cddd width = '15' align='center'>   TJ </td>";} /* aqua 20 (ibm design colors) */
 	elseif (strcasecmp(trim($row_Recordset1[planner]),"HaJ")==0){echo "<td bgcolor=#fed500 width = '15' align='center'>Ha</td>";} /* yellow 10 (ibm design colors) */
@@ -2159,55 +2099,19 @@ do {
 	else{echo "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[planner] </td>";}
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
-?>
-
-  <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
- <?php 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
-	if($row_Memoinfo>0){ 
-?>
-
-    <div class="memo"><?php echo $Memo ?></div>
-
-<?php
-	}
-
-//  Report edit button generation
-    echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-              
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
-    }
-
+		$sql_Memo = mysqli_query($test, "select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test, "select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
 
-</td>
 </tr>
 
 
 <?php
 }
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -2270,16 +2174,16 @@ $query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo
     }
 //     echo($query_Recordset1);
     $query_Recordset1 .= " ORDER BY STR_TO_DATE(TreatmentInfo.RT_start2, '%m/%d/%Y') " . $order;
-    $Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-    $row_Recordset1       = mysql_fetch_assoc($Recordset1);
-    $totalRows_Recordset1 = mysql_num_rows($Recordset1);
+    $Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
+    $row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+    $totalRows_Recordset1 = mysqli_num_rows($Recordset1);
 
 
 
-$rsetTemp = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$rsetTemp = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
 
 for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
-    $rowOrders = mysql_fetch_assoc($rsetTemp);
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
     $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
     $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
     $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
@@ -2354,10 +2258,10 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
 
 $query_limit_Recordset1 = sprintf("%s LIMIT %d, %d", $query_Recordset1, $startRow_Recordset1, $maxRows_Recordset1);
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
+$Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
 // echo $query_Recordset1;
 
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 $Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
 $Today_date1    = date("Y/m/d", strtotime($Today_date));
 
@@ -2617,14 +2521,14 @@ do {
 	$statValA = $statValA. $pid[$tCount];
 	$aChecked = "A". $pid[$tCount];
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $pChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $pChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$pChecked]==1){ $chkCurP = "	checked='checked'";}
 	else{ $chkCurP = "";}
 	
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $aChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $aChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$aChecked]==1){ $chkCurA = "	checked='checked'";}
 	else{ $chkCurA = "";}
-	$sqlQuery = mysql_fetch_assoc(mysql_query("select $bChecked from TreatmentInfo where Hospital_ID = $statVal"));	
+	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $bChecked from TreatmentInfo where Hospital_ID = $statVal"));	
 	if($sqlQuery[$bChecked]==1){ $chkCurB = "	checked='checked'";}
 	else{ $chkCurB = "";}	
 	?>
@@ -2641,7 +2545,6 @@ do {
 		else{
 			$fontColorInp = "#aa231f"; /* red 80 (ibm design colors) */
 		}
-    echo "<td bgcolor=$bgcolorF width = '40px' align='left'>  <strong><font color=$fontColorF>$row_Recordset1[KorName]</font><br><font color=$fontColorInp>$row_Recordset1[InP]</font></strong></td>"; 
     echo "<form id=form111 name=form111></form>";
     echo "<td bgcolor=$bgcolorF><form id=form3 name=form3 method=post target=_blank action=N_edit_all.php>";                        
     echo "<a href=edit.php>";            
@@ -2729,29 +2632,35 @@ do {
 	$weekyoil = $yoil[date('w', strtotime($row_Recordset1[RT_fin_f]))];
     echo "<td rowspan = 1 width = '20px' align='left' bgcolor=$bgcolorF>$cropDateFin<br>$weekyoil</td>";
     
-	if (strcasecmp(trim($row_Recordset1[$Method_f]),"3D Conformal")==0){
-		$tempTech = substr(trim($row_Recordset1[$Method_f]), 0, 3); echo "<td bgcolor=$bgcolorF width = '15' align='center'>3D </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"VMAT")==0){echo "<td bgcolor=#F0E768 width = '15' align='center'>VM </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"IMRT")==0){echo "<td bgcolor=$bgcolorF width = '15' align='center'>IM </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Method_f]),"2D Conventional")==0){
-		$tempTech = substr(trim($row_Recordset1[$Method_f]), 0, 3); echo "<td bgcolor=$bgcolorF align='center'>2D</td>";
+	$phyMark = "<td bgcolor=$bgcolorF align='center'>$tcn</td>";
+
+	for($idphyss=0;$idphyss<$numtech;$idphyss++){
+
+		if (strcasecmp(trim($row_Recordset1[$Method_f]),$techIdd[$idphyss])==0){
+			$phyMark = "<td bgcolor=$techCol[$idphyss] width = '15' align='center'>$techInt[$idphyss] </td>";
+		} 	 /* #33FF00 (web safe colors) */
+
+	}
+	echo($phyMark) ;
+
+    $txtLinac = "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";
+    for($idlinac=0; $idlinac<$numrooms;$idlinac++){
+		if (strcasecmp(substr(trim($row_Recordset1[$Linac_f]),0,2),substr(trim($rmsInt[$idlinac]),0,2))==0){     	
+			$txtLinac = "<td bgcolor=$rmsCol[$idlinac] align=center width = '15'>   $rmsIdd[$idlinac] </td>";
 		}
-	elseif (strcasecmp(trim($$row_Recordset1[$Method_f]),"EB")==0){echo "<td bgcolor=#469BBB>EB </td>";}
-	elseif (strcasecmp(trim($$row_Recordset1[$Method_f]),"electron")==0){echo "<td bgcolor=#469BBB>EB </td>";}
-	else{echo "<td bgcolor=$bgcolorF align='center'>$row_Recordset1[$Method_f]</td>";}
+    }
+   	echo "$txtLinac";
 
-	if (strcasecmp(trim($row_Recordset1[$Linac_f]),"Versa")==0){echo "<td bgcolor=#DBA67B align=center width = '15'>   1 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"IX")==0){echo "<td bgcolor=#458985 align=center width = '15'>   2 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"Infinity")==0){echo "<td bgcolor=#D7D6A5 align=center width = '15'>   3 </td>";}
-	else{echo "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";}
-
-	if (strcasecmp(trim($row_Recordset1[physician]),"myki")==0){echo "<td bgcolor=#33FF00 width = '15' align='center'>   KI </td>";} 	 /* #33FF00 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjlee")==0){echo "<td bgcolor=#CC6699 width = '15' align='center'>   Ja </td>";} /* #CC6699 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mhlee")==0){echo "<td bgcolor=#00CCFF width = '15' align='center'>   Ju </td>";} /* #00CCFF (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjnam")==0){echo "<td bgcolor=#CCFFFF width = '15' align='center'>   JN </td>";} /* #CCFFFF (web safe colors) */
-	else{echo "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";}
-
-
+	   $phyMark = "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";
+	   for($idphyss=0;$idphyss<$numphyss;$idphyss++){
+   
+		   if (strcasecmp(trim($row_Recordset1[physician]),$phyIdd[$idphyss])==0){
+			   $phyMark = "<td bgcolor=$phyCol[$idphyss] width = '15' align='center'>   $phyInt[$idphyss] </td>";
+		   } 	 /* #33FF00 (web safe colors) */
+   
+	   }
+	   echo($phyMark) ;
+   
 
 
 
@@ -2766,10 +2675,9 @@ do {
 	
     echo "<select class='form-control' style='width:50px' type='text' name='forced[]'>";
 
-    echo "<option value=HY>HY</option>";
-    echo "<option value=TJ>TJ</option>";    
-    echo "<option value=HaJ>HaJ</option>";    
-    echo "<option value=HoJ>HoJ</option>";    
+	for($idplanners=0;$idplanners<$numplnss;$idplanners++){
+		echo "<option value=$plnInt[$idplanners]>$plnInt[$idplanners]</option>";
+	}
 	echo "</select>";
     echo "<input name=hidTime[] type=hidden id=hf_edit value= $row_Recordset1[Hospital_ID] >"; 
 
@@ -2780,55 +2688,19 @@ do {
 
 
 
-		$sql_Memo = mysql_query("select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$sql_Date = mysql_query("select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
-		$row_Memoinfo = mysql_num_rows($sql_Date);
-?>
-
-  <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
- <?php 
-			$Memo = mysql_result($sql_Memo, $row_Memoinfo-1,"Memo1");
-			$Date = mysql_result($sql_Date, $row_Memoinfo-1,"Date1");
-	if($row_Memoinfo>0){ 
-?>
-
-    <div class="memo"><?php echo $Memo ?></div>
-
-<?php
-	}
-
-//  Report edit button generation
-    echo "<form id=form111 name=form111></form>";
-    if ($permitUser == 1 || $permitUser == 1) {        
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-              
-    }
-    if ($permitUser == 2) {
-	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
-      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
-      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
-      echo "<input name=username type=hidden id=username  value=$uid/>";      
-      
-	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
-        
-    }
-
+		$sql_Memo = mysqli_query($test, "select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test, "select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
 ?>
 
 
-</td>
 </tr>
 
 
 <?php
 
 }
-} while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
   unset($row_Recordset1);
 }
 }
@@ -2869,11 +2741,11 @@ do {
 
 <?php
 /*
-mysql_query("set session character_set_client=latin1");
+mysqli_query($test, "set session character_set_client=latin1");
 
-mysql_query("set session character_set_connection=latin1");  
+mysqli_query($test, "set session character_set_connection=latin1");  
 
-mysql_query("set session character_set_results=latin1"); 
+mysqli_query($test, "set session character_set_results=latin1"); 
 */
 
 
@@ -2882,8 +2754,8 @@ mysql_query("set session character_set_results=latin1");
     
 $query_Recordset1 = "SELECT * FROM Holiday";
 
-$Recordset1 = mysql_query($query_Recordset1, $test) or die(mysql_error());
-$row_Recordset1 = mysql_fetch_assoc($Recordset1);
+$Recordset1 = mysqli_query($test, $query_Recordset1) or die(mysqli_error());
+$row_Recordset1 = mysqli_fetch_assoc($Recordset1);
 
 		
 do {	
@@ -2911,7 +2783,7 @@ do {
 
 	echo "</tr>";
 } 
-while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
+while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
 
 ?>
 
@@ -2942,8 +2814,8 @@ while ($row_Recordset1 = mysql_fetch_assoc($Recordset1));
 </body>
 </html>
 <?php
-mysql_free_result($Recordset1);
-mysql_free_result($Recordset2);
+mysqli_free_result($Recordset1);
+mysqli_free_result($Recordset2);
 
 ?>
 

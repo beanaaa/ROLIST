@@ -345,12 +345,10 @@ if(strcmp($ontime,"1")==0){
 		
 		if($Timers==0){
 			$queries = "insert into Timer (Hospital_ID, date1, time1, Duration) values ('$idH', '$fDate', '$spctime', '$durtime')";
-			echo($queries);
 			mysqli_query($test, $queries);
 		}
 		else{
 			$queries = "update Timer set time1='$spctime', Duration='$durtime' where  (Hospital_ID like '$idH' and date1 like '$fDate')";
-			echo($queries);
 			mysqli_query($test, $queries);
 		}
 		
@@ -390,7 +388,7 @@ else{
 
 // Delay 구현 하는 부붙....
 if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "form1")) {
-  	$h_result = sprintf("select idx from TreatmentInfo where Hospital_ID = %s", ($_POST['txt_hospital_id']   ));
+  	$h_result = sprintf("select idx from TreatmentInfo where Hospital_ID = '%s'", ($_POST['txt_hospital_id']   ));
   	$h_result = mysqli_query($test, $h_result);		
   	$h_idx = mysqli_result($h_result,0,"idx");
   	$ID_ = $_POST['H_ID'];
@@ -407,7 +405,7 @@ $UPDATESQL = sprintf("UPDATE TreatmentInfo SET Hospital_ID=%s, Modality_var1=%s 
 
 
 mysqli_select_db($database_test );
-$query_manualEdit = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = %s", ($_POST['txt_hospital_id']   ));
+$query_manualEdit = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = '%s'", ($_POST['txt_hospital_id']   ));
 $editinfo = mysqli_query($test, $query_manualEdit ) or die(mysqli_error());
 $row_editinfo = mysqli_fetch_assoc($editinfo);
 $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$ID_'",
@@ -957,7 +955,8 @@ echo($UPDATESQL);
 	mysqli_query($test, $deleteComment);
 	for($j = 1; $j<=$C_Plan; $j++){
 		$jj = $j-1;
-		$insertComment = sprintf("INSERT INTO MemoTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$Comment[$jj]', %s, $j)", ($CommentDate[$jj]    ));
+		$insertComment = sprintf("INSERT INTO MemoTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$Comment[$jj]', '%s', $j)", ($CommentDate[$jj]    ));
+		echo($insertComment."<br>");
 		//echo $insertComment;
 		$insertQuery = mysqli_query($test, $insertComment );
 		if($insertQuery == TRUE){
@@ -973,7 +972,7 @@ echo($UPDATESQL);
 	mysqli_query($test, $deleteOrder);
 	for($j = 1; $j<=$C_Order; $j++){
 		$jj = $j-1;
-		$insertOrder = sprintf("INSERT INTO OrderTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$Order[$jj]', %s, $j)", ($OrderDate[$jj]    ));
+		$insertOrder = sprintf("INSERT INTO OrderTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$Order[$jj]', '%s', $j)", ($OrderDate[$jj]    ));
 		echo($insertOrder);
 		//echo $insertComment;
 		$insertQuery = mysqli_query($test, $insertOrder );
@@ -1016,29 +1015,29 @@ if($_GET['H_ID']){
 
 
 mysqli_select_db($database_test );
-$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = %s", ($colname_Hospital_ID  ));
+$query_clinicalinfo = sprintf("SELECT * FROM ClinicalInfo WHERE Hospital_ID = '%s'", ($colname_Hospital_ID  ));
 $clinicalinfo = mysqli_query($test, $query_clinicalinfo ) or die(mysqli_error());
 $row_clinicalinfo = mysqli_fetch_assoc($clinicalinfo);
 $totalRows_clinicalinfo = mysqli_num_rows($clinicalinfo);
 
 mysqli_select_db($database_test );
-$query_patientinfo = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = %s", ($colname_Hospital_ID  ));
+$query_patientinfo = sprintf("SELECT * FROM PatientInfo WHERE Hospital_ID = '%s'", ($colname_Hospital_ID  ));
 $patientinfo = mysqli_query($test, $query_patientinfo ) or die(mysqli_error());
 $row_patientinfo = mysqli_fetch_assoc($patientinfo);
 $totalRows_patientinfo = mysqli_num_rows($patientinfo);
 
 mysqli_select_db($database_test );
-$query_treatmentinfo = sprintf("SELECT * FROM TreatmentInfo WHERE Hospital_ID = %s", ($colname_Hospital_ID  ));
+$query_treatmentinfo = sprintf("SELECT * FROM TreatmentInfo WHERE Hospital_ID = '%s'", ($colname_Hospital_ID  ));
 $treatmentinfo = mysqli_query($test, $query_treatmentinfo ) or die(mysqli_error());
 $row_treatmentinfo = mysqli_fetch_assoc($treatmentinfo);
 $totalRows_treatmentinfo = mysqli_num_rows($treatmentinfo);
 
-$query_TempMemo = sprintf("SELECT * FROM MemoTemp WHERE Hospital_ID = %s", ($colname_Hospital_ID  ));
+$query_TempMemo = sprintf("SELECT * FROM MemoTemp WHERE Hospital_ID = '%s'", ($colname_Hospital_ID  ));
 $MemoInfo = mysqli_query($test, $query_TempMemo ) or die(mysqli_error());
 $row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
 $total_Memoinfo = mysqli_num_rows($MemoInfo);
 
-$query_TempOrder = sprintf("SELECT * FROM OrderTemp WHERE Hospital_ID = %s", ($colname_Hospital_ID  ));
+$query_TempOrder = sprintf("SELECT * FROM OrderTemp WHERE Hospital_ID = '%s'", ($colname_Hospital_ID  ));
 $OrderInfo = mysqli_query($test, $query_TempOrder ) or die(mysqli_error());
 $row_Orderinfo = mysqli_fetch_assoc($OrderInfo);
 $total_Orderinfo = mysqli_num_rows($OrderInfo);
@@ -1375,7 +1374,7 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
    		
    		
   		<tr>
-	  		<td width="70px"  bgcolor="#153d73" rowspan="2"><font color="white">Site</font></td>	  		
+	  		<td width="70px"  bgcolor="#153d73" align=center rowspan="2"><font color="white">Site</font></td>	  		
   			<td width="120px">
 	  			<select  class="form-control" style=" width:100%; font-size: 12px;" name="primary_menu" id="primary_menu" class="required" onchange="fnCngList(this.value);" >
 	  				<option value="<?php echo $row_treatmentinfo['primarysite']; ?>" selected="selected"><?php echo $row_treatmentinfo['primarysite']; ?></option>
@@ -1397,7 +1396,7 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 	  			<strong><input class="form-control" style="width:100%; font-size: 11pt " name="sub_site" type="text" id="sub_site" value="<?php echo $row_treatmentinfo['subsite']; ?>" /></strong>
   			</td>
 
-  			  			<td bgcolor="#153d73" width="100px"><font color="white">Stage</font></td>      
+  			  			<td bgcolor="#153d73" align=center  width="100px"><font color="white">Stage</font></td>      
   			<td><strong><input class="form-control" style="width:100%; font-size: 11pt " name="txt_tnmstage" type="text" id="txt_tnmstage" value="<?php echo $row_treatmentinfo['tnm']; ?>" /> </strong></td>
 
 		</tr>
@@ -1410,7 +1409,7 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
   			<td  colspan="2">
 	  			<input class="form-control"  name="sub_siteDet" type="text" id="sub_siteDet" value="<?php echo $row_treatmentinfo['subsiteDet']; ?>" />	  			
   			</td>  			 
-  			<td bgcolor="#153d73" rowspan="1" width="100px"><font color="white">Pathology</font></td>
+  			<td bgcolor="#153d73" rowspan="1" align=center  width="100px"><font color="white">Pathology</font></td>
   			<td>
   				<strong><input class="form-control" style="width:100%; font-size: 11pt" name="pathology_menu" type="text" id="pathology_menu" value="<?php echo $row_treatmentinfo['pathol']; ?>" /></strong>	  			
 	  		</td>
@@ -1421,8 +1420,8 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 
 	  	
 
-		<tr>
-			<td bgcolor="#153d73" rowspan=1 width="72px"><font color="white">Px.</font></td>
+		<tr height="50px">
+			<td bgcolor="#153d73" align=center rowspan=1 width="72px" height="30px"><font color="white">Px.</font></td>
   			<td colspan=4>
 	  			<?php
 		  			$fxDose = (float)$row_treatmentinfo['dose_sum']/(float)$row_treatmentinfo['Fx_sum'];
@@ -1889,15 +1888,15 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
   
   	<table class = "type05" width="960px" border="0" cellspacing="1" cellpadding="1" align="center">
 		<tr height="30">
-		<th width="60px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> Sim </th>  
-		<th width="120px" align=left scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 08:40 </th>  
-		<th width="120px" align=left scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 09:20 </th>
-		<th width="120px" align=left scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 10:20 </th>
-		<th width="120px" align=left scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 11:00 </th>		
-		<th width="120px" align=left scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 13:30</th>
-		<th width="120px" align=left scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 14:20</th>
-		<th width="120px" align=left scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 15:10  </th>
-		<th width="120px" align=left scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 16:00  </th>    
+		<td width="60px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> Sim </td>  
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 08:40 </td>  
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 09:20 </td>
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 10:20 </td>
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 11:00 </td>		
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 13:30</td>
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 14:20</td>
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 15:10  </td>
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 16:00  </td>    
   		</tr>
 
 
@@ -1905,7 +1904,6 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 	for($idxx=0;$idxx<$row_treatmentinfo[idx];$idxx++){
 		$simNums = $idxx+1;
 		$simTag = "CT_Sim".$simNums;
-// 		echo($row_treatmentinfo[$simTag]);	  
 		if(strlen($row_treatmentinfo[$simTag]>5)){ 
 	?>
 
@@ -1952,25 +1950,32 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 <th width="60px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> <?php echo(substr($datePick2,0,strlen($datePick2)-3)); ?> </th>  
 
 			<?php
+
+
 				for($secInd = 1;$secInd<9; $secInd++){ 
 				$txVal = $TimeTable[$secInd];
+				$bgcols = "#f4e1d2";
+				if($numSlot[$secInd]==1){
+					$bgcols = "#b2b2b2"; /* red 50 (ibm design colors) */
+				}
 				if(strcmp($txVal,$row_treatmentinfo[Hospital_ID])==0 and $numSlot[$secInd]>0){
-					$bgcols = "#e62325"; /* red 50 (ibm design colors) */
+					$bgcols = "#80ced6"; /* red 50 (ibm design colors) */
 				}
-				else{
-					$bgcols = "#FFFFFF";
+
+				if($numSlot[$secInd]>1){
+					$bgcols = "#bc5a45";					
 				}
-				
-				echo "<th bgcolor=$bgcols align=left>";
+
+				echo "<td bgcolor=$bgcols align=center>";
 				if(strlen($txVal)>5 and $numSlot[$secInd]>0){ 
 					echo "<form id=form3 name=form3 method=post target=_blank action= N_edit_sim.php>";
 					echo "<input type=submit name=btn_edit id=btn_edit value= $txVal >";
 					echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
 					echo "<input name=datePick type=hidden id=datePick  value=$datePick />";												
 					echo "<input name=hf_edit type=hidden id=hf_edit value= $txVal /> </form>";
-					echo($numSlot[$secInd]);
+
 				}
-				echo("</th>");
+				echo("</td>");
 				}
 			?> 
   		</tr>
@@ -2392,9 +2397,10 @@ $sql_idx = mysqli_query($test, "select idx from MemoTemp where Hospital_ID = '$r
 				$sql_Memo = mysqli_query($test, $queryMemo);
 				for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
 					$Memo = mysqli_result($sql_Memo, $i,"Memo1");
-					 echo($Memo); echo("<br>");
+					 echo($Memo); echo("<br>"); 
 					}
 			  	?>
+
 		  	<?php
 		  		$hisID = $row_patientinfo['Hospital_ID'];
 				$queryMemo = "Select * from OrderTemp where (Date1 like '$tDates' AND Hospital_ID like $hisID)";
@@ -2943,7 +2949,13 @@ var DateCT = <?php if($n_CT){echo $n_CT+3;}else{echo 3;} ?>;
 var Meet_Count_;
 if(<?php echo $total_Meetinfo; ?>){ Meet_Count_ = <?php echo $total_Meetinfo; ?>;}else{Meet_Count_ = 1;}
 
-var CDate = <?php if($i_){echo $i_;}else{echo 0;}?>;
+
+
+
+
+var CDate_memo = <?php if($total_Memoinfo){echo $total_Memoinfo;}else{echo 0;}?>;
+var CDate_order = <?php if($total_Orderinfo){echo $total_Orderinfo;}else{echo 0;}?>;
+
 var Fx = [18,12,3,7];
 var Fx_ = [22, 6];
 var fXLung = [15, 10, 5, 6];
@@ -4033,7 +4045,7 @@ $(function() {
 		
 		var row = "<tr>";
 			row += "<td><center>"+count_+".</center></td>";
-			row += "<td><input class = 'form-control input-sm ' id = 'OrderPicker"+CDate+"' type='OrderDate' name= 'OrderDate[]' value ='"+Order_Finish+"' ></td>"
+			row += "<td><input class = 'form-control input-sm ' id = 'OrderPicker"+CDate_order+"' type='OrderDate' name= 'OrderDate[]' value ='"+Order_Finish+"' ></td>"
 			row += "<td><input class = 'form-control input-sm ' type='Order' name= 'Order[]' ></td>"
 			
 			
@@ -4042,7 +4054,7 @@ $(function() {
 		$("#OrderTable").append(row);
 		
 		$(document).find("input[name='OrderDate[]']").removeClass('hasDatepicker').datepicker({dateFormat:'m/d/y'});     
-		CDate++;	
+		CDate_order++;	
 		
 		//동적할당으로 생선된 Datepicker는 작동이 안되기 떄문에 다음과 같은 코드를 선언한다.
 
@@ -4054,16 +4066,14 @@ $(function() {
 		
 		var row = "<tr>";
 			row += "<td><center>"+count_+".</center></td>";
-			row += "<td><input class = 'form-control input-sm ' id = 'CommentPicker"+CDate+"' type='CommentDate' name= 'CommentDate[]' value ='"+Comment_Finish+"' ></td>"
-			row += "<td><input class = 'form-control input-sm ' type='Comment' name= 'Comment[]' ></td>"
-			
-			
+			row += "<td><input class = 'form-control input-sm ' id = 'CommentPicker"+CDate_memo+"' type='CommentDate' name= 'CommentDate[]' value ='"+Comment_Finish+"' ></td>"
+			row += "<td><input class = 'form-control input-sm ' type='Comment' name= 'Comment[]' ></td>"						
 			row += "<td><center><button type='button' class='btn btn-default'>-</button></center></td>";
 			row += "</tr>";
 		$("#CommentTable").append(row);
 		
 		$(document).find("input[name='CommentDate[]']").removeClass('hasDatepicker').datepicker({dateFormat:'m/d/y'});     
-		CDate++;	
+		CDate_memo++;	
 		
 		//동적할당으로 생선된 Datepicker는 작동이 안되기 떄문에 다음과 같은 코드를 선언한다.
 
