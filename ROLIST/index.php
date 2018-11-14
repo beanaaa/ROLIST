@@ -83,11 +83,9 @@ if (isset($_POST['ID_txt'])) {
   // echo($LoginRS__query);
   $loginFoundUser = mysqli_num_rows($LoginRS);
   echo($loginFoundUser);
-echo("redirected?");
+
   if ($loginFoundUser !=0) {
-    echo("redirected?");
  
-    // $loginStrGroup  = mysqli_result($LoginRS,0,'access');
     $temp = mysqli_fetch_assoc($LoginRS);
     $loginStrGroup= $temp[access];
     echo($MM_redirectLoginSuccess);
@@ -95,20 +93,20 @@ echo("redirected?");
     //declare two session variables and assign them
     $_SESSION['MM_Username'] = $loginUsername;
     $_SESSION['MM_UserGroup'] = $loginStrGroup;	      
-    $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
-    echo($MM_redirectLoginSuccess);
+    // $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
+    // echo($MM_redirectLoginSuccess);
     if (isset($_SESSION['PrevUrl']) && false) {
       $MM_redirectLoginSuccess = $_SESSION['PrevUrl'];	
     }
 
-    header("Location: " . "daily_report.php" );
+    header("Location: " . $MM_redirectLoginSuccess );
   }
   else {
-    echo($loginFoundUser);
-    echo( $LoginRS__query);
-    echo($loginFoundUser);    
-    //  echo "<script>window.alert('Login Fail');
-		//     window.location.href='index.php';</script>";
+    // echo($loginFoundUser);
+    // echo( $LoginRS__query);
+    // echo($loginFoundUser);    
+     echo "<script>window.alert('Login Fail');
+		    window.location.href='index.php';</script>";
   }
 }
 ?>
