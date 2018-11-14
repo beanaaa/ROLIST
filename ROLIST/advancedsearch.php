@@ -1,4 +1,5 @@
 <!doctype html>
+
 <?php
 function mysqli_result($res,$row=0,$col=0)
 { 
@@ -69,6 +70,7 @@ session_start();
 $permitUser = $_SESSION['MM_UserGroup'];
 
 include("idc.php");
+include("configuration.php");
 
 if($_POST['permit']!=''){
 	$permitUser = $_POST['permit'];
@@ -675,14 +677,13 @@ echo($to);
 
 	<td   valign="middle" align="left">
 		<select name="txt_category">
+
 				<option name="txt_category" value="" ></option>
-				<option name="txt_category" value="CNS" >CNS</option>
-				<option name="txt_category" value="HN" >HN</option>
-				<option name="txt_category" value="THX" >THX</option>
-				<option name="txt_category" value="BRST" >BRST</option>
-				<option name="txt_category" value="GI" >GI</option>
-				<option name="txt_category" value="GU" >GU</option>
-				<option name="txt_category" value="GY" >GY</option>
+<?php
+				for($idphys=0;$idphys<$numcatg;$idphys++){
+					echo("<option name='txt_category' value='$catgInt[$idphys]' >$catgInt[$idphys]</option>");
+				}
+?>
 		</select>		    
 		
 	</td>
@@ -705,11 +706,13 @@ echo($to);
 
 	<td   valign="middle" align="left">
 		<select name="txt_physician">
-				<option name="txt_physician" value="" ></option>
-				<option name="txt_physician" value="myki" >KI</option>
-				<option name="txt_physician" value="mjlee" >JaL</option>
-				<option name="txt_physician" value="mhlee" >JuL</option>
-				<option name="txt_physician" value="mjnam" >JN</option>
+		<option name="txt_physician" value="" ></option>
+<?php
+				for($idphys=0;$idphys<$numphyss;$idphys++){
+					echo("<option name='txt_physician' value='$phyIdd[$idphys]' >$phyInt[$idphys]</option>");
+				}
+?>
+				
 		</select>		    
 		
 	</td>
@@ -1203,7 +1206,7 @@ do {
 		else{
 			$fontColorInp = "#aa231f"; /* red 60 (ibm design colors) */
 		}
-    echo "<td align='center' bgcolor=$bgcolorF width = '60px' align='left'>  <strong><font color=$fontColorF>$row_Recordset1[KorName]</font>"; 
+    echo "<td align='center' bgcolor=$bgcolorF width = '60px' align='left'>  <strong><font color=$fontColorF>$row_Recordset1[KorName]<br></font>"; 
 
 
 	$dump_temp = iconv("utf8", "euckr", $row_Recordset1[KorName]);
@@ -1347,19 +1350,26 @@ do {
     echo "<td rowspan = 1 width = '20px' align='left' bgcolor=$bgcolorF>$cropDateFin<br>$weekyoil</td>";
     
 
-	if (strcasecmp(trim($row_Recordset1[$Linac_f]),"Versa")==0){echo "<td bgcolor=#DBA67B align=center width = '15'>   1 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"IX")==0){echo "<td bgcolor=#458985 align=center width = '15'>   2 </td>";}
-	elseif (strcasecmp(trim($row_Recordset1[$Linac_f]),"Infinity")==0){echo "<td bgcolor=#D7D6A5 align=center width = '15'>   3 </td>";}
-	else{echo "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";}
+    $txtLinac = "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";
+    for($idlinac=0; $idlinac<$numrooms;$idlinac++){
+		if (strcasecmp(substr(trim($row_Recordset1[$Linac_f]),0,2),substr(trim($rmsInt[$idlinac]),0,2))==0){     	
+			$txtLinac = "<td bgcolor=$rmsCol[$idlinac] align=center width = '15'>   $rmsIdd[$idlinac] </td>";
+		}
+    }
+   	echo "$txtLinac";
 
 	if($mdChart==0){					
 
-	if (strcasecmp(trim($row_Recordset1[physician]),"myki")==0){echo "<td bgcolor=#33FF00 width = '15' align='center'>   KI </td>";} 	 /* #33FF00 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjlee")==0){echo "<td bgcolor=#CC6699 width = '15' align='center'>   Ja </td>";} /* #CC6699 (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mhlee")==0){echo "<td bgcolor=#00CCFF width = '15' align='center'>   Ju </td>";} /* #00CCFF (web safe colors) */
-	elseif (strcasecmp(trim($row_Recordset1[physician]),"mjnam")==0){echo "<td bgcolor=#CCFFFF width = '15' align='center'>   JN </td>";} /* #CCFFFF (web safe colors) */
-	else{echo "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";}
-	}
+		$phyMark = "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";
+		for($idphyss=0;$idphyss<$numphyss;$idphyss++){
+	
+			if (strcasecmp(trim($row_Recordset1[physician]),$phyIdd[$idphyss])==0){
+				$phyMark = "<td bgcolor=$phyCol[$idphyss] width = '15' align='center'>   $phyInt[$idphyss] </td>";
+			} 	 /* #33FF00 (web safe colors) */
+	
+		}
+		echo($phyMark) ;
+		}
 
 
 		$sql_Memo = mysqli_query($test, "select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");

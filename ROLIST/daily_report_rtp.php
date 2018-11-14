@@ -2370,9 +2370,6 @@ do {
 			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
 			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
 	if($row_Memoinfo>0){ 
-?>
-
-    	<?php 
 		if(strlen($Memo)>30){
 			$Memo = mb_substr($Memo,0,30,"EUC-KR")." ...";
 		}
