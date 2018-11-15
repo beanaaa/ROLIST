@@ -411,7 +411,6 @@ $row_editinfo = mysqli_fetch_assoc($editinfo);
 $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$ID_'",
                        ($_POST['txt_reservation']  ));
         $Result1 = mysqli_query($test, $UPDATESQL);
-echo($UPDATESQL);
 
 
 // echo($UPDATESQLManual);
@@ -615,7 +614,7 @@ echo($UPDATESQL);
 
 
 		
-		if(($Order_[$i])>0){
+		if(($Order_[$i])>=0){
 			$Timeupdate = " $Q_CTTime = '$Order_[$i]',";
 		}
 		else{
@@ -650,8 +649,7 @@ echo($UPDATESQL);
  		$UPDATESQL3 = sprintf(
  			"UPDATE TreatmentInfo SET $Q_RT_start = '$Start_[$i]', RT_start_f = '$Start_[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]', $Timeupdate $CEupdate $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', idx = '$idx_', $Q_CT = '$CT_[$i]', CT_Sim_f = '$CT_[$i]', $Q_Finish = '$Finish_[$i]', RT_fin_f = '$Finish_[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]', $Q_Delay='$Delay_[$i]', $Q_Site='$Site_[$i]', site_f = '$Site_[$i]'  WHERE Hospital_ID = '$ID_'");
 
- 		
- 		echo($UPDATESQL3);
+ 	
 
 		if (strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_[$i])!=0 or strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
 			
@@ -685,7 +683,7 @@ echo($UPDATESQL);
 			}
 
 	 		$UPDATESQL3 = sprintf("UPDATE TreatmentInfo SET $Q_RT_start = '$Start_Date[$i]', RT_start_f = '$Start_Date[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]', $Timeupdate $CEupdate $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', idx = '$idx_', $Q_CT = '$Start_CT[$i]', CT_Sim_f = '$Start_CT[$i]', $Q_Finish = '$Finish_Date[$i]', RT_fin_f = '$Finish_Date[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]', $Q_Delay='$Delay_[$i]', $Q_Site='$Site_[$i]', site_f = '$Site_[$i]'  WHERE Hospital_ID = '$ID_'");
-	 	 		echo($UPDATESQL3);
+	 	 		
 
 		if (strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_Date[$i])!=0 or strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_Date[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
 			$tm = 0;
@@ -956,7 +954,6 @@ echo($UPDATESQL);
 	for($j = 1; $j<=$C_Plan; $j++){
 		$jj = $j-1;
 		$insertComment = sprintf("INSERT INTO MemoTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$Comment[$jj]', '%s', $j)", ($CommentDate[$jj]    ));
-		echo($insertComment."<br>");
 		//echo $insertComment;
 		$insertQuery = mysqli_query($test, $insertComment );
 		if($insertQuery == TRUE){
@@ -973,7 +970,6 @@ echo($UPDATESQL);
 	for($j = 1; $j<=$C_Order; $j++){
 		$jj = $j-1;
 		$insertOrder = sprintf("INSERT INTO OrderTemp (Hospital_ID, Memo1, Date1, idx) VALUES ('$ID_', '$Order[$jj]', '%s', $j)", ($OrderDate[$jj]    ));
-		echo($insertOrder);
 		//echo $insertComment;
 		$insertQuery = mysqli_query($test, $insertOrder );
 		if($insertQuery == TRUE){
@@ -1568,14 +1564,17 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 		$datePick2 = substr($row_treatmentinfo[$simTag],0,strlen($row_treatmentinfo[$simTag]));
 		$numSlot = array_fill(0,9, 0);	
 		$numActive = array_fill(0,8, '');	
-			$timeSlot[1] = "<option value=1>1: 08:40</option>";
-			$timeSlot[2] = "<option value=2>2: 09:20</option>";
-			$timeSlot[3] = "<option value=3>3: 10:20</option>";
-			$timeSlot[4] = "<option value=4>4: 11:00</option>";
-			$timeSlot[5] = "<option value=5>5: 13:30</option>";
-			$timeSlot[6] = "<option value=6>6: 14:20</option>";
-			$timeSlot[7] = "<option value=7>7: 15:10</option>";
-			$timeSlot[8] = "<option value=8>8: 16:00</option>"; 				
+		for($idslot=0;$idslot<count($slotInt);$idslot++){
+			$timeSlot[$idslot] = "<option value=$slotIdd[$idslot]>$slotIdd[$idslot]: $slotInt[$idslot]</option>";			
+		}
+			// $timeSlot[1] = "<option value=1>1: 08:40</option>";
+			// $timeSlot[2] = "<option value=2>2: 09:20</option>";
+			// $timeSlot[3] = "<option value=3>3: 10:20</option>";
+			// $timeSlot[4] = "<option value=4>4: 11:00</option>";
+			// $timeSlot[5] = "<option value=5>5: 13:30</option>";
+			// $timeSlot[6] = "<option value=6>6: 14:20</option>";
+			// $timeSlot[7] = "<option value=7>7: 15:10</option>";
+			// $timeSlot[8] = "<option value=8>8: 16:00</option>"; 				
 		
 		for($iddds = 1;$iddds<8;$iddds++){ 
 		$Sim_ID = 			"CT_Sim".$iddds;
@@ -1763,15 +1762,10 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
         </td>
 
         <?php
-        if($row_treatmentinfo[$sim_f]==1){$cInd = "1: 08:40";}
-        if($row_treatmentinfo[$sim_f]==2){$cInd = "2: 09:20";}        
-        if($row_treatmentinfo[$sim_f]==3){$cInd = "3: 10:20";}        
-        if($row_treatmentinfo[$sim_f]==4){$cInd = "4: 11:00";}        
-        if($row_treatmentinfo[$sim_f]==5){$cInd = "5: 13:30";}        
-        if($row_treatmentinfo[$sim_f]==6){$cInd = "6: 14:20";}        
-        if($row_treatmentinfo[$sim_f]==7){$cInd = "7: 15:10";}        
-        if($row_treatmentinfo[$sim_f]==8){$cInd = "8: 16:00";}        
-        if($row_treatmentinfo[$sim_f]==0){$cInd = "Other";}        
+		if($row_treatmentinfo[$sim_f]==0){$cInd = "Other";} 
+		else{
+			$cInd = $slotIdd[$row_treatmentinfo[$sim_f]-1].": ".$slotInt[$row_treatmentinfo[$sim_f]-1];
+		}       
         
         ?>
         
@@ -1779,14 +1773,12 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 			
 			<select class="form-control" name="CTOrder[]" >			
 			<option value=" <?php $cInd; ?>" selected="selected"><?php echo $cInd; ?></option>
-			<?php echo($timeSlot[1]); ?>
-			<?php echo($timeSlot[2]); ?>
-			<?php echo($timeSlot[3]); ?>
-			<?php echo($timeSlot[4]); ?>
-			<?php echo($timeSlot[5]); ?>
-			<?php echo($timeSlot[6]); ?>
-			<?php echo($timeSlot[7]); ?>
-			<?php echo($timeSlot[8]); ?>
+			<option value=0>Other</option>;
+<?php
+		for($idslot=0;$idslot<count($slotInt);$idslot++){
+			echo($timeSlot[$idslot]);			
+		}
+?>
 			
 			
 <!--
@@ -1888,15 +1880,19 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
   
   	<table class = "type05" width="960px" border="0" cellspacing="1" cellpadding="1" align="center">
 		<tr height="30">
-		<td width="60px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> Sim </td>  
-		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 08:40 </td>  
+		<td width="60px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> Sim </td> 
+			<?php for($idslot=0;$idslot<count($slotInt);$idslot++){
+				echo("<td align=center  bgcolor=#FF7E79 style='color: #FFFFFF'> &nbsp;&nbsp; $slotInt[$idslot] </td>");
+			} ?>
+		<!-- <td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 08:40 </td>  
+		
 		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 09:20 </td>
 		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 10:20 </td>
 		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 11:00 </td>		
 		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 13:30</td>
 		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 14:20</td>
 		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 15:10  </td>
-		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 16:00  </td>    
+		<td width="120px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> &nbsp;&nbsp; 16:00  </td>     -->
   		</tr>
 
 
@@ -1946,13 +1942,14 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 		}
 		
 	?>
-  				<tr height="30">
-<th width="60px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> <?php echo(substr($datePick2,0,strlen($datePick2)-3)); ?> </th>  
+  	<tr height="30">
+<td width="60px" align=center scope="row" bgcolor="#FF7E79" style="color: #FFFFFF"> <?php echo(substr($datePick2,0,strlen($datePick2)-3)); ?> </td>  
 
 			<?php
 
-
-				for($secInd = 1;$secInd<9; $secInd++){ 
+				$sepWidth = 900/count($slotIdd);
+				
+				for($secInd = 1;$secInd<count($slotIdd)+1; $secInd++){ 
 				$txVal = $TimeTable[$secInd];
 				$bgcols = "#f4e1d2";
 				if($numSlot[$secInd]==1){
@@ -1966,7 +1963,7 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 					$bgcols = "#bc5a45";					
 				}
 
-				echo "<td bgcolor=$bgcols align=center>";
+				echo "<td bgcolor=$bgcols width = $sepWidth align=center>";
 				if(strlen($txVal)>5 and $numSlot[$secInd]>0){ 
 					echo "<form id=form3 name=form3 method=post target=_blank action= N_edit_sim.php>";
 					echo "<input type=submit name=btn_edit id=btn_edit value= $txVal >";

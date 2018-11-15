@@ -747,10 +747,6 @@ $today_date2 = $years. "-". $months. "-31";
 	
 	for($idMd = 0; $idMd<3; $idMd++){ 
 		for($idSite = 0; $idSite<3;$idSite++){ 	
-/*
-			$today_date = "2018-01-01";
-			$today_date2 = "2018-01-31";
-*/
 			$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where 
 			(TreatmentInfo.physician LIKE '$mdP[$idMd]') AND 
 			(STR_TO_DATE(TreatmentInfo.CT_Sim1, '%m/%d/%Y') >= '$today_date' and STR_TO_DATE(TreatmentInfo.RT_start1, '%m/%d/%Y') <= '$today_date2') AND 

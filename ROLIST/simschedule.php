@@ -691,8 +691,8 @@ var detail = 0;
 					}
 				}
 												
-				$timeTable[1] = "08:40";$timeTable[2] = "09:30";$timeTable[3] = "10:20";$timeTable[4] = "11:10";
-				$timeTable[5] = "13:30";$timeTable[6] = "14:20";$timeTable[7] = "15:10";$timeTable[8] = "16:00"; 				
+				for($idslot=0;$idslot<$numslots;$idslot++){ 					$timeTable[$slotIdd[$idslot]] = $slotInt[$idslot];	 				}
+				 				
 				
 				if($j2!=0){
 // 				echo "<br />\n";				
@@ -737,7 +737,7 @@ var detail = 0;
 				echo("<hr>");
 				
 				 echo "<table cellpadding='2' cellspacing='0'>";				
-				 for($jj=1;$jj<9;$jj++){	 	
+				 for($jj=1;$jj< count($slotInt)+1;$jj++){	 	
 					 if($scheduledTime[$jj]!=0){
 						$query1_CT_ID = $scheduledId[$jj];
 						
@@ -1389,8 +1389,8 @@ var detail = 0;
 					}
 				}
 												
-				$timeTable[1] = "08:40";$timeTable[2] = "09:30";$timeTable[3] = "10:20";$timeTable[4] = "11:10";
-				$timeTable[5] = "13:30";$timeTable[6] = "14:20";$timeTable[7] = "15:10";$timeTable[8] = "16:00"; 				
+				for($idslot=0;$idslot<$numslots;$idslot++){ 					$timeTable[$slotIdd[$idslot]] = $slotInt[$idslot];	 				}
+				 				
 				
 				if($j2!=0){
 // 				echo "<br />\n";				
@@ -1432,7 +1432,7 @@ var detail = 0;
 				echo("<hr>");
 				
 				 echo "<table cellpadding='2' cellspacing='0'>";				
-				 for($jj=1;$jj<9;$jj++){	 	
+				 for($jj=1;$jj< count($slotInt)+1;$jj++){	 	
 					 if($scheduledTime[$jj]!=0){
 						$query1_CT_ID = $scheduledId[$jj];
 						
@@ -2100,8 +2100,8 @@ var detail = 0;
 					}
 				}
 												
-				$timeTable[1] = "08:40";$timeTable[2] = "09:30";$timeTable[3] = "10:20";$timeTable[4] = "11:10";
-				$timeTable[5] = "13:30";$timeTable[6] = "14:20";$timeTable[7] = "15:10";$timeTable[8] = "16:00"; 				
+				for($idslot=0;$idslot<$numslots;$idslot++){ 					$timeTable[$slotIdd[$idslot]] = $slotInt[$idslot];	 				}
+				 				
 				
 				if($j2!=0){
 // 				echo "<br />\n";				
@@ -2143,7 +2143,7 @@ var detail = 0;
 				echo("<hr>");
 				
 				 echo "<table cellpadding='2' cellspacing='0'>";				
-				 for($jj=1;$jj<9;$jj++){	 	
+				 for($jj=1;$jj< count($slotInt)+1;$jj++){	 	
 					 if($scheduledTime[$jj]!=0){
 						$query1_CT_ID = $scheduledId[$jj];
 						

@@ -1027,8 +1027,7 @@ mysqli_query($test, "set session character_set_client=latin1;");
                        ($_POST['NextStatus_menu']),
                        ($_POST['txt_pStatus'])
                                         	     
-                       );                      
-               echo($UPDATESQL1);        
+                       );                           
                        $curstats = $_POST['CurrentStatus_menu'];
                        if(strlen($curstats)==0){
 	                       $curstats = "0";
@@ -3794,13 +3793,17 @@ $sql_idx = mysqli_query($test, "select idx from MemoTemp where Hospital_ID = '$c
 
 	<br>
 	<br>
-	<form id=form11 name=form11 method=post target=_blank action="N_register_all.php">
-			<input class = "btn button-update" style="font-size: 20px; font-weight: 200" type=submit name=btn_home id=btn_home value="✎" />
-			<input class = "btn button-update" name=permit type=hidden id=permit  value= <?php echo $permitUser ?>/>
-	</form>
+	<input class="btn button-update" type="button" id="button1" onclick="buttonNew_click();" style="font-size: 14px; font-weight: 200" value="✎" />
+
+	<script>
+	function buttonNew_click() {
+		<?php
+		echo "window.open('N_register_all.php?permit=$permitUser', '_blank', 'width=1100px, toolbar=no, menubar=no, resizable=no, copyhistory=no' );"; ?>
+	}
+	</script>
 
 	<br>
-
+	<br>
 	
 	<input class="btn button-close" type="button" id="button1" onclick="button1_click();" style="font-size: 14px; font-weight: 200" value="📅" />
 	<script>

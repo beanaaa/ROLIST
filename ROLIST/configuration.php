@@ -221,3 +221,48 @@
    		$catgInt[$ids] = substr($RmsItTemp,0,strlen($RmsItTemp)-1);
    }
 ?>
+
+
+<?php
+// Read CT Slots
+   $filename = "param.cfg";
+   $fp = fopen($filename, "r") or die("파일열기에 실패하였습니다");
+   $tId=0;
+   while(!feof($fp)){
+         $buffer = fgets($fp);
+         if(strlen($buffer)>3 and strcmp($buffer[0],"!")!=0){
+            $txts[$tId] = $buffer;
+            $tId++;
+         }
+
+   }
+
+   fclose($fp);
+
+
+   for($ids=0;$ids<count($txts);$ids++){
+         $trimtxt = trim($txts[$ids]);
+         if(strcmp(substr($trimtxt,0,4),"Slot")==0){
+            $physId = $ids;
+			$resm = substr($trimtxt,4,100);
+			$lench = 0;
+			for($tlen = 0; $tlen<strlen($resm);$tlen++){
+				if(strcmp($resm[$tlen],":")!=0 and strcmp($resm[$tlen],";")!=0 and strcmp($resm[$tlen]," ")!=0){
+				$numSlot[$lench] = $resm[$tlen];
+				$lench++;
+				}
+			}
+			$numslots = (int)(implode($numSlot));       
+         }
+   }
+//    echo($numslots);
+   for($ids=0;$ids<$numslots;$ids++){
+
+         $phyItTemp = trim($txts[$physId+1+$ids*2]);
+         $phyColTemp = trim($txts[$physId+1+$ids*2+1]);
+
+         $slotInt[$ids] = substr($phyItTemp,0,strlen($phyItTemp)-1);
+		 $slotIdd[$ids] = substr($phyColTemp,0,strlen($phyColTemp)-1);
+   }
+   
+?>

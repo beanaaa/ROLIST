@@ -5041,10 +5041,19 @@ do {
 				<input type = hidden name = "sitename"	id ="sitename" value = "<?php echo $siteInput; ?>" />				
 	<br>
 	<br>
-	<form id=form11 name=form11 method=post target=_blank action="N_register_all.php">
+	<!-- <form id=form11 name=form11 method=post target=_blank action="N_register_all.php">
 			<input class = "btn button-update" style="font-size: 20px; font-weight: 200" type=submit name=btn_home id=btn_home value="✎" />
 			<input class = "btn button-update" name=permit type=hidden id=permit  value= <?php echo $permitUser ?>/>
-	</form>
+
+	</form> -->
+	<input class="btn button-update" type="button" id="button1" onclick="buttonNew_click();" style="font-size: 14px; font-weight: 200" value="✎" />
+
+	<script>
+	function buttonNew_click() {
+		<?php
+		echo "window.open('N_register_all.php?permit=$permitUser', '_blank', 'width=1100px, height=750, toolbar=no, menubar=no, resizable=no, copyhistory=no' );"; ?>
+	}
+	</script>
 	
 	<br>
 	<br>
@@ -5057,16 +5066,8 @@ do {
 	}
 	</script>
 	<br>	
-<!--
-	
-	<form method=post target="_blank"  action="simschedule.php">
-		<input class="btn button-close" style="font-size: 14px; font-weight: 200" type=submit name=btn_home id=btn_home value=📅>
-		<input class="btn button-close" name=permit type=hidden id=permit value= <?php echo $permitUser ?>/>
-		<input  type = hidden name = username id = username value = <?php echo $uid; ?> />				
-		<input  type = hidden name = mdname id = mdname value = <?php echo $md; ?> />		
-		<input  type = hidden name = curpage id = curpage value = <?php echo "simschedule.php"; ?> />										
-	</form>
--->
+
+
 	    <br>
 	<?php if ($permitUser ==1){	?>
 	<form id=form11 name=form11 method=post target=_blank action="pending.php">

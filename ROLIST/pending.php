@@ -1,4 +1,23 @@
 <!doctype html>
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
+
 <link rel="stylesheet" href="normalize.css">
 <meta charset="utf-8">
 <?php 	
@@ -36,6 +55,65 @@ $permitUser = $_SESSION['MM_UserGroup'];
 include("configuration.php");
 
 include("idc.php");
+
+$preId = $_POST['previd'];
+$postId = $_POST['postid'];
+
+if(strlen($preId)!=0 and strlen($postId) !=0){ 
+require_once('Connections/test.php'); 
+
+$curQuery = "select * from PatientInfo where Hospital_ID like '$preId'";
+$prevs = mysqli_query($test, $curQuery);
+$prevsNum = mysqli_num_rows($prevs);
+
+$aftQuery = "select * from PatientInfo where Hospital_ID like '$postId'";
+$afts = mysqli_query($test, $aftQuery);
+$aftsNum = mysqli_num_rows($afts);
+
+if($prevsNum==0){
+	echo("등록되지 않은 환자 입니다. 아이디를 확인 해 주세요.");
+}
+if($aftsNum!=0){
+	echo("변경하고자 하는 아이디가 이미 등록되어 있습니다. 기 등록된 내용은 삭제 됩니다.");
+	mysqli_query($test, "delete from PatientInfo where Hospital_ID like '$postId'");
+	mysqli_query($test, "delete from ClinicalInfo where Hospital_ID like '$postId'");
+	mysqli_query($test, "delete from TreatmentInfo where Hospital_ID like '$postId'");		
+}
+if($prevsNum!=0){
+	$numPatientInfo = mysqli_num_rows(mysqli_query($test, "select * from PatientInfo where Hospital_ID='$preId'"));
+	if($numPatientInfo==0){
+		mysqli_query($test, "Insert into PatientInfo (Hospital_ID) values '$preId'");
+		mysqli_query($test, "update PatientInfo set Hospital_ID='$postId' where Hospital_ID like '$preId'");
+	}
+	else{
+		mysqli_query($test, "update PatientInfo set Hospital_ID='$postId' where Hospital_ID like '$preId'");
+	}
+	$numClinicalInfo = mysqli_num_rows(mysqli_query($test, "select * from ClinicalInfo where Hospital_ID='$preId'"));
+	if($numClinicalInfo==0){
+		mysqli_query($test, "Insert into ClinicalInfo (Hospital_ID) values '$preId'");
+		mysqli_query($test, "update ClinicalInfo set Hospital_ID='$postId' where Hospital_ID like '$preId'");
+	}
+	else{
+		mysqli_query($test, "update ClinicalInfo set Hospital_ID='$postId' where Hospital_ID like '$preId'");
+	}
+	$numTreatmentInfo = mysqli_num_rows(mysqli_query($test, "select * from TreatmentInfo where Hospital_ID='$preId'"));
+	if($numTreatmentInfo==0){
+		mysqli_query($test, "Insert into TreatmentInfo (Hospital_ID) values '$preId'");
+		mysqli_query($test, "update TreatmentInfo set Hospital_ID='$postId' where Hospital_ID like '$preId'");
+	}
+	else{
+		mysqli_query($test, "update TreatmentInfo set Hospital_ID='$postId' where Hospital_ID like '$preId'");
+	}
+
+	echo("<br>환자 ID $preId 를 $postId 로 성공적으로 변경하였습니다. 리스트를 확인 해 주세요.");
+
+}
+}
+
+// echo($curQuery);
+
+
+
 
 if($_POST['permit']!=''){
 	$permitUser = $_POST['permit'];
@@ -404,6 +482,55 @@ for($idx = 0;$idx<$numPends;$idx++){
 ?>
 </table>
       </article>
+
+
+
+
+
+
+      <article class="container">
+        <div class="page-header">
+          <h3>Hospital ID Modification</h3>
+        </div>
+
+
+
+<table class="table">
+  <thead class="thead-dark">	
+	<tr>
+		<td>
+			From
+		</td>
+		<td >
+			To
+		</td>
+		<td align=right>
+			Action
+		</td>
+		
+	</tr>
+  </thead>
+
+<form action="pending.php" method=post>
+	<tr>
+	<td>
+              <input type="text" class="form-control" id="Id" name = "previd" placeholder="To correct">
+	</td>
+	<td>
+              <input type="text" class="form-control" id="Password" name = "postid"  placeholder="Corrected">
+	</td>
+	<td align=right>		
+              <button type="submit" class="btn btn-info">Register<i class="fa fa-check spaceLeft"></i></button>
+	</td>
+	</form>		
+</tr>
+</table>
+      </article>
+
+
+
+
+
 
 
 

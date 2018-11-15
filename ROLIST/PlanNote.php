@@ -1,5 +1,23 @@
 
 
+<?php
+function mysqli_result($res,$row=0,$col=0)
+{ 
+	$nums=mysqli_num_rows($res);
+	if($nums && $row<=($nums-1) && $row>=0)
+	{
+		mysqli_data_seek($res,$row);
+		$resrow=(is_numeric($col))?mysqli_fetch_row($res):mysqli_fetch_assoc($res);
+		if(isset($resrow[$col]))
+		{
+			return $resrow[$col];
+		}
+	}
+	return false;
+}
+	
+	error_reporting(0);	
+?>
 
 <style type="text/css">
 body{
@@ -242,9 +260,9 @@ echo "<h2>파일 정보</h2>
   	$upBolus = $_POST['bolus'];
   	$upper = $_POST['updater'];
   	$upPlannerNote = $_POST['plannernote'];
-	mysql_query("set session character_set_connection=latin1;");
-	mysql_query("set session character_set_results=latin1;");
-	mysql_query("set session character_set_client=latin1;");
+	mysqli_query($test, "set session character_set_connection=latin1;");
+	mysqli_query($test, "set session character_set_results=latin1;");
+	mysqli_query($test, "set session character_set_client=latin1;");
 
   	
 /*
@@ -259,17 +277,17 @@ echo "<h2>파일 정보</h2>
 
   	if(strcmp($upper,'1')==0){ 
 	$queryUpdate = "Update PlannerNote Set PlanID = '$upPlanId' where Hospital_ID like '$hID' and PlanNo = $planID";
-	mysql_query($queryUpdate);
+	mysqli_query($test, $queryUpdate);
 	$queryUpdate = "Update PlannerNote Set cx = '$upCx' where Hospital_ID like '$hID' and PlanNo = $planID";
-	mysql_query($queryUpdate);	
+	mysqli_query($test, $queryUpdate);	
 	$queryUpdate = "Update PlannerNote Set cy = '$upCy' where Hospital_ID like '$hID' and PlanNo = $planID";
-	mysql_query($queryUpdate);	
+	mysqli_query($test, $queryUpdate);	
 	$queryUpdate = "Update PlannerNote Set cz = '$upCz' where Hospital_ID like '$hID' and PlanNo = $planID";
-	mysql_query($queryUpdate);
+	mysqli_query($test, $queryUpdate);
 	$queryUpdate = "Update PlannerNote Set Bolus = '$upBolus' where Hospital_ID like '$hID' and PlanNo = $planID";
-	mysql_query($queryUpdate);
+	mysqli_query($test, $queryUpdate);
 	$queryUpdate = "Update PlannerNote Set PlanNote = '$upPlannerNote' where Hospital_ID like '$hID' and PlanNo = $planID";
-	mysql_query($queryUpdate);
+	mysqli_query($test, $queryUpdate);
 	}
   	
   	
@@ -277,17 +295,17 @@ echo "<h2>파일 정보</h2>
   	
 	
 	$query = "Select * from PlannerNote where Hospital_ID like '$hID' and PlanNo like '$planID'";  
-	$qr = mysql_query($query);
-	$entchk = mysql_num_rows($qr);
+	$qr = mysqli_query($test, $query);
+	$entchk = mysqli_num_rows($qr);
 // 	echo($entchk);
 	
 	$querytotal = "Select * from PlannerNote where Hospital_ID like '$hID' order by PlanNo";   	
-	$qrtotal = mysql_query($querytotal);
-	$entchktotal = mysql_num_rows($qrtotal);
+	$qrtotal = mysqli_query($test, $querytotal);
+	$entchktotal = mysqli_num_rows($qrtotal);
 	
 	if($entchk ==0){
 		$insertQuery = "Insert into PlannerNote (Hospital_ID, PlanNo) values ('$hID', $planID)";
-		mysql_query($insertQuery);
+		mysqli_query($test, $insertQuery);
 		echo("New List Inserted!");
 	}
 	
@@ -325,7 +343,7 @@ echo "<h2>파일 정보</h2>
 	<?php
 	
 	for($ids = 0; $ids<$entchk;$ids++){
-		$dset = mysql_fetch_assoc($qrtotal);
+		$dset = mysqli_fetch_assoc($qrtotal);
 		echo("<tr>");
 			echo("<td>");
 				echo($dset[PlanNo]);
@@ -362,10 +380,10 @@ echo "<h2>파일 정보</h2>
 </table>
 -->
 <?php
-	$dsets = mysql_fetch_assoc($qr);
+	$dsets = mysqli_fetch_assoc($qr);
 	
-	$trData = mysql_fetch_assoc(mysql_query("select * from TreatmentInfo where Hospital_ID like '$hID'"));
-	$ptData = mysql_fetch_assoc(mysql_query("select * from PatientInfo where Hospital_ID like '$hID'"));
+	$trData = mysqli_fetch_assoc(mysqli_query($test, "select * from TreatmentInfo where Hospital_ID like '$hID'"));
+	$ptData = mysqli_fetch_assoc(mysqli_query($test, "select * from PatientInfo where Hospital_ID like '$hID'"));
 //   	print_r("select * from PatientInfo where Hospital_ID like '$hID");
 			if(file_exists("PatientPhoto/". $ptData['RO_ID'].".jpg")==1){
 				$photoPath = "PatientPhoto/". $ptData['RO_ID'].".jpg";

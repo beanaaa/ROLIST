@@ -1739,41 +1739,6 @@ for($idstat = 0; $idstat<count($StatT); $idstat++){
 	$sqlQuery = mysqli_fetch_assoc(mysqli_query($test, "select $sId from TreatmentInfoHistory where Hospital_ID = $hId"));	
 	$sqlQueryPhys = mysqli_fetch_assoc(mysqli_query($test, "select physician from TreatmentInfoHistory where Hospital_ID = $hId"));	
 	$sqlQueryName = mysqli_fetch_assoc(mysqli_query($test, "select Firstname, Secondname from PatientInfo where Hospital_ID = $hId"));	
-	if($sqlQuery[$sId]==0){ 
-
-		$post_title = "$sId 의 상태가 완료됨으로 체크 되었습니다(by $uid)";
-		$post_url = "http://54.160.213.4/messageIndex.php";
-
-// 		$post_url = "";
-
-		$api_code = '460837379:AAEMQO7cETGDbz7sF9ACdDwWjJMhgAyEwpk';
-		if(strcmp($sqlQueryPhys[physician],'myki')==0){$curlPhy ="KI"; $chatId = "@rodbki";}
-		if(strcmp($sqlQueryPhys[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhro";}
-		if(strcmp($sqlQueryPhys[physician],'mjlee')==0){$curlPhy ="JaL";$chatId = "@rodbjal";}
-		if(strcmp($sqlQueryPhys[physician],'mhlee')==0){$curlPhy ="JuL";$chatId = "@pnuyhrojul";}
-		if(strcmp($sqlQueryPhys[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhrojul";}
-// 		print_r($sqlQueryPhys);
-		// 보낼 텍스트를 구성. 줄바꿈은 "\n"으로.
-		// http_build_query()를 이용하면 url 인코딩을 알아서 처리해 줌.
-		$telegram_text = "※ $hId / $sqlQueryName[Firstname] $sqlQueryName[Secondname] \n{$post_title}\n{$post_url}";
-		$query_array = array(
-		    'chat_id' => $chatId,
-		    'text' => $telegram_text,
-		);
-		$request_url = "https://api.telegram.org/bot{$api_code}/sendMessage?" . http_build_query($query_array);
-		
-		// curl로 접속
-		$curl_opt = array(
-		    CURLOPT_RETURNTRANSFER => 1,
-		    CURLOPT_URL => $request_url,
-		);
-		$curl = curl_init($request_url);
-		echo("<font color=#FFFFFF size='1px'> ");
-
-		$resCurl = curl_exec($curl);
-		echo("</font>");				
-	}
-	echo("");
  	$sqlQuery = mysqli_query($test, "update TreatmentInfoHistory set $sId = 1 where Hospital_ID = $hId");		
 }
 ?>

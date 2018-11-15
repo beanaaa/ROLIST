@@ -450,47 +450,97 @@ $hid = trim($hidNew1);
 
 
 
-<body>
-<br>
-<br>
+
+
+
+
+
+
+
+
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>SIGN-UP</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- font awesome -->
+    <link rel="stylesheet" href="css/font-awesome.min.css" media="screen" title="no title" charset="utf-8">
+    <!-- Custom style -->
+    <link rel="stylesheet" href="css/style.css" media="screen" title="no title" charset="utf-8">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
 <form id="form1" name="form1" method="POST" action="N_register_all.php">
- <table class="type1" width="70%" border="0" cellspacing="1" cellpadding="1" align="center">
 
- 
- <tr>
-    <th align = "right" width="80px" scope="row" style="color: #805515">Hospital ID</th>
-    <td width="150px"><input class="form-control" style="height:25px; width:120px" type="text" name="txt_hospital_id" id="txt_hospital_id" required = "required"   /></td>
- </tr>
- 
- </table>
+      <article class="container">
+        <div class="page-header">
+          <h1 align=center>New Patient Registration</h1>
+        </div>
+        <div class="col-md-6 col-md-offset-3">
+            <div class="form-group">
+              <label for="InputId">Hospital ID</label>
+              <input class="form-control" type="text" name="txt_hospital_id" id="txt_hospital_id" required = "required"   />
+            </div>
+			
+			
+            <div class="form-group text-center">
+				<button type="submit" class="btn btn-info" name="btn_reg" id="btn_reg">Register<i class="fa fa-check spaceLeft"></i></button>
+			    <input type="hidden" name="permit" id = "permit" value="<?php echo $permitUser?>" />
+            </div>
+        </div>
 
+      </article>
 
-
-
-  <hr>
-  <center>
-    <input class="btn btn-default" type="submit" name="btn_reg" id="btn_reg" value="Register"  />
-    <input type="hidden" name="permit" id = "permit" value="<?php echo $permitUser?>" />
-  </center>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
   <input type="hidden" name="MM_insert" value="form1" />
 </form>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <p>&nbsp;</p>
 
