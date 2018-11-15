@@ -175,8 +175,8 @@ if($_POST['permit']!=''){
 	require_once('Connections/test.php'); 
 	}
 	else{
- 		$MM_restrictGoTo = "index.php";
- 		header("Location: ". $MM_restrictGoTo); 
+ 		// $MM_restrictGoTo = "index.php";
+ 		// header("Location: ". $MM_restrictGoTo); 
 	require_once('Connections/test.php'); 
 
 	}
@@ -225,8 +225,8 @@ if (!isset($_SESSION)) {
 if ($permitUser == 1 | $permitUser == 2 | $permitUser == 3) {
 	require_once('Connections/test.php');
 } else {
-	$MM_restrictGoTo = "index.php";
-	header("Location: " . $MM_restrictGoTo);
+	// $MM_restrictGoTo = "index.php";
+	// header("Location: " . $MM_restrictGoTo);
 	require_once('Connections/test.php');
 }
 ?>

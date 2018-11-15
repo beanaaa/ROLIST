@@ -702,6 +702,17 @@ else{
 					
 		</th>
 	</form>
+	<form id=form11 name=form11 method=post target=_blank action="pending.php">
+	<?php if ($permitUser ==1){	?>
+
+		<th valign="middle" align=right >
+				<form id=form11 name=form11 method=post target=_blank action="pending.php">
+					<input class = "selector" style="width: 50px; height: 20px; background-color:red; color:white"  type=submit name=btn_home id=btn_home value="Auth" />
+					<input class = "btn button-update" name=permit type=hidden id=permit  value= <?php echo $permitUser ?>/>
+			</form>					
+		</th>
+	<?php } ?>
+	</form>
 
 	</tr>
 </table>
@@ -5070,12 +5081,13 @@ do {
 
 	    <br>
 	<?php if ($permitUser ==1){	?>
-	<form id=form11 name=form11 method=post target=_blank action="pending.php">
+	<!-- <form id=form11 name=form11 method=post target=_blank action="pending.php">
 			<input class = "btn button-update" style="font-weight: 200" type=submit name=btn_home id=btn_home value="Auth" />
 			<input class = "btn button-update" name=permit type=hidden id=permit  value= <?php echo $permitUser ?>/>
-	</form>
-	<?php }	?>
+	</form> -->
 
+	<?php }	?>
+	<br>
 	
 	
     </div>

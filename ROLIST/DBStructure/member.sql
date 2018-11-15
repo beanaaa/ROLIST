@@ -1,23 +1,31 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.3
+-- version 4.7.8
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:8889
--- Generation Time: Nov 12, 2018 at 02:17 PM
--- Server version: 5.7.23
--- PHP Version: 7.2.10
+-- Host: localhost
+-- 생성 시간: 18-11-15 15:25
+-- 서버 버전: 10.3.7-MariaDB
+-- PHP 버전: 5.6.36
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
 --
--- Database: `login`
+-- 데이터베이스: `login`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `login`
+-- 테이블 구조 `login`
 --
 
 CREATE TABLE `login` (
@@ -28,8 +36,26 @@ CREATE TABLE `login` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `login`
+-- 테이블의 덤프 데이터 `login`
 --
 
 INSERT INTO `login` (`h_id`, `h_password`, `access`, `msg`) VALUES
 ('admin', 'admin', '1', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `loginpend`
+--
+
+CREATE TABLE `loginpend` (
+  `h_id` varchar(100) DEFAULT NULL,
+  `h_password` varchar(100) DEFAULT NULL,
+  `access` int(16) DEFAULT NULL,
+  `msg` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

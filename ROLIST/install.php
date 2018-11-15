@@ -27,12 +27,12 @@ if(strlen($rootId) !=0){
     $username = $rootId;
     $password = $rootPassword;
     $conn = new mysqli($servername, $username, $password);
-    // $sql = "Drop DATABASE test";
-    // if ($conn->query($sql) === TRUE) {
-    //     echo "Database created successfully";
-    // } else {
-    //     echo "Error creating database: " . $conn->error;
-    // }
+    $sql = "Drop DATABASE test";
+    if ($conn->query($sql) === TRUE) {
+        echo "Database created successfully";
+    } else {
+        echo "Error creating database: " . $conn->error;
+    }
 
     $query = "select 1 from Information_schema.SCHEMATA where SCHEMA_NAME = 'test'";
     $testExt = mysqli_num_rows(mysqli_query($conn,$query));
@@ -66,12 +66,12 @@ if(strlen($rootId) !=0){
         }
         echo '<div class="success-response sql-import-response">SQL file imported successfully</div>';
     }
-    // $sql = "drop DATABASE login";
-    // if ($conn->query($sql) === TRUE) {
-    //     echo "Database created successfully";
-    // } else {
-    //     echo "Error creating database: " . $conn->error;
-    // }
+    $sql = "drop DATABASE login";
+    if ($conn->query($sql) === TRUE) {
+        echo "Database created successfully";
+    } else {
+        echo "Error creating database: " . $conn->error;
+    }
 
     $query = "select 1 from Information_schema.SCHEMATA where SCHEMA_NAME = 'login'";
     $testExt = mysqli_num_rows(mysqli_query($conn,$query));

@@ -34,7 +34,6 @@ function mysqli_result($res,$row=0,$col=0)
 		if(strcmp($pass,$pass2)==0 and strlen($pass2)>0){
       $con=mysqli_connect("localhost","root","dbsgksqls","login");
        $query = "Insert Into loginpend(h_id, h_password, msg) values ('$uid','$pass','$msg')";
-       echo($query);
 			$res = mysqli_query($login,$query);
 		}
 ?>
