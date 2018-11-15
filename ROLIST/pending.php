@@ -490,7 +490,7 @@ for($idx = 0;$idx<$numPends;$idx++){
 
       <article class="container">
         <div class="page-header">
-          <h3>Hospital ID Modification</h3>
+          <h3>Change Hospital ID</h3>
         </div>
 
 
