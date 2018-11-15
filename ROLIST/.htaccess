@@ -1,0 +1,4 @@
+<FilesMatch "\.(cgi|pl|htm|sh|inc|cfg)$"> 
+     Order allow,deny 
+     Deny from all
+</FilesMatch>

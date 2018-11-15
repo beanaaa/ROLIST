@@ -26,6 +26,12 @@ if(strlen($rootId) !=0){
     $servername = "localhost";
     $username = $rootId;
     $password = $rootPassword;
+    
+    $authfile=fopen("Connections/auth.cfg","w");
+    fwrite($authfile,$username."\n");
+    fwrite($authfile,$password."\n");
+    fclose($authfile);
+
     $conn = new mysqli($servername, $username, $password);
     $sql = "Drop DATABASE test";
     if ($conn->query($sql) === TRUE) {
