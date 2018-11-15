@@ -52,6 +52,11 @@ target delineation, plan approval등 Todolist 표시. 체크박스를 통해 RTP
  - 자세한 내용은 Wiki를 참고 해 주세요. http://ec2-54-88-165-135.compute-1.amazonaws.com/wiki/doku.php?id=wiki:welcome
  - 위키는 시간날때마다 조금씩 업데이트 할 계획입니다 :) 
 
+ ## 설치
+  - Clone/Download 받은 전체 폴더트리를 http 루트 폴더에 복사한다.
+  - 브라우저에서 install.php를 실행하고 mysql 설치 과정에서 지정한 root 아이디와 비밀번호르 입력한다.
+  - 초기 접속 아이디/비밀번호는 admin/admin이다.
+  - 접속이 문제없이 되었다면 루트폴더으 install.php를 삭제한다.
 
  ## 참고
  - HTML, MariaDB, PHP, Javascript등등을 구글링 하여 만들었습니다 :)
