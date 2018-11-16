@@ -432,6 +432,11 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 	$Finish_ = $_POST['Finish'];
 	
 	$Delay_ = $_POST['Delay'];
+	for($iddelay=0;$iddelay<count($Delay_);$iddelay++){
+		if(strlen($Delay_[$iddelay])==0){
+			$Delay_[$iddelay] = 0;
+		}
+	}
 	for($iddelay = 0; $iddelay<count($Delay_);$iddelay++){
 		if(strlen($Delay_[$iddelay])==0){
 			$Delay_[$iddelay] = '0';
@@ -637,7 +642,7 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 			
  		$UPDATESQL3 = sprintf(
  			"UPDATE TreatmentInfo SET $Q_RT_start = '$Start_[$i]', RT_start_f = '$Start_[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]', $Timeupdate $CEupdate $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', idx = '$idx_', $Q_CT = '$CT_[$i]', CT_Sim_f = '$CT_[$i]', $Q_Finish = '$Finish_[$i]', RT_fin_f = '$Finish_[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]', $Q_Delay='$Delay_[$i]', $Q_Site='$Site_[$i]', site_f = '$Site_[$i]'  WHERE Hospital_ID = '$ID_'");
-
+			echo($UPDATESQL3);
 
 
 		if (strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_[$i])!=0 or strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
@@ -672,7 +677,7 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 			}
 
 	 		$UPDATESQL3 = sprintf("UPDATE TreatmentInfo SET $Q_RT_start = '$Start_Date[$i]', RT_start_f = '$Start_Date[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]', $Timeupdate $CEupdate $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', idx = '$idx_', $Q_CT = '$Start_CT[$i]', CT_Sim_f = '$Start_CT[$i]', $Q_Finish = '$Finish_Date[$i]', RT_fin_f = '$Finish_Date[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]', $Q_Delay='$Delay_[$i]', $Q_Site='$Site_[$i]', site_f = '$Site_[$i]'  WHERE Hospital_ID = '$ID_'");
-			//  echo($UPDATESQL3."<br>" );
+			  echo($UPDATESQL3."<br>" );
 
 		if (strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_Date[$i])!=0 or strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_Date[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
 			$tm = 0;
@@ -1004,33 +1009,62 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 ?>
 
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>User Authentication</title>
-
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <!-- font awesome -->
-    <link rel="stylesheet" href="css/font-awesome.min.css" media="screen" title="no title" charset="utf-8">
-    <!-- Custom style -->
-    <link rel="stylesheet" href="css/style.css" media="screen" title="no title" charset="utf-8">
-
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-  </head>
-  <body>
-
-
-      <article class="container">
-        <div class="page-header">
-          <h3>Radiation Oncology Record</h3>
-        </div>
-
-
 
 <form id="form1" name="form1" method="POST" action="N_edit_sim.php">
+  	<table  class="type05" width="960px" border="0" cellspacing="1" cellpadding="1" align="center">
+    	<br>
+		<td valign="middle" width="810px" scope="row" colspan="2" height="60" valign="middle"> 
+			<p style="font-family: arial; font-size:24px; color: #a83845">Radiation Oncology Record</p>
+		</td>
+		<td width='40px'>
+			<right> RESERVATION </right>
+		</td>
+		<td width="35px">
+			<td>
+				<input class="form-control" style="height:25px; width:50px" type="text" name="txt_reservation" id="txt_reservation" value="<?php echo $row_patientinfo['TimeTd']; ?>"   />				
+				
+			</td>
+			
+		</td>
+		<td width="25px" scope="row">
+			<form></form>
+			<form id="formr" name="formr" method="POST" action="N_report_all.php">
+		  		<input class = "btn btn-default" type="submit" name="btn_report" id="btn_report" value="Report" />
+		  		<input type="hidden" name="permit" id = "permit" value="<?php echo $permitUser?>" />
+		  		<input type="hidden" name="hr_field" id = "hr_field" value="<?php echo $row_patientinfo['Hospital_ID']; ?>" />
+			</form>	
+			</td>
+		<td width="50px" scope="row">
+			<form id="formd" name="formd" method="POST" action="N_edit_sim_manual.php">		  	
+		      <input class = "btn btn-default" type="submit" name="btn_edit" id="btn_edit" value="Manual-edit" />
+		      <input type="hidden" name="permit" id = "permit" value="<?php echo $permitUser?>" />
+		      <input type="hidden" name="hf_edit" id = "hf_edit" value="<?php echo $row_patientinfo['Hospital_ID']; ?>" />
+	      </form>	
+			    	    	    
+		</td>
+		<td width="50px" scope="row">
+			<form id="form5" name="form5" method="POST" action="ShortDue.php">		  	
+		      <input class = "btn btn-default" type="submit" name="btn_edit" id="btn_edit" value="Due" />
+		      <input type="hidden" name="permit" id = "permit" value="<?php echo $permitUser?>" />
+			  <input name= username type=hidden id=username  value=<?php echo $uid?> />		      
+		      <input type="hidden" name="hc_field" id = "hc_field" value="<?php echo $row_patientinfo['Hospital_ID']; ?>" />
+	      </form>	
+			    	    	    
+		</td>
+
+
+
+		<td width="50px" scope="row">
+			<form id=form11 name=form11 method=post target=_blank action="N_register_all.php">
+				<th align=right ><input class = "btn btn-default" type=submit name=btn_home id=btn_home value=NEW-PATIENT />
+					<input class = "btn btn-default" name=permit type=hidden id=permit  value= <?php echo $permitUser ?>/>
+				</th>
+			</form>
+			
+		</td>
+  
+  	</table>
+  	<hr>
 	    <?php
 			if (strcmp($row_treatmentinfo['physician'],"mjnam")==0){$drSel = "JN";} 
 			if (strcmp($row_treatmentinfo['physician'],"myki")==0){$drSel = "KI";} 			
@@ -1061,32 +1095,23 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 		
  <div class="jbMenu">		
   	
-  	<table   class="table" width="80%" border="1" cellspacing="5" cellpadding="5" align="center">
-	  <thead>	  
+  	<table  class="type05" width="960px" border="1" cellspacing="5" cellpadding="5" align="center">
   		<tr>
-	  		<td rowspan=2 align="center" style="padding-left: 0px; padding-right: 0px; padding-bottom: 0px; padding-top: 0px" width="70px" cellspacing="0"  cellpadding="0" rowspan="4" align="center" >
+	  		<td align="center" style="padding-left: 0px; padding-right: 0px; padding-bottom: 0px; padding-top: 0px" width="70px" cellspacing="0"  cellpadding="0" rowspan="4" align="center" >
 		  		<img  src=<?php echo $photoPath; ?> width="70px">
 	  		</td>
 
 
-  			<td align="center">Name</td> 
-  			<td align="center">Name</td> 
-  			<td align="center">Name</td> 
-  			<td align="center">Name</td> 
-  			<td align="center">Name</td> 
-  			<td align="center">Name</td> 
-  			<td align="center">Name</td> 
-  			<td align="center">Name</td> 
-	</thead>			  
-  			<!-- <td width="120px" bgcolor="#153d73" align="center"><font color="white">Chart no.</font></td>
+  			<td height="30px" width="120px" bgcolor="#153d73" align="center"><font color="white">Name</font></td> 
+  			<td width="120px" bgcolor="#153d73" align="center"><font color="white">Chart no.</font></td>
   			<td width="140px" bgcolor="#153d73" align="center"><font color="white">RO no.</font></td>      
   			<td width="60px" bgcolor="#153d73" align="center"><font color="white">S</font></td>
   			<td width="60px" bgcolor="#153d73" align="center"><font color="white">A</font></td>  			
   			<td width="80px" bgcolor="#153d73" align="center"><font color="white">Physician</font></td>
   			<td width="220px" bgcolor="#153d73" align="center"><font color="white">Clinic (hospital)</font></td>
-  			<td width="100px" bgcolor="#153d73" align="center"><font color="white">Ref. physician</font></td> -->
+  			<td width="100px" bgcolor="#153d73" align="center"><font color="white">Ref. physician</font></td>
 		</tr>
-		<tbody>
+
 		<tr>
 			<td align="center">
 				<input class="form-control"  name="txt_name" type="text" id="txt_name"  style="width:90%;height:100%; font-size:11pt; text-align: center"  value="<?php echo $row_patientinfo['KorName']; ?>"  />        
@@ -1144,7 +1169,7 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 				<input class="form-control"  style="width:90%;height:100%; font-size:11pt; text-align: center" name="txt_doctor" type="text" id="txt_doctor" value="<?php echo $row_treatmentinfo['diagnosis']; ?>" />
 			</td>
    		</tr>
-   		</tbody>
+   		
 <!--
 	  			
 	  			
@@ -1651,6 +1676,8 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 		else{
 			$cInd = $slotIdd[$row_treatmentinfo[$sim_f]-1].": ".$slotInt[$row_treatmentinfo[$sim_f]-1];
 		}               
+		echo("ORDER");
+		echo($row_treatmentinfo[$sim_f]);
 ?>
         
 		<td >
@@ -2374,6 +2401,17 @@ $sql_idx = mysqli_query($test, "select idx from OrderTemp where Hospital_ID = '$
 
 <!--
 
+<table class="type05" width="960px" border="0" cellspacing="1" cellpadding="1" align="center">
+	<td width="20%" scope="row" colspan="2" height="60" valign="middle"> <font style="font-family: arial; font-size:18px; color:#1C73B9">Remarks</font></td>
+</table>
+
+<table class="type05" width="960px" align="center">
+	<tr>
+		<th>
+			<button type = "button" id="addComment" class = "btn btn-default">+</button>
+		</th>
+	</tr>
+</table>
 
 <?php	    
 $Today_Date = Date("n/j/y");
