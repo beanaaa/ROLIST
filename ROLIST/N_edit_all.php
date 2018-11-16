@@ -2027,38 +2027,23 @@ if(strcmp($autofillchk,'1')==0 and strcmp($row_treatmentinfo['physician'],'mhlee
 		
 		
 		
-// 		print_r($prevhist);
-/*
-		echo("<br>");
-		print_r($chemos);
-		echo("<br>");
-		print_r($$rtss);
-*/
 
 		for($idh=0;$idh<count($prevhist);$idh++){
 			
 			
 			$opstr = $prevhist[$idh];
-// 			echo($opstr."  ");
 		  	for($idw=0;$idw<strlen($opstr);$idw++){
 			  	if(strcmp(substr($opstr,$idw,2),'20')==0){
 				  	for($idsw=0;$idsw<strlen($opstr);$idsw++){
 					  	if(strcmp(substr($opstr,$idw+$idsw,1),'.')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'0')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'1')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'2')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'3')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'4')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'5')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'6')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'7')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'8')!=0 and strcmp(substr($opstr,$idw+$idsw,1),'9')!=0 and strcmp(substr($opstr,$idw+$idsw,1),' ')!=0){
-// 						  	echo($idsw);
 						  	break;
 					  	}
 				  	}
-// 				  	echo(substr($opstr,$idw,$idsw)."<br>");
 				  	$ondate = substr($opstr,$idw,$idsw);
 				  	$hist[$ondate] = $opstr;
-				  	
-				  	
 				  	break;
 			  	}
 		  	}  
-
-
-			
 		}
 
 		ksort($hist);
@@ -2068,7 +2053,6 @@ if(strcmp($autofillchk,'1')==0 and strcmp($row_treatmentinfo['physician'],'mhlee
 		}
 		
 		$cGy = ((float)$replytd)*100;
-// 		echo($cGy);
 		$fxdiv = $replyfx."회";
 	$replystr = $replystr."
 방사선치료는 총 $fxdiv $cGy cGy 조사 예정이나 환자 상태 및 치료설계로 인해 변경될 수 있습니다.
