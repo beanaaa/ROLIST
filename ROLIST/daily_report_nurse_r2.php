@@ -3518,7 +3518,7 @@ for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
     $nullDate = "1980-01-01";
     
 // 	echo($rowOrders["idx"]);
-    if ((($ss >= $s1 && $ss < $s2) or ($ss >= $s1 && $s2 < $nullDate)) and $rowOrders["idx"]>=1  ) {
+    if ((( $ss < $s2) or ( $s2 < $nullDate)) and $rowOrders["idx"]>=1  ) {
         $pid[$iddd]        = "1";
         $dateSorter[$iddd] = $s1;
     }
@@ -4089,9 +4089,10 @@ $planIdInd = 0;
 
 if ($totalRows_Recordset1!=0){
 ?>
-<tr>
+<tr class='border_bottom'>
 <td colspan=100>
-Unscheduled Simulation
+<font style="font-size:12px">Unscheduled simulation</font>
+
 <input type="submit" name="statchk" id="Plans" value = "Update" />
 		    <input type = hidden name = "permit" id = "permit" value = <?php echo $permitUser; ?> />
 			<input type = hidden name = "username" id = "username" value = <?php echo $uid; ?> />				    
