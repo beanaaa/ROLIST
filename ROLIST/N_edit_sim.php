@@ -308,11 +308,6 @@ mysqli_query($test, "set session character_set_results=latin1;");
 mysqli_query($test, "set session character_set_client=latin1;");
 
 
-// 
-// 
-// 
-// 
-
 
 // 시간 스케쥴러 계산을 위한 변수 불러오기(input 박스에서 불러오는 변수)
 $datetime = $_POST['datetime'];
@@ -320,6 +315,9 @@ $datetimeend = $_POST['hf_fin'];
 $spctime = $_POST['spctime'];
 $durtime = $_POST['durtime'];
 $ontime = $_POST['ontime'];
+
+$roid = $_POST['txt_ro_id'];
+
 
 
 
@@ -351,10 +349,6 @@ if(strcmp($ontime,"1")==0){
 			$queries = "update Timer set time1='$spctime', Duration='$durtime' where  (Hospital_ID like '$idH' and date1 like '$fDate')";
 			mysqli_query($test, $queries);
 		}
-		
-		
-		
-		
 	}
 }
 else{
@@ -393,10 +387,10 @@ if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "form1")) {
   	$h_idx = mysqli_result($h_result,0,"idx");
   	$ID_ = $_POST['H_ID'];
 
-$UPDATESQLManual = sprintf("UPDATE PatientInfo SET ManualEdit=%s WHERE Hospital_ID='$ID_'",($_POST['Manual']   ));
+	  $UPDATESQLManual = sprintf("UPDATE PatientInfo SET ManualEdit=%s WHERE Hospital_ID='$ID_'",($_POST['Manual']   ));
 
-mysqli_query($test, $UPDATESQLManual);
-
+	  mysqli_query($test, $UPDATESQLManual);
+	  
 
 $UPDATESQL = sprintf("UPDATE TreatmentInfo SET Hospital_ID=%s, Modality_var1=%s WHERE Hospital_ID='$ID_'",
                        ($_POST['txt_hospital_id']  ),
@@ -410,10 +404,12 @@ $editinfo = mysqli_query($test, $query_manualEdit ) or die(mysqli_error());
 $row_editinfo = mysqli_fetch_assoc($editinfo);
 $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$ID_'",
                        ($_POST['txt_reservation']  ));
-        $Result1 = mysqli_query($test, $UPDATESQL);
+$Result1 = mysqli_query($test, $UPDATESQL);
 
 
-// echo($UPDATESQLManual);
+// Update RO ID
+$UPDATESQLManual = sprintf("UPDATE PatientInfo SET RO_ID='%s' WHERE Hospital_ID='$ID_'",($_POST['txt_ro_id']   ));
+mysqli_query($test, $UPDATESQLManual);
 
 
 
@@ -613,6 +609,9 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 		$row_PrevCT = mysqli_fetch_assoc($PrevCT);
 
 
+		if(strlen($Order_[$i])==0){
+			$Order_[$i] = 0;
+		}
 		
 		if(($Order_[$i])>=0){
 			$Timeupdate = " $Q_CTTime = '$Order_[$i]',";
@@ -620,25 +619,11 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 		else{
 			$Timeupdate = "";
 		}
-/*
-		if(($Order_[$i])==0){
-			$Timeupdate = " $Q_CTTime = '$Order_[$i]',";
-		}
-		else{
-			$Timeupdate = "";
-		}
-*/
-		
-		
-		if(strcmp($row_PrevCT[$CTCurs],$CT_[$i])!=0){
-			$Timeupdate = " $Q_CTTime = '0',";
-		}
-		
 
+		
 
 // 		업데이트! Manual을 선택하면 자동 계산되는 파트가 무시됨
 		if(strcmp($row_editinfo[ManualEdit],"1")==0){
-// 			echo("Manual!!");
 			if(strtotime($Start_[$i])<strtotime("1/1/00")){
 				$Start_Date[$i] = "";
 			}
@@ -648,8 +633,6 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 			
  		$UPDATESQL3 = sprintf(
  			"UPDATE TreatmentInfo SET $Q_RT_start = '$Start_[$i]', RT_start_f = '$Start_[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]', $Timeupdate $CEupdate $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', idx = '$idx_', $Q_CT = '$CT_[$i]', CT_Sim_f = '$CT_[$i]', $Q_Finish = '$Finish_[$i]', RT_fin_f = '$Finish_[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]', $Q_Delay='$Delay_[$i]', $Q_Site='$Site_[$i]', site_f = '$Site_[$i]'  WHERE Hospital_ID = '$ID_'");
-
- 	
 
 		if (strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_[$i])!=0 or strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
 			
@@ -683,52 +666,13 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 			}
 
 	 		$UPDATESQL3 = sprintf("UPDATE TreatmentInfo SET $Q_RT_start = '$Start_Date[$i]', RT_start_f = '$Start_Date[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]', $Timeupdate $CEupdate $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', idx = '$idx_', $Q_CT = '$Start_CT[$i]', CT_Sim_f = '$Start_CT[$i]', $Q_Finish = '$Finish_Date[$i]', RT_fin_f = '$Finish_Date[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]', $Q_Delay='$Delay_[$i]', $Q_Site='$Site_[$i]', site_f = '$Site_[$i]'  WHERE Hospital_ID = '$ID_'");
-	 	 		
-
-		if (strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_Date[$i])!=0 or strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_Date[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
-			$tm = 0;
-			if(strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_Date[$i])!=0){ 
-				$preD = substr($row_RecordsetTelegram[$Q_RT_start],0,strlen($row_RecordsetTelegram[$Q_RT_start])-3);
-				$postD = substr($Start_Date[$i],0,strlen($Start_Date[$i])-3);
-				$marker = "시작";
-				$tm = 1;
-			}
-			if(strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_Date[$i])!=0){
-				$preD = substr($row_RecordsetTelegram[$Q_Finish],0,strlen($row_RecordsetTelegram[$Q_Finish])-3);
-				$postD = substr($Finish_Date[$i],0,strlen($Finish_Date[$i])-3);
-				$marker = "종결";
-				if($tm==1){
-					$marker = "시작/종결";
-				}				
-			}
-			
-			if(strlen($startend)<1){
-			$startend = $idx_."번".$marker."(".$preD."->".$postD.")";
-			}
-			else{
-			$startend=$startend.", ".$idx_."번".$marker."(".$preD."->".$postD.")";				
-			}
-
-		}
-		if (strcmp($row_RecordsetTelegram[$Q_CT],$Start_CT[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
-			$preD = substr($row_RecordsetTelegram[$Q_CT],0,strlen($row_RecordsetTelegram[$Q_CT])-3);
-			$postD = substr($Start_CT[$i],0,strlen($Start_CT[$i])-3);
-
-			if(strlen($simstart)<1){
-			$simstart = $idx_."번(".$preD."->".$postD.")";
-			}
-			else{
-			$simstart=$simstart.", ".$idx_."번(".$preD."->".$postD.") ";				
-			}
-			
-		}
-
  		}
 
 	
 
 		//echo $UPDATESQL3;
 		$UPDATE_Result3 = mysqli_query($test, $UPDATESQL3);
+
 		if($UPDATE_Result3 == TRUE){
 				$Q_idx = $Q_idx + 1;
 		}
@@ -754,77 +698,6 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 
 		$Dates = Date("n/j/y");    
 
-
-
-		if(strlen($statChange)>0){
-			$post_title = "$row_RecordsetTelegram[Hospital_ID]($row_RecordsetTelegram[FirstName] $row_RecordsetTelegram[SecondName] $row_RecordsetTelegram[KorName])의 상태변경 ".$statChange."($uid)";
-			$api_code = '460837379:AAEMQO7cETGDbz7sF9ACdDwWjJMhgAyEwpk';
-			if(strcmp($row_RecordsetTelegram[physician],'myki')==0){$curlPhy ="KI"; $chatId = "@rodbki";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhro";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjlee')==0){$curlPhy ="JaL";$chatId = "@rodbjal";}
-			if(strcmp($row_RecordsetTelegram[physician],'mhlee')==0){$curlPhy ="JuL";$chatId = "@pnuyhrojul";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhrojul";}
-			$telegram_text = "{$post_title}";
-			$query_array = array(
-			    'chat_id' => $chatId,
-			    'text' => $telegram_text,
-			);
-			$request_url = "https://api.telegram.org/bot{$api_code}/sendMessage?" . http_build_query($query_array);
-			$curl_opt = array(
-			    CURLOPT_RETURNTRANSFER => 1,
-			    CURLOPT_URL => $request_url,
-			);
-/*
-			$curl = curl_init($request_url);
-			echo("<font color=#FFFFFF size='1px'> ");	
-			$resCurl = curl_exec($curl);
-			echo("</font>");	
-*/
-/*
-			$logquery = "insert into Log (date1, content, author, Hospital_ID) values('$Dates', '$post_title', '$uid', '$row_RecordsetTelegram[Hospital_ID]')";
-			mysqli_query($test, $logquery);
-*/
-			
-		}
-
-
-
-		if(strlen($titleSum)>0){
-			$post_title = "$row_RecordsetTelegram[Hospital_ID]($row_RecordsetTelegram[FirstName] $row_RecordsetTelegram[SecondName] $row_RecordsetTelegram[KorName])의 ". $titleSum. "일정 추가/변경($uid)";
-
-			$api_code = '460837379:AAEMQO7cETGDbz7sF9ACdDwWjJMhgAyEwpk';
-			if(strcmp($row_RecordsetTelegram[physician],'myki')==0){$curlPhy ="KI"; $chatId = "@rodbki";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhro";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjlee')==0){$curlPhy ="JaL";$chatId = "@rodbjal";}
-			if(strcmp($row_RecordsetTelegram[physician],'mhlee')==0){$curlPhy ="JuL";$chatId = "@pnuyhrojul";}
-			if(strcmp($row_RecordsetTelegram[physician],'mjnam')==0){$curlPhy ="JN";$chatId = "@pnuyhrojul";}
-			$telegram_text = "{$post_title}";
-			$query_array = array(
-			    'chat_id' => $chatId,
-			    'text' => $telegram_text,
-			);
-			$request_url = "https://api.telegram.org/bot{$api_code}/sendMessage?" . http_build_query($query_array);
-			$curl_opt = array(
-			    CURLOPT_RETURNTRANSFER => 1,
-			    CURLOPT_URL => $request_url,
-			);
-/*
-			$curl = curl_init($request_url);
-			echo("<font color=#FFFFFF size='1px'> ");	
-			$resCurl = curl_exec($curl);
-			echo("</font>");	
-*/
-
-/*
-			$logquery = "insert into Log (date1, content, author, Hospital_ID) values('$Dates', '$post_title', '$uid', '$row_RecordsetTelegram[Hospital_ID]')";
-			
-			mysqli_query($test, $logquery);
-*/
-			
-// 		echo($logquery);
-					
-			
-		}
 		
 	
 	
@@ -909,11 +782,6 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 	 		$UPDATESQL3 = sprintf("UPDATE TreatmentInfo SET $Q_RT_start = '', $Q_dose = '', $Q_Fx = '', $Q_method = '', $Q_CT = '', $Q_Finish = '', $Q_Linac = '', $Q_Delay='', $Q_Site=''  WHERE Hospital_ID = '$ID_'");
 		$UPDATE_Result3 = mysqli_query($test, $UPDATESQL3);
 
-/*
-		echo($UPDATESQL3);
-		echo("<br>");
-*/
-
 			
 	}
 
@@ -936,7 +804,7 @@ $UPDATESQL = sprintf("UPDATE PatientInfo SET TimeTD=%s WHERE Hospital_ID like '$
 	mysqli_query($test, $deleteMeetingDate);
 	for($j = 1; $j<=$M_Plan; $j++){
 		$jj = $j-1;
-		$insertMeeting = sprintf("INSERT INTO MeetingList (Hospital_ID, Memo, Date, Time1, idxMeet) VALUES ('$ID_', '$Meet[$jj]', %s, %s, $j)", ($MeetDate[$jj]    ), ($MeetTime[$jj]    ));
+		$insertMeeting = sprintf("INSERT INTO MeetingList (Hospital_ID, Memo, Date, Time1, idxMeet) VALUES ('$ID_', '$Meet[$jj]', '%s', '%s', $j)", ($MeetDate[$jj]    ), ($MeetTime[$jj]    ));
 		//echo $insertComment;
 		$insertQuery = mysqli_query($test, $insertMeeting );
 		if($insertQuery == TRUE){
@@ -1063,7 +931,6 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 	
 	if($Timers==0){
 		$queries = "insert into Timer (Hospital_ID, date1) values ('$idH', '$fDate')";
-		echo($queries); echo("<br>");
 		mysqli_query($test, $queries);
 	}
 	$failchk++;
@@ -1196,7 +1063,7 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 			</td>
 			
 			<td align="center">
-				<input class="form-control"  style="width:90%;height:100%; font-size:11pt; text-align: center" type="text" name="txt_hospital_id" id="txt_hospital_id" value="<?php echo $row_patientinfo['Hospital_ID']; ?>"   />				
+				<input class="form-control"  disabled style="width:90%;height:100%; font-size:11pt; text-align: center" type="text" name="txt_hospital_id" id="txt_hospital_id" value="<?php echo $row_patientinfo['Hospital_ID']; ?>"   />				
 				
 			</td>
 			
@@ -1567,44 +1434,15 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 		for($idslot=0;$idslot<count($slotInt);$idslot++){
 			$timeSlot[$idslot] = "<option value=$slotIdd[$idslot]>$slotIdd[$idslot]: $slotInt[$idslot]</option>";			
 		}
-			// $timeSlot[1] = "<option value=1>1: 08:40</option>";
-			// $timeSlot[2] = "<option value=2>2: 09:20</option>";
-			// $timeSlot[3] = "<option value=3>3: 10:20</option>";
-			// $timeSlot[4] = "<option value=4>4: 11:00</option>";
-			// $timeSlot[5] = "<option value=5>5: 13:30</option>";
-			// $timeSlot[6] = "<option value=6>6: 14:20</option>";
-			// $timeSlot[7] = "<option value=7>7: 15:10</option>";
-			// $timeSlot[8] = "<option value=8>8: 16:00</option>"; 				
 		
 		for($iddds = 1;$iddds<8;$iddds++){ 
-		$Sim_ID = 			"CT_Sim".$iddds;
-// 		echo($datePick2);
-		
-		$query_Recordset1 = "SELECT * FROM TreatmentInfo where $Sim_ID like  '$datePick2'" ;	
-		$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
-		$total_Memoinfo2 = mysqli_num_rows($Recordset1);
-		$numSim = "CT_Sim". $iddds;
-		$timSim = "CT_Time". $iddds;
-// 				echo($query_Recordset1);
-// 				echo("<br>");
-				
-// 		$numSlot = [0,0,0,0,0,0,0,0];
+			$Sim_ID = 			"CT_Sim".$iddds;
 			
-/*
-		for($i=0; $i<$total_Memoinfo2; $i = $i+1){ 
-		    $IDs = mysqli_result($Recordset1, $i,"Hospital_ID");
-		    $CTdate = mysqli_result($Recordset1, $i,$numSim);
-		    $CTkor = mysqli_result($Recordset1, $i,$timSim);
-	    
-		    if($CTkor !=0){
-			    $TimeTable[$CTkor] = $IDs;
-			    $numSlot[$CTkor] = $numSlot[$CTkor]+1;
-			    $timeSlot[$CTkor] = "";
-			    
-		    }
-		}
-*/
-
+			$query_Recordset1 = "SELECT * FROM TreatmentInfo where $Sim_ID like  '$datePick2'" ;	
+			$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+			$total_Memoinfo2 = mysqli_num_rows($Recordset1);
+			$numSim = "CT_Sim". $iddds;
+			$timSim = "CT_Time". $iddds;
 		}
 		
 	?>
@@ -1612,11 +1450,6 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
 
 
 
-<table class="type05" width="960px" align="center">
-	<tr>
-	</tr>
-	
-</table>
 
 <table class="type05" id="DataTable" width="960px" border="0" cellspacing="1" cellpadding="1" align="center">
   	<tr height="30">
@@ -1770,30 +1603,17 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
         ?>
         
 		<td >
-			
 			<select class="form-control" name="CTOrder[]" >			
-			<option value=" <?php $cInd; ?>" selected="selected"><?php echo $cInd; ?></option>
-			<option value=0>Other</option>;
+			<option value=" <?php echo $row_treatmentinfo[$sim_f]; ?>" selected="selected"><?php echo $cInd; ?></option>
 <?php
 		for($idslot=0;$idslot<count($slotInt);$idslot++){
 			echo($timeSlot[$idslot]);			
 		}
 ?>
-			
-			
-<!--
-			<option value="1">1: 08:40</option>
-			<option value="2">2: 09:20</option>
-			<option value="3">3: 10:20</option>
-			<option value="4">4: 11:00</option>
-			<option value="5">5: 13:30</option>
-			<option value="6">6: 14:20</option>
-			<option value="7">7: 15:10</option>
-			<option value="8">8: 16:00</option>
--->
-			<option value="0">Other</option>
+		<option value="0">Other</option>
 		</select></td>							
-		<td ></select>			
+		<td >			
+
 		<select class="form-control" name="Ce[]" >
 			<option value=" <?php $row_treatmentinfo[$ce_f]; ?>" selected="selected"> <?php echo $row_treatmentinfo[$ce_f]; ?></option>
 			<option value="CE">CE</option>
@@ -1803,9 +1623,7 @@ while(strcmp($fDate,$eDate)!=0 and $failchk<150){
         <td><input type="text" class="form-control" id = "<?php echo $DelayID; ?>" name = "Delay[]"  value ="<?php if($row_treatmentinfo[$Delay_idx_f]){echo $row_treatmentinfo[$Delay_idx_f];}else{};?>" /> </td>
 		<td><center><input type="button" class="btn btn-basic"  value = "+" id = "<?php echo $Delay_Plus; ?>" ></center></td>
 		<td><center><input type="button" class="btn btn-basic"  value = "-" id = "<?php echo $Delay_Minus; ?>" ></center></td>
-        
 		<td><center><button type = "button"  class="btn btn-default" >-</button></center>
-			
 		</td>
 
     </tr>

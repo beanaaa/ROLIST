@@ -61,6 +61,7 @@ $permitUser = $_SESSION['MM_UserGroup'];
 
 include("idc.php");
 
+
 if($_POST['permit']!=''){
 	$permitUser = $_POST['permit'];
 }
@@ -108,6 +109,18 @@ if($_POST['permit']!=''){
 	 ?>
 
 <?php
+
+$timeIndex = ($_POST['TimeChecker']);
+$timeId = ($_POST['hidTime']);
+$timeOrder = ($_POST['currs']);
+
+for($idtimes=0;$idtimes<count($timeOrder);$idtimes++){
+	$timeQuery = "Update TreatmentInfo Set CT_TIme".$timeOrder[$idtimes]."=".$timeIndex[$idtimes]." where Hospital_ID like '".$timeId[$idtimes]."'";
+	mysqli_query($test, $timeQuery);
+}
+
+
+
 
 if (!isset($_SESSION)) {
 	session_start();
@@ -3451,11 +3464,20 @@ $sortCat5 = 'CT_Sim5';
 $sortCat6 = 'CT_Sim6';
 $sortCat7 = 'CT_Sim7';
 
+for($idslot=0;$idslot<count($slotIdd); $idslot++){ 
 
-
+// print_r($slotIdd);
 $query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD 
-((STR_TO_DATE(TreatmentInfo. $sortCat1, '%m/%d/%Y') BETWEEN '$a_week_ago' AND '$a_week_after') or (STR_TO_DATE(TreatmentInfo.$sortCat2, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') or 								
-(STR_TO_DATE(TreatmentInfo.$sortCat3, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') or (STR_TO_DATE(TreatmentInfo.$sortCat4, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') or 											(STR_TO_DATE(TreatmentInfo.$sortCat5, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') or (STR_TO_DATE(TreatmentInfo.$sortCat6, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') or 											(STR_TO_DATE(TreatmentInfo.$sortCat7, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') ) AND (PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND (PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
+(((STR_TO_DATE(TreatmentInfo. $sortCat1, '%m/%d/%Y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time1 like $slotIdd[$idslot]) or 
+((STR_TO_DATE(TreatmentInfo.$sortCat2, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time2 like $slotIdd[$idslot]) or 								
+((STR_TO_DATE(TreatmentInfo.$sortCat3, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time3 like $slotIdd[$idslot]) or 
+((STR_TO_DATE(TreatmentInfo.$sortCat4, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time4 like $slotIdd[$idslot]) or 											
+((STR_TO_DATE(TreatmentInfo.$sortCat5, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time5 like $slotIdd[$idslot]) or 
+((STR_TO_DATE(TreatmentInfo.$sortCat6, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time6 like $slotIdd[$idslot]) or 											
+((STR_TO_DATE(TreatmentInfo.$sortCat7, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after')  AND CT_Time7 like $slotIdd[$idslot])) AND 
+(PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND 
+(PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND 
+(PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
 
 // echo($query_Recordset1);
 
@@ -3549,7 +3571,540 @@ $idcolor   = 0;
 $count     = 0;
 $planIdInd = 0;
 // print_r($row_Recordset1);
+if ($totalRows_Recordset1==0){
+	echo "<tr class='border_bottom'>";
+	echo "<td align=center bgcolor=#EEEEEE>";
+	echo($slotInt[$idslot]);
+	echo "</td>";	
+	echo "<td  bgcolor=#EEEEEE colspan=100>";
+	echo "</td>";	
+
+	echo "</tr>";
+}
+
 if ($totalRows_Recordset1!=0){
+do {	
+
+    $idx        = $row_Recordset1['idx']; //진료 횟수
+    $RT_Start_f = "RT_start" . "$idx";
+    $RT_Fin_f   = "RT_fin" . "$idx";
+    $CT_Start_f = "CT_Sim" . "$idx";
+    $Dose_f     = "dose" . "$idx";
+    $Fx_f       = "Fx" . "$idx";
+    $Field_f    = "Field" . "$idx";
+    $Method_f   = "RT_method" . "$idx";
+    $Site_f     = "Site" . "$idx";
+	$Linac_f    = "Linac" . "$idx";
+	
+    $planIdInd++;
+    
+    $RT_Start_date = $row_Recordset1[$RT_Start_f];
+    date_default_timezone_set("GMT+9");
+    $Today_date = date("Y-m-d");
+    
+    // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
+    $Today_date1 = date("Y-m-d", strtotime($RT_Start_date));
+    
+    //strotime 함수
+    $todayIndicator = date("n/j/y", strtotime(date("y-n-j") . " -30 days"));    
+    $RT_Start_sub = (strtotime($Today_date) - strtotime($Today_date1)) / 86400;
+    
+    $today = date("Y-m-d");
+    $today = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d"), date("Y")));
+    $today = date("n/j/y", time(0));
+    $totalDose = $row_Recordset1['dose1'] + $row_Recordset1['dose2'] + $row_Recordset1['dose3'] + $row_Recordset1['dose4'] + $row_Recordset1['dose5'];
+    $totalFx   = $row_Recordset1['Fx1'] + $row_Recordset1['Fx2'] + $row_Recordset1['Fx3'] + $row_Recordset1['Fx4'] + $row_Recordset1['Fx5'];
+    $count         = $count + 1;
+    $tCount        = $count - 1;
+    $RT_start_curr = "RT_start" . "$pid[$tCount]";
+    $CT_sim_curr = "CT_Sim" . "$pid[$tCount]";
+    $RT_fin_curr   = "RT_fin" . "$pid[$tCount]";
+    $dose_curr     = "dose" . "$pid[$tCount]";
+    $fx_curr       = "Fx" . "$pid[$tCount]";
+    $nextInd 	 = $pid[$tCount]+1;
+	$CT_sim_next   = "CT_Sim" . "$nextInd";
+	$times = "CT_Time" . "$pid[$tCount]";
+	
+            
+    echo "<tr class='border_bottom'>";
+
+    if ($totalDays % 2 == 0) {
+        $bgcolorF = "#FFFFFF";
+    } else {
+        $bgcolorF = "#DDDDDD";
+    }
+
+// 	if($pid[$tCount]<=$idx){
+	if($pid[$tCount]<=9){
+    $idcolor++;
+    $totalDays++;
+	
+    $startColor = "#424747"; /* cool-gray 70 (ibm design colors) */
+    $startVal = "";
+    $startValR = "";	        	        
+
+	if (strtotime($row_Recordset1[$RT_start_curr]) == strtotime($workingyest)) {
+		$startColor = "#3c6df0"; /* ultramarine 50 (ibm design colors) */
+		$startVal = "<strong>";
+		$startValR = "</strong>";	        
+
+	}
+	if (strtotime($row_Recordset1[$RT_start_curr]) == strtotime($workingtom)) {
+		$startColor = "#00884b"; /* green 70 (ibm design colors) */
+		$startVal = "<strong>";
+		$startValR = "</strong>";	        
+
+	}
+	if (strtotime($row_Recordset1[$RT_start_curr]) == strtotime($today)) {
+		$startColor = "#e62325"; /* red 70 (ibm design colors) */
+		$startVal = "<strong>";
+		$startValR = "</strong>";	        
+	}
+	
+	
+/*
+	echo(strtotime($workingyest));
+	echo("<br>");
+	echo(strtotime($row_Recordset1[$RT_start_curr]));
+	echo("<br><br>");
+*/
+
+	
+	
+    $simColor = "#424747"; /* cool-gray 70 (ibm design colors) */
+    $simVal = "";
+    $simValR = "";	        	        
+
+	if (strtotime($row_Recordset1[$CT_sim_curr]) == strtotime($workingyest)) {
+		$simColor = "#3c6df0"; /* ultramarine 50 (ibm design colors) */
+		$simVal = "<strong>";
+		$simValR = "</strong>";	        
+
+	}
+	if (strtotime($row_Recordset1[$CT_sim_curr]) == strtotime($workingtom)) {
+		$simColor = "#00884b"; /* green 50 (ibm design colors) */
+		$simVal = "<strong>";
+		$simValR = "</strong>";	        
+
+	}
+	if (strtotime($row_Recordset1[$CT_sim_curr]) == strtotime($today)) {
+		$simColor = "#e62325"; /* red 50 (ibm design colors) */
+		$simVal = "<strong>";
+		$simValR = "</strong>";	        
+	}
+    
+    
+    $yoil = array("일","월","화","수","목","금","토");
+    
+
+    $lenDate = strlen($row_Recordset1[$RT_start_curr]);
+    $cropDate = substr($row_Recordset1[$RT_start_curr],0,$lenDate-3);
+    
+    $lenDate = strlen($row_Recordset1[$CT_sim_curr]);   
+    $cropDateCT = substr($row_Recordset1[$CT_sim_curr],0,$lenDate-3);
+    
+	$lenDate = strlen($row_Recordset1[$RT_start_curr]);
+	
+	
+    $ss2        = date('Y-m-d', strtotime($row_Recordset1["RT_fin_f"] . '-' . '7' . ' days'));
+
+    if ($ss2 < $ss) {
+	        $bgcolorF = "#FFFFFF"; /* LightSteelBlue (web colors) */
+	}
+	else{
+			$bgcolorF = "#FFFFFF";
+	}
+
+	
+	if(file_exists("PatientPhoto/". $row_Recordset1['RO_ID'].".jpg")==1){
+		$photoPath = "PatientPhoto/". $row_Recordset1['RO_ID'].".jpg";
+	}
+	elseif(strcmp($row_Recordset1['Sex'],"M")==0 and file_exists("PatientPhoto/". $row_Recordset1['RO_ID'].".jpg")!=1){
+						$photoPath = "/PatientPhoto/m.jpg";
+
+	}
+	elseif(strcmp($row_Recordset1['Sex'],"F")==0 and file_exists("PatientPhoto/". $row_Recordset1['RO_ID'].".jpg")!=1){
+						$photoPath = "/PatientPhoto/f.jpg";
+
+	}
+	else{
+		$photoPath = "/PatientPhoto/icon.png";
+
+	}
+	
+
+	$timess = $row_Recordset1[$times];
+	$fTime = $slotInt[intval($timess)-1];
+	$bgcolorTime = $bgcolorF;
+	if($totalRows_Recordset1>1){ 
+		$bgcolorTime = "red";
+	}
+	// echo "<td bgcolor=$bgcolorF cellspacing='0' align=center><div class='scale'> <img class='photo3' src='$photoPath?v1605070516'></div></td>";	
+	echo "<td bgcolor=$bgcolorTime cellspacing='0' align=center>$fTime</td>";	
+
+
+
+	echo "<td bgcolor=$bgcolorF width = '60px'>  <strong><font>$row_Recordset1[Hospital_ID]</font></strong>  </td>";         /* #CC6699 (web safe colors) */
+	$bgcolorF = "#FFFFFF";
+
+//  CCRT or not
+    if (strlen(trim($row_Recordset1[Modality_var1])) == 0){
+        echo "<td width = '15px' color=white bgcolor=$bgcolorF align='center'>  </td>";
+        }
+    else{
+	    $combined = substr(trim($row_Recordset1[Modality_var1]), 0, 1); 
+		echo "<td width = '15px' bgcolor=#f45942 align='center'> C </td>";
+	}
+
+
+
+	if(strcmp($row_Recordset1[InP], "외래")==0){
+			$fontColorInp = "#3151b7"; /* ultramarine 60 (ibm design colors) */
+		}
+		else{
+			$fontColorInp = "#aa231f"; /* red 80 (ibm design colors) */
+		}
+    echo "<td bgcolor=$bgcolorF width = '40px' align='left'>  <strong><font color=$fontColorF>$row_Recordset1[KorName]</font><br><font color=$fontColorInp>$row_Recordset1[InP]</font></strong></td>"; 
+        
+
+    echo "<form id=form111 name=form111></form>";
+    echo "<td bgcolor=$bgcolorF><form id=form3 name=form3 method=post target=_blank action=N_edit_sim.php>";                        
+    echo "<a href=edit.php>";            
+    echo "<input type=submit name=btn_edit id=btn_edit value=$row_Recordset1[Sex]/$row_Recordset1[Age]>";
+    echo "<input name=permit type=hidden id=permit  value=$permitUser/>";   
+      echo "<input name=username type=hidden id=username  value=$uid/>";      
+             
+    echo "<input name=hf_edit type=hidden id=hf_edit value= $row_Recordset1[Hospital_ID] /></a></form></td>";      
+
+    echo " <td bgcolor=$bgcolorF  width = '80px'>   <strong>$row_Recordset1[subsite]</strong> </td> ";  
+    $cropTnm = substr($row_Recordset1[tnm],0,100); 
+    echo " <td bgcolor=$bgcolorF width = '70px'>    $cropTnm<br>$row_Recordset1[purpose]</td> ";
+
+	
+	
+// 	Prescription 
+	$cropN = 8;
+	echo "<td bgcolor=$bgcolorF width='180' align='left'><div class='memo'>";
+	echo "<font  face=arial></font><font color=blue face=arial><strong>$row_Recordset1[dose_sum]($row_Recordset1[Fx_sum])</strong>&nbsp;</font>";
+    for($planIdx=1;$planIdx<$idx+1;$planIdx++){		    
+		$SiteX       = "Site" . "$planIdx";
+		$SiteX=(substr($row_Recordset1[$SiteX],0,$cropN));
+		if(strlen($SiteX)==0){
+			$SiteX = "N/A";
+		}
+		$doseX     = "dose" . "$planIdx";
+		$fxX       = "Fx" . "$planIdx";
+				
+		if($planIdx==$pid[$tCount]){
+			echo "<font color=gray face=arial>&nbsp$planIdx.$SiteX:</font><font color=red face=arial>$row_Recordset1[$doseX]($row_Recordset1[$fxX])</font>";
+		}
+		else{
+			echo "<font color=gray face=arial>&nbsp$planIdx.$SiteX:$row_Recordset1[$doseX]($row_Recordset1[$fxX])</font>";	
+		}
+		if($planIdx%2==0){
+			echo("<br>");
+		}
+    }
+    echo "</div></td>";
+    
+	if($workDay==1){
+		$BColor = "#FFFF33"; /* #FFFF33 (web safe colors) */
+	}
+	elseif($workDay==2){
+		$BColor = "#FFFF66"; /* #FFFF66 (web safe colors) */
+	}
+	elseif($workDay==3){
+		$BColor = "#FFFF99"; /* #FFFF99 (web safe colors) */
+	}
+	elseif($workDay==4){
+		$BColor = "#FFFFCC"; /* #FFFFCC (web safe colors) */
+	}
+	elseif($workDay==5){
+		$BColor = "#FFFFEE"; /* White (web safe colors) */
+	}
+	else{
+		$BColor = $bgcolorF;
+	}
+	
+	$weekyoil = $yoil[date('w', strtotime($row_Recordset1[$CT_sim_curr]))];
+	if(strlen($row_Recordset1[$CT_sim_curr])<5){
+		$weekyoil = " ";
+	}
+	echo "<td rowspan = 1 width = '20px' align='left' bgcolor=$bgcolorF><font color = $simColor> $simVal $cropDateCT<br>$weekyoil</font>$simValR</td>";
+
+// 	if($idcolor==1){
+		$weekyoil = $yoil[date('w', strtotime($row_Recordset1[$RT_start_curr]))];
+	echo "<td rowspan = 1 width = '20px' align='left' bgcolor=$bgcolorF><font color = $startColor> $startVal $cropDate<br>$weekyoil</font>$startValR</td>";	
+
+    $lenDate = strlen($row_Recordset1[RT_fin_f]);   
+    $cropDateFin = substr($row_Recordset1[RT_fin_f],0,$lenDate-3);
+	$weekyoil = $yoil[date('w', strtotime($row_Recordset1[RT_fin_f]))];
+    echo "<td rowspan = 1 width = '20px' align='left' bgcolor=$bgcolorF>$cropDateFin<br>$weekyoil</td>";
+/*
+    }
+    else{
+	        echo "<td rowspan = 1 width = '20px' align='center' rowspan = $totalRows_Recordset1 bgcolor=$BColor>  </td>";
+
+    }
+*/
+    
+ $RT_method_curr = "RT_method" . "$pid[$tCount]";
+	$tcn = substr(trim($row_Recordset1[$RT_method_curr]),0,2);
+	$phyMark = "<td bgcolor=$bgcolorF align='center'>$tcn</td>";
+
+	for($idphyss=0;$idphyss<$numtech;$idphyss++){
+
+		if (strcasecmp(trim($row_Recordset1[$RT_method_curr]),$techIdd[$idphyss])==0){
+			$phyMark = "<td bgcolor=$techCol[$idphyss] width = '15' align='center'>$techInt[$idphyss] </td>";
+		} 	 /* #33FF00 (web safe colors) */
+
+	}
+	echo($phyMark) ;
+
+
+    $txtLinac = "<td bgcolor=$bgcolorF align=center>   $row_Recordset1[$Linac_f] </td>";
+    for($idlinac=0; $idlinac<$numrooms;$idlinac++){
+		if (strcasecmp(substr(trim($row_Recordset1[$Linac_f]),0,2),substr(trim($rmsInt[$idlinac]),0,2))==0){     	
+			$txtLinac = "<td bgcolor=$rmsCol[$idlinac] align=center width = '15'>   $rmsIdd[$idlinac] </td>";
+		}
+    }
+   	echo "$txtLinac";
+
+
+// Physician
+	$phyMark = "<td bgcolor=$bgcolorF  align='center'>   $row_Recordset1[physician] </td>";
+	for($idphyss=0;$idphyss<$numphyss;$idphyss++){
+
+		if (strcasecmp(trim($row_Recordset1[physician]),$phyIdd[$idphyss])==0){
+			$phyMark = "<td bgcolor=$phyCol[$idphyss] width = '15' align='center'>   $phyInt[$idphyss] </td>";
+		} 	 /* #33FF00 (web safe colors) */
+
+	}
+	echo($phyMark) ;
+
+
+
+		$sql_Memo = mysqli_query($test, "select Memo1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$sql_Date = mysqli_query($test, "select Date1 from OrderTemp where Hospital_ID = $row_Recordset1[Hospital_ID]");
+		$row_Memoinfo = mysqli_num_rows($sql_Date);
+?>
+
+  <td  align="left" bgcolor= <?php echo $bgcolorF ?>>
+ <?php 
+			$Memo = mysqli_result($sql_Memo, $row_Memoinfo-1,"Memo1");
+			$Date = mysqli_result($sql_Date, $row_Memoinfo-1,"Date1");
+	if($row_Memoinfo>0){ 
+?>
+
+    <div class="memo"><?php echo $Memo ?></div>
+
+<?php
+	}
+
+//  Report edit button generation
+    echo "<form id=form111 name=form111></form>";
+    if ($permitUser == 1 || $permitUser == 1) {
+        
+	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
+      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
+      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
+      echo "<input name=username type=hidden id=username  value=$uid/>";      
+      
+	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
+              
+    }
+    if ($permitUser == 2) {
+        
+	  echo  "<td bgcolor=$bgcolorF><form id=form5 name=form5 method=post target=_blank  action=shortorder.php >";
+      echo "<input type=submit name=btn_comment id=btn_comment value=C />";
+      echo "<input name=permit type=hidden id=permit  value=$permitUser/>";
+      echo "<input name=username type=hidden id=username  value=$uid/>";      
+      
+	  echo "<input name=hc_field type=hidden id=hc_field value= $row_Recordset1[Hospital_ID] /></form></td>";
+        
+    }
+?>
+
+
+</td>
+</tr>
+
+	
+<?php
+}
+} while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
+
+
+  unset($row_Recordset1);
+}
+}
+}
+
+?>
+
+
+
+
+
+
+
+
+
+
+
+<?php
+
+
+$workDay = 0;
+$totalDays = 0;
+for($idDays = 0;$idDays<1;$idDays++){ 
+	
+	
+	
+$seven          = $idDays + $week_post;
+$a_week_ago_todo     = date('Y-m-d', strtotime($date . "+" . $seven . 'days'));
+$a_week_after_todo     = date('Y-m-d', strtotime($date . "+" . $seven . 'days'));
+// echo($a_week_ago_todo);
+$weekDays= strftime("%w", strtotime($a_week_ago_todo));
+if($weekDays!=6 and $weekDays!=0){
+	$workDay = $workDay+1;
+	
+}
+// echo($weekDays);
+$catchar  = '';
+$sortCat1 = 'CT_Sim1';
+$sortCat2 = 'CT_Sim2';
+$sortCat3 = 'CT_Sim3';
+$sortCat4 = 'CT_Sim4';
+$sortCat5 = 'CT_Sim5';
+$sortCat6 = 'CT_Sim6';
+$sortCat7 = 'CT_Sim7';
+
+for($idslot=0;$idslot<1; $idslot++){ 
+
+// print_r($slotIdd);
+$query_Recordset1 = "SELECT * FROM PatientInfo join TreatmentInfo on PatientInfo.Hospital_ID = TreatmentInfo.Hospital_ID where $queryMD 
+(((STR_TO_DATE(TreatmentInfo. $sortCat1, '%m/%d/%Y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time1 like 0) or 
+((STR_TO_DATE(TreatmentInfo.$sortCat2, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time2 like 0) or 								
+((STR_TO_DATE(TreatmentInfo.$sortCat3, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time3 like 0) or 
+((STR_TO_DATE(TreatmentInfo.$sortCat4, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time4 like 0) or 											
+((STR_TO_DATE(TreatmentInfo.$sortCat5, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time5 like 0) or 
+((STR_TO_DATE(TreatmentInfo.$sortCat6, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after') AND CT_Time6 like 0) or 											
+((STR_TO_DATE(TreatmentInfo.$sortCat7, '%m/%d/%y') BETWEEN '$a_week_ago' AND '$a_week_after')  AND CT_Time7 like 0)) AND 
+(PatientInfo.CurrentStatus !=2 OR PatientInfo.CurrentStatus is NULL) AND 
+(PatientInfo.CurrentStatus !=4 OR PatientInfo.CurrentStatus is NULL) AND 
+(PatientInfo.CurrentStatus !=3 OR PatientInfo.CurrentStatus is NULL)";
+
+// echo($query_Recordset1);
+
+
+if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
+    $order = 'DESC';
+}
+
+
+$query_Recordset1 .= " ORDER BY TreatmentInfo.RT_start1 " . $order;
+
+$Recordset1 = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+
+
+
+$row_Recordset1       = mysqli_fetch_assoc($Recordset1);
+$totalRows_Recordset1 = mysqli_num_rows($Recordset1);
+
+// print_r($row_Recordset1);
+/*
+print_r($query_Recordset1);
+echo("<br>");
+*/
+// print_r(($totalRows_Recordset1));
+$rsetTemp = mysqli_query($test, $query_Recordset1 ) or die(mysqli_error());
+
+for ($iddd = 0; $iddd <= $totalRows_Recordset1 - 1; $iddd = $iddd + 1) {
+    $rowOrders = mysqli_fetch_assoc($rsetTemp);
+//     $idss = 
+    $s1        = date("Y-m-d", strtotime($rowOrders["RT_start1"]));
+    $s2        = date("Y-m-d", strtotime($rowOrders["RT_start2"]));
+    $s3        = date("Y-m-d", strtotime($rowOrders["RT_start3"]));
+    $s4        = date("Y-m-d", strtotime($rowOrders["RT_start4"]));
+    $s5        = date("Y-m-d", strtotime($rowOrders["RT_start5"]));
+    $s6        = date("Y-m-d", strtotime($rowOrders["RT_start6"]));
+    $s7        = date("Y-m-d", strtotime($rowOrders["RT_start7"]));
+    $ss        = date('Y-m-d', strtotime($today_date . '+' . '0' . ' days'));
+    $nullDate = "1980-01-01";
+    
+// 	echo($rowOrders["idx"]);
+    if ((($ss < $s2) or ($s2 < $nullDate)) and $rowOrders["idx"]>=1  ) {
+        $pid[$iddd]        = "1";
+        $dateSorter[$iddd] = $s1;
+    }
+    elseif ((($ss >= $s2 && $ss < $s3) or ($ss >= $s2 && $s3 < $nullDate)) and $rowOrders["idx"]>=2) {
+        $pid[$iddd]        = "2";
+        $dateSorter[$iddd] = $s2;
+    }
+    elseif ((($ss >= $s3 && $ss < $s4) or ($ss >= $s3 && $s4 < $nullDate)) and $rowOrders["idx"]>=3) {
+        $pid[$iddd]        = "3";
+        $dateSorter[$iddd] = $s3;
+    }
+    elseif ((($ss >= $s4 && $ss < $s5) or ($ss >= $s4 && $s5 < $nullDate)) and $rowOrders["idx"]>=4) {
+        $pid[$iddd]        = "4";
+        $dateSorter[$iddd] = $s4;
+    }
+    elseif ((($ss >= $s5 && $ss < $s6) or ($ss >= $s5 && $s6 < $nullDate)) and $rowOrders["idx"]>=5) {
+        $pid[$iddd]        = "5";
+        $dateSorter[$iddd] = $s5;
+    }
+    elseif ((($ss >= $s6 && $ss < $s7) or ($ss >= $s6 && $s7 < $nullDate)) and $rowOrders["idx"]>=6) {
+        $pid[$iddd]        = "6";
+        $dateSorter[$iddd] = $s6;
+    }
+    elseif ((($ss >= $s7) && $s7>$nullDate) and $rowOrders["idx"]>=7) {
+        $pid[$iddd]        = "7";
+        $dateSorter[$iddd] = $s7;
+    }
+//     echo($pid[$iddd]);
+//  	$sqlQuery = mysqli_query($test, "update TreatmentInfo set RT_start_cur = $dateSorter[$iddd] where Hospital_ID = $rowOrders[Hospital_ID]");		
+
+    
+}
+
+$Today_date     = date("n/j/y"); // n : 월 1~12 로 표시, j : 일 1~31 로 표시, y : 년도를 2자리로 표시
+$Today_date1    = date("Y/m/d", strtotime($Today_date));
+
+
+$StatT = $_POST['StatT'];
+
+
+?>
+
+
+
+<?php
+
+$today = date("n/j/y", time(0));
+
+$idcolor   = 0;
+$count     = 0;
+$planIdInd = 0;
+
+if ($totalRows_Recordset1!=0){
+?>
+<tr>
+<td colspan=100>
+Unscheduled Simulation
+<input type="submit" name="statchk" id="Plans" value = "Update" />
+		    <input type = hidden name = "permit" id = "permit" value = <?php echo $permitUser; ?> />
+			<input type = hidden name = "username" id = "username" value = <?php echo $uid; ?> />				    
+			<input type = hidden name = "weekago"	id ="weekago" value = <?php echo $week_post; ?> />	 
+			<input type = hidden name = "mdname"	id ="mdname" value = "<?php echo $md; ?>" />	
+			<input type = hidden name = "mdname2"	id ="mdname2" value = "<?php echo $md2; ?>" />	
+			<input type = hidden name = "sitename"	id ="sitename" value = "<?php echo $siteInput; ?>" />				
+
+
+</td>
+</tr>
+
+<?php
 do {	
 
     $idx        = $row_Recordset1['idx']; //진료 횟수
@@ -3696,7 +4251,26 @@ do {
 
 	}
 	
-	echo "<td bgcolor=$bgcolorF cellspacing='0' align=center><div class='scale'> <img class='photo3' src='$photoPath?v1605070516'></div></td>";	
+	?>
+	<td >
+	<select class="form-control" name="TimeChecker[]" >			
+	<option value="0" selected="selected"><?php echo "N/A"; ?></option>
+<?php
+for($idslot=0;$idslot<count($slotInt);$idslot++){
+	echo("<option value='$slotIdd[$idslot]'>$slotIdd[$idslot]</option>");			
+}
+?>
+<!-- <option value="0">Other</option> -->
+</select></td>							
+<?php
+    echo "<input name=hidTime[] type=hidden id=hf_edit value= $row_Recordset1[Hospital_ID] >"; 
+    echo "<input name=currs[] type=hidden id=hf_edit value= $pid[$tCount] >"; 
+
+?>
+</form>
+<?php
+
+	// echo "<td bgcolor=$bgcolorF cellspacing='0' align=center><div class='scale'> <img class='photo3' src='$photoPath?v1605070516'></div></td>";	
     echo "<td bgcolor=$bgcolorF width = '60px'>  <strong><font>$row_Recordset1[Hospital_ID]</font></strong>  </td>";         /* #CC6699 (web safe colors) */
 	$bgcolorF = "#FFFFFF";
 
@@ -3888,7 +4462,7 @@ do {
 </td>
 </tr>
 
-
+	
 <?php
 }
 } while ($row_Recordset1 = mysqli_fetch_assoc($Recordset1));
@@ -3897,8 +4471,21 @@ do {
   unset($row_Recordset1);
 }
 }
-
+}
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

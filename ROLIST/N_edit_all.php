@@ -824,8 +824,20 @@ if ((isset($_POST["MM_update"])) && (($_POST["MM_update"] == "form1") or ($_POST
 
   $manuals = $_POST['Manual'];
 
+  //   Method나 Linac이 비어 있다면 이전 엔트리를 복사한다.
   $Method_ = $_POST['Method'];
+  for($idmtd=1;$idmtd<count($Method_);$idmtd++){
+	  if(strlen(trim($Method_[$idmtd]))==0){
+		$Method_[$idmtd] = $Method_[$idmtd-1];
+	  }
+  }
   $Linac_ = $_POST['Linac'];
+  for($idmtd=1;$idmtd<count($Linac_);$idmtd++){
+	if(strlen(trim($Linac_[$idmtd]))==0){
+		$Linac_[$idmtd] = $Linac_[$idmtd-1];
+	}
+}
+
   $Site_ = $_POST['Site'];
 
   $Dose_ = $_POST['Dose'];
@@ -975,29 +987,26 @@ if ((isset($_POST["MM_update"])) && (($_POST["MM_update"] == "form1") or ($_POST
     $Result41 = mysqli_query($test, $UPDATESQL21);   
     
 	$UPDATESQL22 = sprintf("UPDATE ClinicalInfo SET  chemo='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryChemo'] ));
-
-	
     $Result42 = mysqli_query($test, $UPDATESQL22);    
+
 	$UPDATESQL23 = sprintf("UPDATE ClinicalInfo SET   Radio='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryRadio'] ));
     $Result43 = mysqli_query($test, $UPDATESQL23);    
     
-	$UPDATESQL24 = sprintf("UPDATE ClinicalInfo SET   Pathol='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryPathol']));
-	
+	$UPDATESQL24 = sprintf("UPDATE ClinicalInfo SET   Pathol='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryPathol']));	
     $Result44 = mysqli_query($test, $UPDATESQL24);
+	
 	$UPDATESQL25 = sprintf("UPDATE ClinicalInfo SET   Op='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryOp'] ));
     $Result45 = mysqli_query($test, $UPDATESQL25);    
+	
 	$UPDATESQL26 = sprintf("UPDATE ClinicalInfo SET   RadioHistory='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryRadioHistory'] ));
     $Result46 = mysqli_query($test, $UPDATESQL26);
+	
 	$UPDATESQL26 = sprintf("UPDATE ClinicalInfo SET   ConsultTemplate='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryConsult'] ));
     $Result46 = mysqli_query($test, $UPDATESQL26);
+	
 	$UPDATESQL27 = sprintf("UPDATE ClinicalInfo SET   ConsultReply='%s' WHERE Hospital_ID='$ID_'", ($_POST['txt_ClinicalHistoryReply'] ));
     $Result46 = mysqli_query($test, $UPDATESQL27);
 				  
-/*
-            mysqli_query($test, "set session character_set_client=utf8");
-          mysqli_query($test, "set session character_set_connection=utf8");  
-          mysqli_query($test, "set session character_set_results=utf8"); 
-*/
 
 
 mysqli_query($test, "set session character_set_connection=latin1;");
@@ -1091,7 +1100,6 @@ mysqli_query($test, "set session character_set_client=latin1;");
 		$pName = "P".$tCounter;
 		$aName = "A".$tCounter;				
 		$UPDATESQL = "UPDATE TreatmentInfo SET  $tName='$TsI', $pName='$PsI', $aName='$AsI' WHERE Hospital_ID like '$ID_'";
-// 		echo($UPDATESQL."<br>");
 		$Result1 = mysqli_query($test, $UPDATESQL);
 
 
@@ -1127,7 +1135,10 @@ mysqli_query($test, "set session character_set_client=latin1;");
    		$c=1;
    		while($c<$Total_Delay){   
 	    	$Start_Date_ = date('n/j/y',strtotime($Start_Date_."+1 day"));			
-	    	$val = array_search($Start_Date_, $holiday);
+			$val = array_search($Start_Date_, $holiday);
+			// echo("<br>");
+			// echo($val);
+			// echo("<br>");
 			$yoil = date('w', strtotime($Start_Date_));	    
 			if($val != TRUE && $yoil != '6' && $yoil !='0'){$c++;}
 		}
@@ -1220,17 +1231,13 @@ mysqli_query($test, "set session character_set_client=latin1;");
  		$UPDATESQL3 = sprintf(
  			"UPDATE TreatmentInfo SET $Q_RT_start = '$Start_[$i]', RT_start_f = '$Start_[$i]', $Q_dose = '$Dose_[$i]', $Q_Fx = '$Fx_[$i]',  $CEupdate $Q_method = '$Method_[$i]', RT_method_f = '$Method_[$i]', idx = '$idx_', $Q_CT = '$CT_[$i]', CT_Sim_f = '$CT_[$i]', $Q_Finish = '$Finish_[$i]', RT_fin_f = '$Finish_[$i]', $Q_Linac = '$Linac_[$i]', Linac_f = '$Linac_[$i]',  $Q_Site='$Site_[$i]', site_f = '$Site_[$i]'  WHERE Hospital_ID = '$ID_'");
 
- 		
-
-		if (strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_[$i])!=0 or strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
-			
+		if (strcmp($row_RecordsetTelegram[$Q_RT_start], $Start_[$i])!=0 or strcmp($row_RecordsetTelegram[$Q_Finish],$Finish_[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){			
 			if(strlen($startend)<1){
 			$startend = $idx_;
 			}
 			else{
 			$startend=$startend.",".$idx_;				
-			}
-			
+			}			
 		}
 		if (strcmp($row_RecordsetTelegram[$Q_CT],$CT_[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
 			if(strlen($simstart)<1){
@@ -1238,8 +1245,7 @@ mysqli_query($test, "set session character_set_client=latin1;");
 			}
 			else{
 			$simstart=$simstart.",".$idx_;				
-			}
-			
+			}			
 		}
 
 
@@ -1272,26 +1278,10 @@ mysqli_query($test, "set session character_set_client=latin1;");
 					$marker = "시작/종결";
 				}				
 			}
-			
-			if(strlen($startend)<1){
-			$startend = $idx_."번".$marker."(".$preD."->".$postD.")";
-			}
-			else{
-			$startend=$startend.", ".$idx_."번".$marker."(".$preD."->".$postD.")";				
-			}
-
 		}
 		if (strcmp($row_RecordsetTelegram[$Q_CT],$Start_CT[$i])!=0 or $row_RecordsetTelegram[idx]<$idx_){
 			$preD = substr($row_RecordsetTelegram[$Q_CT],0,strlen($row_RecordsetTelegram[$Q_CT])-3);
-			$postD = substr($Start_CT[$i],0,strlen($Start_CT[$i])-3);
-
-			if(strlen($simstart)<1){
-			$simstart = $idx_."번(".$preD."->".$postD.")";
-			}
-			else{
-			$simstart=$simstart.", ".$idx_."번(".$preD."->".$postD.") ";				
-			}
-			
+			$postD = substr($Start_CT[$i],0,strlen($Start_CT[$i])-3);			
 		}
 
  		}

@@ -59,6 +59,33 @@ include("idc.php");
 $preId = $_POST['previd'];
 $postId = $_POST['postid'];
 
+$delid = $_POST['delid'];
+
+if(strlen(($delid))>0){
+	?>
+
+	<script> 
+		var con_test = confirm("Really delete patient  <?php echo($delid)."?" ?>"); 
+		if(con_test == true){
+  			<?php
+				require_once('Connections/test.php'); 
+				mysqli_query($test, "delete from PatientInfo where Hospital_ID like '$delid'");
+				mysqli_query($test, "delete from ClinicalInfo where Hospital_ID like '$delid'");
+				mysqli_query($test, "delete from TreatmentInfo where Hospital_ID like '$delid'");		
+				
+			?>
+			alert("Successfully Deleted!!");
+		}
+		else if(con_test == false){
+			alert("Canceled!");
+  			
+		}
+	</script>
+<?php
+}
+
+
+
 if(strlen($preId)!=0 and strlen($postId) !=0){ 
 require_once('Connections/test.php'); 
 
@@ -69,6 +96,12 @@ $prevsNum = mysqli_num_rows($prevs);
 $aftQuery = "select * from PatientInfo where Hospital_ID like '$postId'";
 $afts = mysqli_query($test, $aftQuery);
 $aftsNum = mysqli_num_rows($afts);
+
+
+
+
+
+
 
 if($prevsNum==0){
 	echo("등록되지 않은 환자 입니다. 아이디를 확인 해 주세요.");
@@ -531,7 +564,38 @@ for($idx = 0;$idx<$numPends;$idx++){
 
 
 
+      <article class="container">
+        <div class="page-header">
+          <h3>Drop Patient</h3>
+        </div>
 
+
+
+<table class="table">
+  <thead class="thead-dark">	
+	<tr>
+		<td>
+			Hospital ID
+		</td>
+		<td align=right>
+			Action
+		</td>
+		
+	</tr>
+  </thead>
+
+<form action="pending.php" method=post>
+	<tr>
+	<td>
+              <input type="text" class="form-control" id="Id" name = "delid" placeholder="Hospital ID">
+	</td>
+	<td align=right>		
+              <button type="submit" class="btn btn-info">Delete<i class="fa fa-check spaceLeft"></i></button>
+	</td>
+	</form>		
+</tr>
+</table>
+      </article>
 
 
 
