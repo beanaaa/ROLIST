@@ -823,7 +823,6 @@ if ((isset($_POST["MM_update"])) && (($_POST["MM_update"] == "form1") or ($_POST
 
 
   $manuals = $_POST['Manual'];
-
   //   Method나 Linac이 비어 있다면 이전 엔트리를 복사한다.
   $Method_ = $_POST['Method'];
   for($idmtd=1;$idmtd<count($Method_);$idmtd++){
@@ -1018,10 +1017,11 @@ mysqli_query($test, "set session character_set_client=latin1;");
 	if(strlen($Manuals)==0){
 		$Manuals = 0;
 	}
-                       $curstats = $_POST['CurrentStatus_menu'];
-                       if(strlen($curstats)==0){
-	                       $curstats = "0";
-                       }
+	
+   $curstats = $_POST['CurrentStatus_menu'];
+   if(strlen($curstats)==0){
+       $curstats = "0";
+   }
 
 	$pAge = $_POST['txt_age'];
 	if(strlen($_POST['txt_age'])==0){
@@ -1218,8 +1218,10 @@ mysqli_query($test, "set session character_set_client=latin1;");
 		
 
 
+// 		echo($row_editinfo[ManualEdit]);
+
 // 		업데이트! Manual을 선택하면 자동 계산되는 파트가 무시됨
-		if(strcmp($row_editinfo[ManualEdit],"1")==0){
+		if(($Manuals)==1){
 // 			echo("Manual!!");
 			if(strtotime($Start_[$i])<strtotime("1/1/00")){
 				$Start_Date[$i] = "";
@@ -1248,7 +1250,7 @@ mysqli_query($test, "set session character_set_client=latin1;");
 			}			
 		}
 
-
+		
  		}
  		else{
 	 		
@@ -1328,7 +1330,6 @@ mysqli_query($test, "set session character_set_client=latin1;");
 
 		}
 		
-	
 	$tVals = $idx_;
     for($i = $tVals; $i < 8; $i++){ 	     
 	    $idx_ = $i+1;

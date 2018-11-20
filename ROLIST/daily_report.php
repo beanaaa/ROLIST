@@ -5062,7 +5062,7 @@ do {
 	<script>
 	function buttonNew_click() {
 		<?php
-		echo "window.open('N_register_all.php?permit=$permitUser', '_blank', 'width=1100px, height=750, toolbar=no, menubar=no, resizable=no, copyhistory=no' );"; ?>
+		echo "window.open('N_register_all.php?permit=$permitUser', '_blank', 'width=1100px, toolbar=no, menubar=no, resizable=no, copyhistory=no' );"; ?>
 	}
 	</script>
 	
