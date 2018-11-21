@@ -249,30 +249,6 @@ table.type05 {
     border-left: 3px solid rgba(117, 154, 240, 0.98); /* red 50 (ibm design colors) */
 	margin : 20px 10px;
 }
-table.typeCal {
-    border-collapse: collapse;
-    text-align: left;
-    line-height: 1.5;
-    border-top: 1px solid #ccc;
-    border-left: 3px solid rgba(117, 154, 240, 0.98); /* red 50 (ibm design colors) */
-	margin : 5px 5px;
-}
-table.typeCal th {
-/*     width: 147px; */
-    padding: 1px;
-/*     font-weight: bold; */
-    vertical-align: top;
-    color: #f13e5c;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-}
-table.typeCal td {
-/*     width: 349px; */
-    padding: 1px;
-    vertical-align: top;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-}
 
 input{
     margin: 0px ; 
@@ -633,17 +609,16 @@ mysqli_query($test, $UPDATESQLManual);
 		$row_PrevCT = mysqli_fetch_assoc($PrevCT);
 
 
-		if(strlen($Order_[$i])==0){
+		if(strlen(trim($Order_[$i]))==0){
 			$Order_[$i] = 0;
 		}
 		
-		if(($Order_[$i])>=0){
+		if(($Order_[$i])>=0 and strlen($Order_[$i])!=0){
 			$Timeupdate = " $Q_CTTime = '$Order_[$i]',";
 		}
 		else{
 			$Timeupdate = "";
 		}
-
 		
 
 // 		업데이트! Manual을 선택하면 자동 계산되는 파트가 무시됨
@@ -694,7 +669,7 @@ mysqli_query($test, $UPDATESQLManual);
 
 	
 
-		//echo $UPDATESQL3;
+
 		$UPDATE_Result3 = mysqli_query($test, $UPDATESQL3);
 
 		if($UPDATE_Result3 == TRUE){
@@ -2013,24 +1988,15 @@ $cleanup = "delete from Timer where STR_TO_DATE(date1, '%m/%d/%Y') < '$now_date'
 // mysqli_query($test, $cleanup);
 ?>
 
-
-
-
-
-
-
-
-
-<?php $dumDose=0; ?>
-<table class="typeCal" width="960px" border="0" cellspacing="1" cellpadding="5" align="left">
-  	<tr height="30">
-<!-- 	  	<td width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"><center> Sun  </center></td>	  	 -->
-	  	<td width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"><center> Mon  </center></td>
-		<td width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"><center>Tue</center></td> 
-		<td width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"> <center>Wed</center></td> 
-		<td width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"> <center>Thu</center></td>
-		<td width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"> <center>Fri</center></td>		
-<!-- 	  	<td width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"><center> Sat  </center></td> -->
+<table class="type05" id="MeetingTable" width="960px" border="1" cellspacing="1" cellpadding="1" align="center" >
+  	<tr height="30" valign="top">
+<!-- 	  	<th width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"><center> Sun  </center></th>	  	 -->
+	  	<th width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"><center> MON  </center></th>
+		<th width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"><center>Tue</center></th> 
+		<th width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"> <center>Wed</center></th> 
+		<th width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"> <center>Thu</center></th>
+		<th width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"> <center>Fri</center></th>		
+<!-- 	  	<th width="192px" scope="row" bgcolor="#1C73B9" style="color: #FFFFFF"><center> Sat  </center></th> -->
 		
   	</tr>
 
@@ -2038,28 +2004,18 @@ $cleanup = "delete from Timer where STR_TO_DATE(date1, '%m/%d/%Y') < '$now_date'
 // 	echo($row_treatmentinfo[CT_Sim1]);	  	
 // 	echo($row_treatmentinfo[RT_fin_f]);	  	
  	$weekDays= date("w",strtotime($row_treatmentinfo[CT_Sim1]));  
+
 	$Rtdate = strtotime($row_treatmentinfo[CT_Sim1]); // 20120101 같은 포맷도 잘됨
 	$mondayChecker = "-".$weekDays." days";
 	$stDate = date("m/d/y",strtotime($mondayChecker,strtotime($row_treatmentinfo[CT_Sim1])));
 
-  if(strlen($row_treatmentinfo[CT_Sim1])<2){
-      $stDate = date("m/d/y",strtotime($mondayChecker,strtotime($row_treatmentinfo[RT_start1])));
-
-  }
-  $diffDate = strtotime($row_treatmentinfo[CT_Sim1]);
-  if(strlen($row_treatmentinfo[CT_Sim1])<2){
-      $diffDate = strtotime($row_treatmentinfo[RT_start1]);
-
-  }
-
-
 	$RtdateF = strtotime($row_treatmentinfo[RT_fin_f]);
-	$diff = abs(strtotime($row_treatmentinfo[RT_fin_f]) -  $diffDate);
+	$diff = abs(strtotime($row_treatmentinfo[RT_fin_f]) - strtotime($row_treatmentinfo[CT_Sim1]));
 	$years = floor($diff / (365*60*60*24));
 	$months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
 	$days = floor(($diff/(60*60*24)));
 	
-
+	
  
  
 // 	echo(floor($days/7));
@@ -2069,11 +2025,10 @@ $cleanup = "delete from Timer where STR_TO_DATE(date1, '%m/%d/%Y') < '$now_date'
 	
 	$dayPlus = 0;
 	$Mon = substr($stDate,0,2);
-  if($numWeeks<50){
 	for ($idWeeks = 0; $idWeeks<$numWeeks+3; $idWeeks++){ 
   	?>
   	
-  	<tr height="30">
+  	<tr height="30" valign="top">
 	  	<?php
 		  	
 	  		for ($idDays = 0; $idDays<7; $idDays++){ 		  	
@@ -2115,213 +2070,48 @@ $cleanup = "delete from Timer where STR_TO_DATE(date1, '%m/%d/%Y') < '$now_date'
 			  	if(strcmp(Date("n/j/y"),date("n/j/y",strtotime($tDate)))==0){
 				  	$bCol = "#f5e7eb";				  	 /* magenta 1 (ibm design colors) */
 			  	}
-
-          mysqli_query($test, "set session character_set_client=utf8");
-          mysqli_query($test, "set session character_set_connection=utf8");  
-          mysqli_query($test, "set session character_set_results=utf8"); 
-
-
-          $holdate = date("Y-m-d",strtotime($tDate));
-          $holquery = "Select * from Holiday where solar_date like '$holdate'";
-			  	$row_holiday = mysqli_fetch_assoc(mysqli_query($test, $holquery));
-          if(strlen($row_holiday[memo])>0){
-            $bCol = "#EEEEEE";
-
-          }
-          $holmarker = $row_holiday[memo];
-          mysqli_query($test, "set session character_set_connection=latin1;");
-          mysqli_query($test, "set session character_set_results=latin1;");
-          mysqli_query($test, "set session character_set_client=latin1;");
-
-
+			  	
 			  	?>
 			  	
 			  	
 			  	<?php
 				  	 	if(date("w",strtotime($tDate))!=6 and date("w",strtotime($tDate))!=0){   
 
-        $tDates = date("n/j/y",strtotime($tDate));      
-
-        $hisID = $row_patientinfo['Hospital_ID'];
-
 				?>
+	  			<th height="120px" width="192px" scope="row" bgcolor=<?php echo($bCol);?> style="color: #000000">
 
-	  	<td  <?php echo($celCanceled); ?>  height="70px" width="192px" scope="row" bgcolor=<?php echo($bCol);?> style="color: #000000">
 		  		<p align="right">
 
 <?php			  	
-
-			  	
-			  $dateMarker = "<font color=$tCol size = '3'>".substr($tDate,$strInits,$strLens)."</font>";
+			  	echo("<font color=$tCol>");
+				echo(substr($tDate,$strInits,$strLens));  	
+				echo("</font>");
+				$tDates = date("n/j/y",strtotime($tDate));			
+				
 
 			?>
-		  	
-		  	
+		  	</p>
+
 		  	<?php
-			$doseMarker = "";
-			if(strcmp($row_treatmentinfo[RT_start1],$tDates)==0){
-				$fxDose = $row_treatmentinfo[dose1]/$row_treatmentinfo[Fx1];
-				$dateMarker = "<font color=red size = '3'>START </font>".$dateMarker;
-				$doseMarker = "$row_treatmentinfo[Site1]<br>$row_treatmentinfo[dose1] Gy: $fxDose Gy X $row_treatmentinfo[Fx1] fx.<br>";	
-			}
-			if(strcmp($row_treatmentinfo[RT_fin_f],$tDates)==0){
-				$dateMarker = "<font color=red size = '3'>FIN </font>".$dateMarker;
-			}
+			  	if(strtotime($row_treatmentinfo[RT_start1])<=strtotime($tDate) and strtotime($row_treatmentinfo[RT_fin_f])>=strtotime($tDate)){
 
-	  		$hisID = $row_patientinfo['Hospital_ID'];
-			$queryMemo = "Select * from MeetingList where (Date like '$tDates' AND Hospital_ID like $hisID)";
+		  	?>
 
-			$MemoInfo = mysqli_query($test, $queryMemo )  ;
-			$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
-			$total_Memoinfo = mysqli_num_rows($MemoInfo);
-			
-			if($total_Memoinfo>0){
-				$dateMarker = "<font color = #9753e1 size = '3'>EXAM </font>".$dateMarker;
-			}
+	  		<?php
+		  	$datetimeTd = substr($tDate,0,strlen($tDate));
+		  	$datetimeTd = date("n/j/y", strtotime($datetimeTd));
+	
+			mysqli_select_db($database_test );
+			$query_timerinfo  = sprintf("SELECT * FROM Timer WHERE Hospital_ID like '%s' and date1 like '%s'", ($colname_Hospital_ID  ),$datetimeTd);
+			echo($$query_timerinfo );
+			$timerinfo = mysqli_query($test, $query_timerinfo );
+			$row_timerinfo = mysqli_fetch_assoc($timerinfo);
+			 // echo($row_timerinfo[time1]);
+			//  print_r($row_timerinfo);
 
-
-
-
-			for($idresim=2;$idresim<$row_treatmentinfo[idx]+1;$idresim++){
-				$reorder = "RT_start".$idresim;
-				$Fxorder = "Fx".$idresim;
-				$Doseorder = "dose".$idresim;
-
-				if(strcmp($row_treatmentinfo[$reorder],$tDates)==0 and strcmp($row_treatmentinfo[$Fxorder],'0') !=0){
-					$fxDose = $row_treatmentinfo[$Doseorder]/$row_treatmentinfo[$Fxorder];
-					$dateMarker = "<font color=blue size = '3'>RF </font>".$dateMarker;
-					$doseMarker = "$row_treatmentinfo[Site2]<br>$row_treatmentinfo[dose2] Gy: $fxDose Gy X $row_treatmentinfo[Fx2] fx.<br>";	
-					
-				}
-				
-			}
-
-
-/*
-			if(strcmp($row_treatmentinfo[RT_start2],$tDates)==0 and strcmp($row_treatmentinfo[Fx2],'0') !=0){
-				$fxDose = $row_treatmentinfo[dose2]/$row_treatmentinfo[Fx2];
-				$dateMarker = "<font color=blue size = '3'>RF </font>".$dateMarker;
-				$doseMarker = "$row_treatmentinfo[Site2]<br>$row_treatmentinfo[dose2] Gy: $fxDose Gy X $row_treatmentinfo[Fx2] fx.<br>";	
-				
-			}
-			if(strcmp($row_treatmentinfo[RT_start3],$tDates)==0 and strcmp($row_treatmentinfo[Fx3],'0') !=0){
-				$fxDose = $row_treatmentinfo[dose3]/$row_treatmentinfo[Fx3];
-				$dateMarker = "<font color=blue size = '3'>RF </font>".$dateMarker;
-				$doseMarker = "$row_treatmentinfo[Site3]<br>$row_treatmentinfo[dose3] Gy: $fxDose Gy X $row_treatmentinfo[Fx3] fx.<br>";	
-			}
-			if(strcmp($row_treatmentinfo[RT_start4],$tDates)==0 and strcmp($row_treatmentinfo[Fx4],'0') !=0){
-				$fxDose = $row_treatmentinfo[dose4]/$row_treatmentinfo[Fx4];
-				$dateMarker = "<font color=blue size = '3'>RF </font>".$dateMarker;
-				$doseMarker = "$row_treatmentinfo[Site4]<br>$row_treatmentinfo[dose4] Gy: $fxDose Gy X $row_treatmentinfo[Fx4] fx.<br>";	
-
-			}
-			if(strcmp($row_treatmentinfo[RT_start5],$tDates)==0 and strcmp($row_treatmentinfo[Fx5],'0') !=0){
-				$fxDose = $row_treatmentinfo[dose5]/$row_treatmentinfo[Fx5];
-				$dateMarker = "<font color=blue size = '3'>RF </font>".$dateMarker;
-				$doseMarker = "$row_treatmentinfo[Site5]<br>$row_treatmentinfo[dose5] Gy: $fxDose Gy X $row_treatmentinfo[Fx5] fx.<br>";	
-			}
-			if(strcmp($row_treatmentinfo[RT_start6],$tDates)==0 and strcmp($row_treatmentinfo[Fx6],'0') !=0){
-				$fxDose = $row_treatmentinfo[dose6]/$row_treatmentinfo[Fx6];
-				$dateMarker = "<font color=blue size = '3'>RF </font>".$dateMarker;
-				$doseMarker = "$row_treatmentinfo[Site6]<br>$row_treatmentinfo[dose6] Gy: $fxDose Gy X $row_treatmentinfo[Fx6] fx.<br>";	
-			}
-			if(strcmp($row_treatmentinfo[RT_start7],$tDates)==0 and strcmp($row_treatmentinfo[Fx7],'0') !=0){
-				$fxDose = $row_treatmentinfo[dose7]/$row_treatmentinfo[Fx7];
-				$dateMarker = "<font color=blue size = '3'>RF </font>".$dateMarker;
-				$doseMarker = "$row_treatmentinfo[Site7]<br>$row_treatmentinfo[dose7] Gy: $fxDose Gy X $row_treatmentinfo[Fx7] fx.<br>";	
-			}
-*/
-
-
-      if(strcmp($row_treatmentinfo[RT_start2],$tDates)==0 and strcmp($row_treatmentinfo[Fx2],'0') ==0){
-        $fxDose = $row_treatmentinfo[dose2]/$row_treatmentinfo[Fx2];
-        $dateMarker = "<font color=blue size = '3'>PLCH </font>".$dateMarker;
-        $doseMarker = "";  
-        
-      }
-      if(strcmp($row_treatmentinfo[RT_start3],$tDates)==0 and strcmp($row_treatmentinfo[Fx3],'0') ==0){
-        $fxDose = $row_treatmentinfo[dose3]/$row_treatmentinfo[Fx3];
-        $dateMarker = "<font color=blue size = '3'>PLCH </font>".$dateMarker;
-        $doseMarker = "";  
-      }
-      if(strcmp($row_treatmentinfo[RT_start4],$tDates)==0 and strcmp($row_treatmentinfo[Fx4],'0') ==0){
-        $fxDose = $row_treatmentinfo[dose4]/$row_treatmentinfo[Fx4];
-        $dateMarker = "<font color=blue size = '3'>PLCH </font>".$dateMarker;
-        $doseMarker = "";  
-
-      }
-      if(strcmp($row_treatmentinfo[RT_start5],$tDates)==0 and strcmp($row_treatmentinfo[Fx5],'0') ==0){
-        $fxDose = $row_treatmentinfo[dose5]/$row_treatmentinfo[Fx5];
-        $dateMarker = "<font color=blue size = '3'>PLCH </font>".$dateMarker;
-        $doseMarker = "";  
-      }
-      if(strcmp($row_treatmentinfo[RT_start6],$tDates)==0 and strcmp($row_treatmentinfo[Fx6],'0') ==0){
-        $fxDose = $row_treatmentinfo[dose6]/$row_treatmentinfo[Fx6];
-        $dateMarker = "<font color=blue size = '3'>PLCH </font>".$dateMarker;
-        $doseMarker = "";  
-      }
-      if(strcmp($row_treatmentinfo[RT_start7],$tDates)==0 and strcmp($row_treatmentinfo[Fx7],'0') ==0){
-        $fxDose = $row_treatmentinfo[dose7]/$row_treatmentinfo[Fx7];
-        $dateMarker = "<font color=blue size = '3'>PLCH </font>".$dateMarker;
-        $doseMarker = "";  
-      }
-
-      if(strcmp($bCol,"#EEEEEE")==0){
-        // $fxDose = $row_treatmentinfo[dose7]/$row_treatmentinfo[Fx7];
-        $dateMarker = "<font color=#666666 size = '3'>$holmarker </font>".$dateMarker;
-        $doseMarker = "";  
-      }
-
-      $bCol = "#EEEEEE";
-			
-			
-			if(strcmp($row_treatmentinfo[CT_Sim1],$tDates)==0){
-				$dateMarker = "<font color=#00884b size = '3'>SIM </font>".$dateMarker;
-				
-			}
-			
-			for($idresim=2;$idresim<$row_treatmentinfo[idx]+1;$idresim++){
-				$Simorder = "CT_Sim".$idresim;
-
-				if(strcmp($row_treatmentinfo[$Simorder],$tDates)==0){
-					$dateMarker = "<font color=#00884b size = '3'>RESIM </font>".$dateMarker;
-					
-				}
-				
-			}
-			
-
-
-        $recMarker = "";
-
-        for($i=0; $i<$total_Statinfo; $i = $i+1){ 
-
-          if($DoseM>0){
-            $dumDose = $dumDose+(float)$DoseM;
-            $curDose = sprintf("%.2f", $dumDose);
-            $recMarker = $curDose;
-          }
-
-          if($Stated>0){
-            $recMarker = $recMarker."/".$statVar[(int)$Stated]." ";
-          }
-
-
-          }
-		  $datetimeTd = substr($tDate,0,strlen($tDate));
-		  $datetimeTd = date("n/j/y", strtotime($datetimeTd));
-
-		mysqli_select_db($database_test );
-		$query_timerinfo  = sprintf("SELECT * FROM Timer WHERE Hospital_ID like '%s' and date1 like '%s'", ($colname_Hospital_ID  ),$datetimeTd);
-		echo($$query_timerinfo );
-		$timerinfo = mysqli_query($test, $query_timerinfo );
-		$row_timerinfo = mysqli_fetch_assoc($timerinfo);
-
-
-      echo "$recMarker";
-      $recMarker = "";
-			echo($dateMarker);
-			echo("</p>");
+		  		
+		  		
+		  		
 		    echo "<form id=form111 name=form111></form>";
 		    echo "<form id=form3 name=form3 method=post action=N_edit_sim.php>"; 
 		    echo "<input size=3 name=spctime id=spctime value=$row_timerinfo[time1]>";                       
@@ -2336,62 +2126,125 @@ $cleanup = "delete from Timer where STR_TO_DATE(date1, '%m/%d/%Y') < '$now_date'
 		    echo "<input name=hf_edit type=hidden id=hf_edit value= $row_patientinfo[Hospital_ID] /></a>";    
 		    echo "<input name=hf_fin type=hidden id=hf_fin value= $row_treatmentinfo[RT_fin_f] /></a></form>";    
 
+		    ?>
 
-			echo($doseMarker);
+
+
+
+			<?php } ?>			  	
+		  	<?php
+// 			echo($row_treatmentinfo[RT_start1]);
 			
+			if(strcmp($row_treatmentinfo[RT_start1],$tDates)==0){
+				$fxDose = $row_treatmentinfo[dose1]/$row_treatmentinfo[Fx1];
+				echo("<font color=red>Start ($row_treatmentinfo[Site1]) <br> $row_treatmentinfo[dose1] Gy: $fxDose Gy X $row_treatmentinfo[Fx1] fx.</font>");
+			}
+			if(strcmp($row_treatmentinfo[RT_fin_f],$tDates)==0){
+				echo("<font color=red>Fin</font>");
+			}
 			
+			if(strcmp($row_treatmentinfo[RT_start2],$tDates)==0){
+				$fxDose = $row_treatmentinfo[dose2]/$row_treatmentinfo[Fx2];
+				echo("<font color=blue>RF ($row_treatmentinfo[Site2]) <br> $row_treatmentinfo[dose2] Gy: $fxDose Gy X $row_treatmentinfo[Fx2] fx.</font>");
+			}
+			if(strcmp($row_treatmentinfo[RT_start3],$tDates)==0){
+				$fxDose = $row_treatmentinfo[dose3]/$row_treatmentinfo[Fx3];
+				echo("<font color=blue>RF ($row_treatmentinfo[Site3]) <br> $row_treatmentinfo[dose3] Gy: $fxDose Gy X $row_treatmentinfo[Fx3] fx.</font>");
+			}
+			if(strcmp($row_treatmentinfo[RT_start4],$tDates)==0){
+				$fxDose = $row_treatmentinfo[dose4]/$row_treatmentinfo[Fx4];
+				echo("<font color=blue>RF ($row_treatmentinfo[Site4]) <br> $row_treatmentinfo[dose4] Gy: $fxDose Gy X $row_treatmentinfo[Fx4] fx.</font>");
+
+			}
+			if(strcmp($row_treatmentinfo[RT_start5],$tDates)==0){
+				$fxDose = $row_treatmentinfo[dose5]/$row_treatmentinfo[Fx5];
+				echo("<font color=blue>RF ($row_treatmentinfo[Site5]) <br> $row_treatmentinfo[dose5] Gy: $fxDose Gy X $row_treatmentinfo[Fx5] fx.</font>");
+			}
+			if(strcmp($row_treatmentinfo[RT_start6],$tDates)==0){
+				$fxDose = $row_treatmentinfo[dose6]/$row_treatmentinfo[Fx6];
+				echo("<font color=blue>RF ($row_treatmentinfo[Site6]) <br> $row_treatmentinfo[dose6] Gy: $fxDose Gy X $row_treatmentinfo[Fx6] fx.</font>");
+			}
+			if(strcmp($row_treatmentinfo[RT_start7],$tDates)==0){
+				$fxDose = $row_treatmentinfo[dose7]/$row_treatmentinfo[Fx7];
+				echo("<font color=blue>RF ($row_treatmentinfo[Site7]) <br> $row_treatmentinfo[dose7] Gy: $fxDose Gy X $row_treatmentinfo[Fx7] fx.</font>");
+			}
+			
+			if(strcmp($row_treatmentinfo[CT_Sim1],$tDates)==0){
+				echo("<font color=#00884b>Simulation</font>"); /* green 50 (ibm design colors) */
+			}
+			
+			if(strcmp($row_treatmentinfo[CT_Sim2],$tDates)==0){
+				echo("<font color=#00884b>Resim</font>");
+			}
+			if(strcmp($row_treatmentinfo[CT_Sim3],$tDates)==0){
+				echo("<font color=#00884b>Resim</font>");
+			}
+			if(strcmp($row_treatmentinfo[CT_Sim4],$tDates)==0){
+				echo("<font color=#00884b>Resim</font>");
+			}
+			if(strcmp($row_treatmentinfo[CT_Sim5],$tDates)==0){
+				echo("<font color=#00884b>Resim</font>");
+			}
+			if(strcmp($row_treatmentinfo[CT_Sim6],$tDates)==0){
+				echo("<font color=#00884b>Resim</font>");
+			}
+			  	
+			  	echo("<br>");
 			?>
 
-
-
 		  	<?php
 		  		$hisID = $row_patientinfo['Hospital_ID'];
-				$queryMemo = "Select * from OrderTemp where (Date1 like '$tDates' AND Hospital_ID like '$hisID')";
+				$queryMemo = "Select * from MeetingList where (Date like '$tDates' AND Hospital_ID like $hisID)";
 
-				$MemoInfo = mysqli_query($test, $queryMemo )  ;
+				$MemoInfo = mysqli_query($test, $queryMemo ) or die(mysqli_error());
 				$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
 				$total_Memoinfo = mysqli_num_rows($MemoInfo);
 				$sql_Memo = mysqli_query($test, $queryMemo);
-				if($total_Memoinfo>0){
-					echo("Order");
-				}
-				
+				for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
+					$Memo = mysqli_result($sql_Memo, $i,"Memo");
+					if(strlen($Memo)>1){
+					echo("Exam: "); echo($Memo); echo("<br>");
+					}
+					else{
+						echo("Exam"); echo("<br>");
+
+					}
+					}
+			  	?>
+
+		  	
+		  	<?php
+		  		$hisID = $row_patientinfo['Hospital_ID'];
+				$queryMemo = "Select * from MemoTemp where (Date1 like '$tDates' AND Hospital_ID like $hisID)";
+
+				$MemoInfo = mysqli_query($test, $queryMemo ) or die(mysqli_error());
+				$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
+				$total_Memoinfo = mysqli_num_rows($MemoInfo);
+				$sql_Memo = mysqli_query($test, $queryMemo);
 				for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
 					$Memo = mysqli_result($sql_Memo, $i,"Memo1");
-					 echo("<li>");echo($Memo); echo("</li><br>");
+					 echo($Memo); echo("<br>"); 
 					}
 			  	?>
 
-
-
-
-		  	
 		  	<?php
-			  
 		  		$hisID = $row_patientinfo['Hospital_ID'];
-				$queryMemo = "Select * from MemoTemp where (Date1 like '$tDates' AND Hospital_ID like '$hisID')";
+				$queryMemo = "Select * from OrderTemp where (Date1 like '$tDates' AND Hospital_ID like $hisID)";
 
-				$MemoInfo = mysqli_query($test, $queryMemo )  ;
+				$MemoInfo = mysqli_query($test, $queryMemo ) or die(mysqli_error());
 				$row_Memoinfo = mysqli_fetch_assoc($MemoInfo);
 				$total_Memoinfo = mysqli_num_rows($MemoInfo);
-				if($total_Memoinfo>0){
-					echo("Notice<br>");
-				}
 				$sql_Memo = mysqli_query($test, $queryMemo);
 				for($i=0; $i<$total_Memoinfo; $i = $i+1){ 
-					$Memo = mysqli_result($sql_Memo, $i,"Memo1"); 
-						if(trim(strlen($Memo))>15){
-							$Memo = iconv_substr($Memo,0,14,"utf-8")." ...";			
-						}
-					
-					 echo("- ");echo($Memo); echo("<br>");
+					$Memo = mysqli_result($sql_Memo, $i,"Memo1");
+					 echo($Memo); echo("<br>");
 					}
 			  	?>
 		  	
 		  	
 		  	
 		  	
-	  	</td>
+	  	</th>
 	  	<?php
 		  	}
 		  	}
@@ -2405,25 +2258,12 @@ $cleanup = "delete from Timer where STR_TO_DATE(date1, '%m/%d/%Y') < '$now_date'
   	
   	<?php
 	  	}
-    }
 	  	?>
 
 
 </table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<br>
+</div>
 <!--
 
 <table class="type05" width="960px" border="0" cellspacing="1" cellpadding="1" align="center">
@@ -2520,10 +2360,9 @@ $sql_idx = mysqli_query($test, "select idx from MemoTemp where Hospital_ID = '$c
 </table>
 -->
 
+  <hr>
 
-
-<table>  	  
-<tr>
+  	  
     <center><input class="btn btn-default" type="submit" name="btn_update" id="btn_update" value="UPDATE" />
     <input type="hidden" name="H_ID" id = "H_ID" value = "<?php echo $row_treatmentinfo['Hospital_ID'];  ?>" />
     <input type="hidden" name="permit" id = "permit" value="<?php echo $permitUser?>" />
@@ -2532,12 +2371,9 @@ $sql_idx = mysqli_query($test, "select idx from MemoTemp where Hospital_ID = '$c
     </center>     
   
   
+  <hr>
+  <hr>
 </form>
-</tr>
-</table>
-</div>
-<br>
-
 
 <!-- Routine select -->
 
